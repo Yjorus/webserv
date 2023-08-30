@@ -1,0 +1,19 @@
+server {
+	listen PORT_NUMBER;
+	server_name	PLACEHOLDER;
+	root	PLACEHOLDER;
+	host	IP_ADDRESS;
+	index	PLACEHOLDER;
+	error_codes
+	number location_of_page
+	404	folder/file;
+
+	location / {
+
+	}
+
+	location /FOLDER/ {
+
+	}
+
+}
