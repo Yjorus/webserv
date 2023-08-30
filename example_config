@@ -1,19 +1,27 @@
+
+
+#smmfmk
+
+
 server {
 	listen PORT_NUMBER;
 	server_name	PLACEHOLDER;
 	root	PLACEHOLDER;
 	host	IP_ADDRESS;
 	index	PLACEHOLDER;
+	#ooooooo
 	error_codes
 	number location_of_page
 	404	folder/file;
-
-	location / {
+	location / {#WOW
 
 	}
-
 	location /FOLDER/ {
 
 	}
-
 }
+
+
+
+
+

@@ -11,5 +11,6 @@
 # include <unistd.h>
 # include <exception>
 # include <stdexcept>
+# include <vector>
 
 #endif

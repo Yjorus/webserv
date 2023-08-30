@@ -5,6 +5,9 @@
 
 class Webserv
 {
+		int	_server_amount;
+		std::vector<std::string> _server_blocks;
+		
 	public:
 		Webserv();
 		// Webserv(Webserv const &copy);
@@ -15,6 +18,9 @@ class Webserv
 		void		config(std::string conf);
 		int			checkFile(std::string path);
 		std::string	readContent(std::string path);
+		void		storeServerBlocks(std::string &content);
+		size_t		findBlockStart(size_t a, std::string &content);
+		size_t		findBlockEnd(size_t a, std::string &content);
 };
 
 #endif
