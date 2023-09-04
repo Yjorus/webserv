@@ -7,7 +7,7 @@ server {
 	listen PORT_NUMBER;
 	server_name	PLACEHOLDER;
 	root	PLACEHOLDER;
-	host	IP_ADDRESS;
+	host	127.0.0.1;
 	index	PLACEHOLDER;
 	#ooooooo
 	error_codes

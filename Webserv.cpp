@@ -23,7 +23,12 @@ void	Webserv::config(std::string conf)
 		throw std::invalid_argument("File is empty");
 	storeServerBlocks(content);
 	for (int b = 0; b < _server_amount; b++)
+	{
+		Server	server;
+		server.config(_server_blocks[b]);
+		_servers.push_back(server);
 		std::cout << _server_blocks[b] << std::endl;
+	}
 }
 
 int	Webserv::checkFile(std::string path)

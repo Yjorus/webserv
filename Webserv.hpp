@@ -2,11 +2,13 @@
 # define WEBSERV_HPP
 
 # include "AllHeaders.hpp"
+# include "Server.hpp"
 
 class Webserv
 {
 		int	_server_amount;
 		std::vector<std::string> _server_blocks;
+		std::vector<Server>	_servers;
 		
 	public:
 		Webserv();
