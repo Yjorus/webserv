@@ -18,7 +18,6 @@ class Webserv
 		// Webserv	&operator=(Webserv const &assign);
 
 		void		config(std::string conf);
-		int			checkFile(std::string path);
 		std::string	readContent(std::string path);
 		void		storeServerBlocks(std::string &content);
 		size_t		findBlockStart(size_t a, std::string &content);

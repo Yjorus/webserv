@@ -5,9 +5,9 @@
 
 class Server
 {
-		int							_port;
-		uint32_t					_host;
 		unsigned long				_client_body_size;
+		std::string					_host;
+		std::string					_port;
 		std::string					_index;
 		std::string					_server_name;
 		std::string					_root;

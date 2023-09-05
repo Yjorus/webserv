@@ -16,8 +16,10 @@ void	Webserv::config(std::string conf)
 {
 	std::string	content;
 
-	if (checkFile(conf) == -1)
-		throw std::invalid_argument("Not a file or no access");
+	if (checkFile(conf) != 1)
+		throw std::invalid_argument("Not a regular file");
+	if (checkPath(conf, R_OK))
+		throw std::invalid_argument("No access");
 	content = readContent(conf);
 	if (content.empty())
 		throw std::invalid_argument("File is empty");
@@ -29,15 +31,6 @@ void	Webserv::config(std::string conf)
 		_servers.push_back(server);
 		std::cout << _server_blocks[b] << std::endl;
 	}
-}
-
-int	Webserv::checkFile(std::string path)
-{
-	struct stat	a;
-	if (stat(path.c_str(), &a) == 0 && a.st_mode & S_IFREG)
-		return (access(path.c_str(), R_OK));
-	else
-		return (-1);
 }
 
 std::string	Webserv::readContent(std::string path)
