@@ -11,8 +11,9 @@ class Server
 		std::string					_index;
 		std::string					_server_name;
 		std::string					_root;
-		std::map<int, std::string>	_error_pages;
+		std::map<int, std::string>	_error_codes;
 		bool						_directory_listing;
+		std::vector<Location>		_locations;
 
 
 	public:

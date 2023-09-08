@@ -43,6 +43,7 @@ std::vector<std::string>	Server::configSplit(std::string config, std::string sep
 void	Server::config(std::string config)
 {
 	std::vector<std::string>	split;
+	std::vector<std::string>	error_pages;
 	split = configSplit(config += ' ', std::string(" \n\t"));
 	bool	listing = false;
 
@@ -91,32 +92,46 @@ void	Server::config(std::string config)
 			setDirectoryListing(split[++a]);
 			listing = true;
 		}
-		else if ()
-		{}
-		else if ()
-		{}
-		else if ()
-		{}
-		else if ()
-		{}
-		else if ()
-		{}
-		else if ()
-		{}
-		else
-		{}
+		else if (split[a] == "error_pages" && (a + 1) < split.size())
+		{
+			while (++a < split.size())
+			{
+				error_pages.push_back(split[a]);
+				if (split[a].find(';') != std::string::npos)
+					break ;
+				else if (a + 1 >= split.size())
+					throw std::invalid_argument("Invalid error pages in server block");
+			}
+		}
+		else if (split[a] == "location" && (a + 1) < split.size())
+		{
+			std::string	location_path;
 
+			if (split[++a] == "{" || split[a] == "}")
+				throw std::invalid_argument("Invalid location path in server block");
+			location_path = split[a];
+			if (++a >= split.size() || split[a] != "{")
+				throw std::invalid_argument("Invalid location in server block");
+			std::vector<std::string>	location_data;
+			while (++a < split.size() && split[a] != "}")
+				location.data.push_back(split[a]);
+			setLocation(location_path, location_data);
+		}
+		else if (split[a] != "{" && split[a] != "}")
+			throw std::invalid_argument("unsupported argument");
 	}
 	if (this->_root.empty())
 		setRoot("/;");
-	if (this->_host())
+	if (this->_host.empty())
 		setHost("localhost;");
 	if (this->_port.empty())
 		throw std::invalid_argument("No port set");
 	if (this->_index.empty())
 		setIndex("index.html;");
-	if ()
-	
+	if (checkRootAndIndex())
+		throw std::invalid_argument("Index not found or readable");
+	setErrorPages(error_pages);
+	//checkErrorPages here!
 
 }
 
@@ -229,6 +244,17 @@ void	Server::setDirectoryListing(std::string listing)
 	if (listing == "on")
 		this->_directory_listing = true;
 }
+
+void	Server::setErrorPages(std::vector<std::string> pages)
+{
+	if (pages.empty())
+		return ;
+	if (pages.size() % 2)
+		throw std::invalid_argument("invalid error pages argument");
+}
+
+void	Server::setLocation(std::string path, std::vector<std::string> data)
+{}
 
 void	Server::checkSemicolon(std::string &str)
 {
