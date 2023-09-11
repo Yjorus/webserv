@@ -239,8 +239,8 @@ void	Server::setDirectoryListing(std::string listing)
 	checkSemicolon(listing);
 	if (listing != "on" && listing != "off")
 		throw std::invalid_argument("invalid directory listing argument");
-	if (listing == "on")
-		this->_directory_listing = true;
+	else
+		this->_listing = (listing == "on")
 }
 
 void	Server::setErrorPages(std::vector<std::string> pages)
@@ -278,7 +278,35 @@ void	Server::setErrorPages(std::vector<std::string> pages)
 }
 
 void	Server::setLocation(std::string path, std::vector<std::string> data)
-{}
+{
+	Location	location;
+	bool	listing  = false;
+	location.setPath(path);
+	for (size_t a = 0; a < data.size(); a++)
+	{
+		if (data[a] == "listing" && a + 1 < data.size())
+		{
+			if (listing == true)
+				throw std::invalid_argument("duplicate listing argument in location");
+			checkSemicolon(data[++a]);
+			location.setListing(data[a]);
+			listing = true;
+		}
+		if (data[a] == "root" && a + 1 < data.size())
+		{
+			if (!location.getRoot.empty())
+				throw std::invalid_argument("duplicate root argument in location");
+			checkSemicolon(data[++a]);
+			if (checkFile(data[a]) == 2)
+				location.setRoot(data[a]);
+			else if (checkFile(this->_roor + data[a]) == 2)
+				location.setRoot(this->_root + data[a]);
+			else
+				throw std::invalid_argument("duplicate root argument in location");
+		}
+	}
+
+}
 
 void	Server::checkSemicolon(std::string &str)
 {

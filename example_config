@@ -18,6 +18,7 @@ server {
 	}
 	location /FOLDER/ {
 		methods	POST GET;
+		root /LMAO;
 
 	}
 }
