@@ -9,7 +9,6 @@ Server::Server()
 	this->_server_name = "";
 	this->_root = "";
 	this->_directory_listing = false;
-	//this->_error_pages;
 }
 
 Server::Server(Server const &copy)
@@ -131,7 +130,6 @@ void	Server::config(std::string config)
 	if (checkRootAndIndex())
 		throw std::invalid_argument("Index not found or readable");
 	setErrorPages(error_pages);
-	//checkErrorPages here!
 
 }
 
@@ -251,6 +249,32 @@ void	Server::setErrorPages(std::vector<std::string> pages)
 		return ;
 	if (pages.size() % 2)
 		throw std::invalid_argument("invalid error pages argument");
+	for (size_t a = 0; a < pages.size() - 1; a++)
+	{
+		for (size_t b = 0; b < pages[a].size; b++)
+		{
+			if (!std::isdigit(pages[a][b]))
+				throw std::invalid_argument("error_pages argument is invalid");
+		}
+		if (pages[a].size != 3)
+			throw std::invalid_argument("error_pages argument is invalid");
+		int code = my_stoi(pages[a]);
+		if (statusCodes(code) == "WRONG" || codes < 400)
+			throw std::invalid_argument("error_pages argument is invalid");
+		a++;
+		if (a == pages.size() - 1)
+			checkSemicolon(pages[a]);
+		std::string	path = pages[a];
+		if (checkFile(this->_root + path) != 1)
+			throw std::invalid_argument("error_pages argument is invalid");
+		if (checkPath(this->_root + path, 0) == -1 || checkPath(this->_root + path, 4) == -1)
+			throw std::invalid_argument("error_pages argument is invalid");
+		std::map<int, std::string>::iterator it = this->_error_pages.find(code);
+		if (it != this->_error_pages.end())
+			this_error_pages[code] = path;
+		else
+			this->_error_pages.insert(std::make_pair(code, path));
+	}
 }
 
 void	Server::setLocation(std::string path, std::vector<std::string> data)
@@ -258,7 +282,7 @@ void	Server::setLocation(std::string path, std::vector<std::string> data)
 
 void	Server::checkSemicolon(std::string &str)
 {
-	size_t a = str.find(';');
+	size_t a = str.rfind(';');
 	if (a != str.size() - 1)
 		throw std::invalid_argument("Semicolon missing or in incorrect location");
 	str.erase(a);

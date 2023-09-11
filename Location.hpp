@@ -7,6 +7,13 @@ class location
 		std::string	_root;
 		std::string	_index;
 		bool		_listing;
+
 	public:
+
+		Location();
+		Location(Location const &copy);
+		~Location();
+
+		Location	&operator=(Location const &assign);
 };
 #endif

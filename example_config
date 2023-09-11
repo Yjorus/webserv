@@ -10,13 +10,14 @@ server {
 	host	127.0.0.1;
 	index	PLACEHOLDER;
 	#ooooooo
-	error_codes
+	error_pages
 	number location_of_page
 	404	folder/file;
 	location / {#WOW
 
 	}
 	location /FOLDER/ {
+		methods	POST GET;
 
 	}
 }
