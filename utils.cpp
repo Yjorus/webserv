@@ -19,11 +19,11 @@ int my_stoi(std::string str)
 {
 	std::stringstream	ss(str);
 	if (str.length() > 10)
-		throw std::invalid_argument("argument is not an int");
+		throw std::invalid_argument("1argument is not an int");
 	for (size_t a = 0; a < str.size(); a++)
 	{
-		if (str[a] > 9 || str[a] < 0)
-			throw std::invalid_argument("argument is not an int");
+		if (!std::isdigit(str[a]))
+			throw std::invalid_argument("2argument is not an int");
 	}
 	int a;
 	ss >> a;
@@ -38,7 +38,7 @@ int checkFile(std::string path)
 	{
 		if (a.st_mode & S_IFREG)
 			return (1);
-		else if (a.st_mode & s_IFDIR)
+		else if (a.st_mode & S_IFDIR)
 			return (2);
 		else
 			return (3);
@@ -50,6 +50,15 @@ int checkFile(std::string path)
 int	checkPath(std::string path, int flag)
 {
 	return (access(path.c_str(), flag));
+}
+
+int	checkPathAndFile(std::string path, std::string file)
+{
+	if (checkFile(file) == 1 && checkPath(file, 4) == 0)
+		return (0);
+	if (checkFile(path + "/" + file) == 1 && checkPath(path + "/" + file, 4) == 0)
+		return (0);
+	return (1);
 }
 
 std::string	statusCodes(int code)
@@ -148,7 +157,7 @@ std::string	statusCodes(int code)
 			return ("Gateway Timeout");
 		case 505:
 			return ("HTTP Version Not Supported");
-		case default:
+		default:
 			return ("WRONG");
 	}
 }

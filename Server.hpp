@@ -1,7 +1,8 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include "Allheaders.hpp"
+# include "AllHeaders.hpp"
+# include "Location.hpp"
 
 class Server
 {
@@ -24,21 +25,25 @@ class Server
 
 		Server	&operator=(Server const &assign);
 		
-		void	config(std::string config);
-		void	setHost(std::string ip);
-		void	setPort(std::string port);
-		void	setClientBodySize(std::string size);
-		void	setIndex(std::string index);
-		void	setServerName(std::string name);
-		void	setRoot(std::string root);
-		void	setDirectoryListing(std::string listing);
-		void	setErrorPages(); // not sure yet
+		void						config(std::string config);
+		std::vector<std::string>	configSplit(std::string config, std::string separators);
+		void						setHost(std::string ip);
+		void						setPort(std::string port);
+		void						setClientBodySize(std::string size);
+		void						setIndex(std::string index);
+		void						setServerName(std::string name);
+		void						setRoot(std::string root);
+		void						setDirectoryListing(std::string listing);
+		void						setErrorPages(std::vector<std::string> pages);
+		void						setLocation(std::string path, std::vector<std::string> data);
 
 		bool	checkHost(std::string ip);
 		void	checkSemicolon(std::string &str);
+		int		locationCheck(Location &location)const;
+		int		checkDuplicateLocationPaths(void)const;
 
-		int							getPort()const;
-		uint32_t					getHost()const;
+		std::string					getPort()const;
+		std::string					getHost()const;
 		unsigned long				getClientBodySize()const;
 		std::string					getIndex()const;
 		std::string					getServerName()const;

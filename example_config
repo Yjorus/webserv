@@ -4,22 +4,16 @@
 
 
 server {
-	listen PORT_NUMBER;
-	server_name	PLACEHOLDER;
-	root	PLACEHOLDER;
+	listen 80;
+	server_name	Wahoo.com;
+	root	rootdir;
 	host	127.0.0.1;
-	index	PLACEHOLDER;
+	index	index.html;
 	#ooooooo
 	error_pages
-	number location_of_page
-	404	folder/file;
+	404	folder/file.html;
 	location / {#WOW
-
-	}
-	location /FOLDER/ {
-		methods	POST GET;
-		root /LMAO;
-
+		index index.html;
 	}
 }
 
