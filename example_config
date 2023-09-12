@@ -12,7 +12,8 @@ server {
 	client_max_body_size 1;
 	#ooooooo
 	error_pages
-	404	folder/file.html;
+	404	folder/file.html
+	400	folder/file2.html;
 	location / {#WOW
 		index index.html;
 	}

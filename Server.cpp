@@ -302,9 +302,8 @@ void	Server::setErrorPages(std::vector<std::string> pages)
 			throw std::invalid_argument("5error_pages argument is invalid");
 		std::map<int, std::string>::iterator it = this->_error_pages.find(code);
 		if (it != this->_error_pages.end())
-			this->_error_pages[code] = path;
-		else
-			this->_error_pages.insert(std::make_pair(code, path));
+			throw std::invalid_argument("duplicate error page");
+		this->_error_pages.insert(std::make_pair(code, path));
 	}
 }
 
@@ -536,7 +535,12 @@ std::ostream	&operator<<(std::ostream &o, Server const &server)
 	o << "\nindex: " << server.getIndex();
 	o << "\nserverName: " << server.getServerName();
 	o << "\nroot: " << server.getRoot();
-	// o << "\nerrorPages: " << server.getErrorPages();
-	o << "\nListing: " << server.getDirectoryListing() << std::endl;
+	o << "\nerror_pages: ";
+	std::map<int, std::string>	lmao = server.getErrorPages();
+	for (std::map<int, std::string>::const_iterator it = lmao.begin(); it != lmao.end(); ++it)
+	{
+		o << it->first << " " << it->second << "\n";
+	}
+	o << "Listing: " << server.getDirectoryListing() << std::endl;
 	return (o);
 }
