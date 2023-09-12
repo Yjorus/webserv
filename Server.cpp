@@ -162,6 +162,8 @@ void	Server::config(std::string config)
 	if (checkDuplicateLocationPaths())
 		throw std::invalid_argument("Duplicate location paths");
 	setErrorPages(error_pages);
+	if (!this->_client_body_size)
+		this->_client_body_size = 10000; //PLACEHOLDER
 }
 
 void	Server::setHost(std::string host)
@@ -294,9 +296,9 @@ void	Server::setErrorPages(std::vector<std::string> pages)
 		if (a == pages.size() - 1)
 			checkSemicolon(pages[a]);
 		std::string	path = pages[a];
-		if (checkFile(this->_root + "/" + path) != 1)
+		if (checkFile(this->_root + path) != 1)
 			throw std::invalid_argument("4error_pages argument is invalid");
-		if (checkPath(this->_root + "/" + path, 0) == -1 || checkPath(this->_root + "/" + path, 4) == -1)
+		if (checkPath(this->_root + path, 0) == -1 || checkPath(this->_root + path, 4) == -1)
 			throw std::invalid_argument("5error_pages argument is invalid");
 		std::map<int, std::string>::iterator it = this->_error_pages.find(code);
 		if (it != this->_error_pages.end())
@@ -419,7 +421,7 @@ void	Server::setLocation(std::string path, std::vector<std::string> data)
 		if (this->_client_body_size)
 			location.setClientBodySizeL2(this->_client_body_size);
 		else
-			location.setClientBodySizeL2(10); //PLACEHOLDER
+			location.setClientBodySizeL2(1000); //PLACEHOLDER
 	}
 	if (path != "cgi-bin" && location.getIndexL().empty())
 	{
@@ -524,4 +526,17 @@ std::map<int, std::string>	Server::getErrorPages()const
 bool	Server::getDirectoryListing()const
 {
 	return (this->_directory_listing);
+}
+
+std::ostream	&operator<<(std::ostream &o, Server const &server)
+{
+	o << "\nport: " << server.getPort();
+	o << "\nhost: " << server.getHost();
+	o << "\nbody_size: " << server.getClientBodySize();
+	o << "\nindex: " << server.getIndex();
+	o << "\nserverName: " << server.getServerName();
+	o << "\nroot: " << server.getRoot();
+	// o << "\nerrorPages: " << server.getErrorPages();
+	o << "\nListing: " << server.getDirectoryListing() << std::endl;
+	return (o);
 }

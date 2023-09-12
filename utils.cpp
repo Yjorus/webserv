@@ -7,7 +7,7 @@ unsigned long my_stoul(std::string str)
 		throw std::invalid_argument("argument is not an unsigned long");
 	for (size_t a = 0; a < str.size(); a++)
 	{
-		if (str[a] > 9 || str[a] < 0)
+		if (!std::isdigit(str[a]))
 			throw std::invalid_argument("argument is not an unsigned long");
 	}
 	unsigned long a;

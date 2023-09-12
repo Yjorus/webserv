@@ -29,6 +29,7 @@ void	Webserv::config(std::string conf)
 		Server	server;
 		server.config(_server_blocks[b]);
 		_servers.push_back(server);
+		std::cout << server;
 		std::cout << _server_blocks[b] << std::endl;
 	}
 }

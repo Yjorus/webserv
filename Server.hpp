@@ -50,6 +50,9 @@ class Server
 		std::string					getRoot()const;
 		std::map<int, std::string>	getErrorPages()const;
 		bool						getDirectoryListing()const;
+
 };
+
+std::ostream	&operator<<(std::ostream &o, Server const &server);
 
 #endif
