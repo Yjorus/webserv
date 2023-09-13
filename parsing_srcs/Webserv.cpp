@@ -1,4 +1,4 @@
-#include "Webserv.hpp"
+#include "../inc/Webserv.hpp"
 
 Webserv::Webserv(): _server_amount(0)
 {}
@@ -30,7 +30,22 @@ void	Webserv::config(std::string conf)
 		server.config(_server_blocks[b]);
 		_servers.push_back(server);
 		std::cout << server;
-		std::cout << _server_blocks[b] << std::endl;
+	}
+	if (_server_amount > 1)
+		checkDuplicateServers();
+}
+
+void	Webserv::checkDuplicateServers()
+{
+	std::vector<Server>::iterator it;
+	std::vector<Server>::iterator it2;
+	for (it = this->_servers.begin(); it != this->_servers.end() - 1; it++)
+	{
+		for (it2 = it + 1; it2 != this->_servers.end(); it2++)
+		{
+			if (it->getPort() == it2->getPort() && it->getHost() == it2->getHost() && it->getServerName() == it2->getServerName())
+				throw std::invalid_argument("Duplicate server found");
+		}
 	}
 }
 
@@ -123,4 +138,9 @@ size_t	Webserv::findBlockEnd(size_t a, std::string &content)
 		}
 	}
 	return (a);
+}
+
+std::vector<Server>	Webserv::getServers()
+{
+	return (this->_servers);
 }

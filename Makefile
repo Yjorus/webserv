@@ -1,10 +1,10 @@
-SRCS = main.cpp Webserv.cpp Server.cpp Location.cpp utils.cpp
+SRCS = main.cpp parsing_srcs/Webserv.cpp parsing_srcs/Server.cpp parsing_srcs/Location.cpp parsing_srcs/utils.cpp
 CC = c++
 CPPFLAGS = -Werror -Wall -Wextra -std=c++98
 OBJS = $(SRCS:.cpp=.o)
 RM = rm -rf
 NAME = webserv
-INCLUDES = AllHeaders.hpp Webserv.hpp Server.hpp Location.hpp
+INCLUDES = inc/AllHeaders.hpp inc/Webserv.hpp inc/Server.hpp inc/Location.hpp
 
 all: ${NAME}
 

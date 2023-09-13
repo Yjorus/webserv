@@ -22,6 +22,9 @@ class Webserv
 		void		storeServerBlocks(std::string &content);
 		size_t		findBlockStart(size_t a, std::string &content);
 		size_t		findBlockEnd(size_t a, std::string &content);
+
+		void	checkDuplicateServers();
+		std::vector<Server>	getServers();
 };
 
 #endif

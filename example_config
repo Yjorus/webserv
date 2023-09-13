@@ -18,6 +18,18 @@ server {
 		index index.html;
 	}
 }
+server {
+	index	index.html;
+	root	rootdir/;
+	listen	80;
+	host	127.0.0.1;
+	server_name	Wahoo.be;
+	location /cgi-bin {
+		index	index.html;
+		cgi_path	a/;
+		cgi_extensions	.py;
+	}
+}
 
 
 

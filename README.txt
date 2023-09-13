@@ -1,8 +1,3 @@
-ideas;
+TODO for parsing
 
-->have to check if file is a regular file or a directory often; 
-	=> make a function for that that returns an int that changes according to the file; DONE!
-		-> replace instances where i use stat with a call to that function and just check for an int; DONE!
--> have to check if you can read or write from/to a file often;
-	=> make one for that too that checks access depending on the flag passed; DONE!
-		-> replace instances of access with calls to that function; DONE!
+figure out what kind of cgi will be used and add parsing/ validation for those

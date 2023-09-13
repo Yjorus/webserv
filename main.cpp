@@ -1,5 +1,5 @@
-#include "AllHeaders.hpp"
-#include "Webserv.hpp"
+#include "inc/AllHeaders.hpp"
+#include "inc/Webserv.hpp"
 
 int	main(int ac, char **av)
 {
@@ -11,7 +11,7 @@ int	main(int ac, char **av)
 			if (ac == 2)
 				webserv.config(av[1]);
 			else
-				webserv.config("..");
+				webserv.config("example_config");
 		}
 		catch (std::exception &e)
 		{
