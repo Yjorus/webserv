@@ -25,6 +25,7 @@ class Webserv
 
 		void	checkDuplicateServers();
 		std::vector<Server>	getServers();
+		void	setupServers();
 };
 
 #endif

@@ -4,7 +4,7 @@
 
 
 server {
-	listen 80;
+	listen 2000;
 	server_name	Wahoo.com;
 	root	rootdir/;
 	host	127.0.0.1;
@@ -21,7 +21,7 @@ server {
 server {
 	index	index.html;
 	root	rootdir/;
-	listen	80;
+	listen	2000;
 	host	127.0.0.1;
 	server_name	Wahoo.be;
 	location /cgi-bin {

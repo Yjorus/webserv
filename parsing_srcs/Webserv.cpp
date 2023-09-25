@@ -140,6 +140,25 @@ size_t	Webserv::findBlockEnd(size_t a, std::string &content)
 	return (a);
 }
 
+void	Webserv::setupServers()
+{
+	bool	a = false;
+	for (std::vector<Server>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+	{
+		a = false;
+		for (std::vector<Server>::iterator it2 = this->_servers.begin(); it2 != it; it2++)
+		{
+			if (it->getHost() == it2->getHost() && it->getPort() == it2->getPort())
+			{
+				a = true;
+				it->setFd(it2->getFd());
+			}
+		}
+		if (a == false)
+			it->prepareServer();
+	}
+}
+
 std::vector<Server>	Webserv::getServers()
 {
 	return (this->_servers);

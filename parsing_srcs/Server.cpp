@@ -2,13 +2,14 @@
 
 Server::Server()
 {
-	this->_port = "";
-	this->_host = "";
+	this->_port = 0;
+	this->_host = 0;
 	this->_client_body_size = 0;
 	this->_index = "";
 	this->_server_name = "";
 	this->_root = "";
 	this->_directory_listing = false;
+	this->_fd = 0;
 }
 
 Server::Server(Server const &copy)
@@ -24,6 +25,8 @@ Server::Server(Server const &copy)
 		this->_error_pages = copy._error_pages;
 		this->_directory_listing = copy._directory_listing;
 		this->_locations = copy._locations;
+		this->_fd = copy._fd;
+		this->_address = copy._address;
 	}
 	return ;
 }
@@ -44,6 +47,8 @@ Server	&Server::operator=(Server const &assign)
 		this->_error_pages = assign._error_pages;
 		this->_directory_listing = assign._directory_listing;
 		this->_locations = assign._locations;
+		this->_fd = assign._fd;
+		this->_address = assign._address;
 	}
 	return (*this);
 }
@@ -79,13 +84,13 @@ void	Server::config(std::string config)
 	{
 		if (split[a] == "host" && (a + 1) < split.size() && locs == false)
 		{
-			if (!this->_host.empty())
+			if (this->_host)
 				throw std::invalid_argument("Multiple hosts in server block");
 			setHost(split[++a]);
 		}
 		else if (split[a] == "listen" && (a + 1) < split.size() && locs == false)
 		{
-			if (!this->_port.empty())
+			if (this->_port)
 				throw std::invalid_argument("Multiple ports in server block");
 			setPort(split[++a]);
 		}
@@ -151,9 +156,9 @@ void	Server::config(std::string config)
 	}
 	if (this->_root.empty())
 		setRoot("/;");
-	if (this->_host.empty())
+	if (!this->_host)
 		setHost("localhost;");
-	if (this->_port.empty())
+	if (!this->_port)
 		throw std::invalid_argument("No port set");
 	if (this->_index.empty())
 		setIndex("index.html;");
@@ -170,15 +175,26 @@ void	Server::setHost(std::string host)
 {
 	checkSemicolon(host);
 	if (host == "localhost")
-		this->_host = "127.0.0.1";
+		host = "127.0.0.1";
+	struct in_addr	val;
+	if (myInetAton(host.data(), &val))
+		this->_host = val.s_addr;
 	else
-		this->_host = host;
+		throw std::invalid_argument("invalid host");
 }
 
 void	Server::setPort(std::string port)
 {
 	checkSemicolon(port);
-	this->_port = port;
+	for (size_t a = 0; a < port.size(); a++)
+	{
+		if (!std::isdigit(port[a]))
+			throw std::invalid_argument("port syntax wrong");
+	}
+	int b =  my_stoi(port);
+	if (b < 1 || b > 65535)
+		throw std::invalid_argument("port syntax wrong");
+	this->_port = (uint16_t) b;
 }
 
 void	Server::setClientBodySize(std::string size)
@@ -394,6 +410,11 @@ void	Server::setLocation(std::string path, std::vector<std::string> data)
 	this->_locations.push_back(location);
 }
 
+void						Server::setFd(int value)
+{
+	this->_fd = value;
+}
+
 int		Server::locationCheck(Location &location)const
 {
 	if (location.getPathL() == "/cgi-bin")
@@ -447,12 +468,12 @@ void	Server::checkSemicolon(std::string &str)
 	str.erase(a);
 }
 
-std::string	Server::getPort()const
+uint16_t	Server::getPort()const
 {
 	return(this->_port);
 }
 
-std::string	Server::getHost()const
+uint32_t	Server::getHost()const
 {
 	return (this->_host);
 }
@@ -486,6 +507,30 @@ bool	Server::getDirectoryListing()const
 {
 	return (this->_directory_listing);
 }
+
+int	Server::getFd()const
+{
+	return (this->_fd);
+}
+
+void	Server::prepareServer()
+{
+	_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (_fd == -1)
+		throw std::invalid_argument("Failed to init socket");
+	int	option = 1;
+	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(int));
+	memset(&_address, 0, sizeof(_address));
+	_address.sin_family = AF_INET;
+	_address.sin_port = htons(_port);
+	_address.sin_addr.s_addr = _host;
+	if (bind(_fd, (struct sockaddr *) &_address, sizeof(_address)) == -1)
+	{
+		std::string error = "failed to bind socket: ";
+		throw std::invalid_argument(error + strerror(errno));
+	}
+}
+
 
 std::ostream	&operator<<(std::ostream &o, Server const &server)
 {

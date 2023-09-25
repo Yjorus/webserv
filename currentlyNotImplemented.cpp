@@ -74,3 +74,104 @@ bool	Server::checkHost(std::string ip)
 // 	}
 // 	return (false);
 // }
+
+	// struct	addrinfo hints;
+	// memset(&hints, 0 , sizeof hints);
+	// hints.ai_family = AF_INET;
+	// hints.ai_socktype = SOCK_STREAM;
+	// struct addrinfo *servinfo;
+	// int status = getaddrinfo(this->getHost().c_str(), this->getPort().c_str(), &hints, &servinfo);
+	// if (status)
+	// 	throw std::invalid_argument(gai_strerror(status));
+	// this->_fd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+	// if (this->_fd == -1)
+	// {
+	// 	freeaddrinfo(servinfo);
+	// 	throw std::invalid_argument("Failed to init socket");
+	// }
+	// if( bind(this->_fd, servinfo->ai_addr, servinfo->ai_addrlen) < 0 )
+	// {
+    // 	close(this->_fd);
+    // 	freeaddrinfo(servinfo);
+	// 	throw std::invalid_argument("Failed to bind socket");
+	// }
+	// std::cout << "correct" << std::endl;
+	// freeaddrinfo(servinfo);
+
+int myInetAton(const char *cp, struct in_addr *addr)
+{
+	u_long parts[4];
+	in_addr_t val = 0;
+	const char *c;
+	char *endptr;
+	int gotend, n;
+
+	c = (const char *)cp;
+	n = 0;
+
+	gotend = 0;
+	while (!gotend) {
+		unsigned long l;
+		l = strtoul(c, &endptr, 0);
+
+		if (l == ULONG_MAX || (l == 0 && endptr == c))
+			return (0);
+
+		val = (in_addr_t)l;
+
+		if (endptr == c)
+			return (0);
+		parts[n] = val;
+		c = endptr;
+
+		switch (*c) {
+		case '.' :
+			if (n == 3)
+				return (0);
+			n++;
+			c++;
+			break;
+
+		case '\0':
+			gotend = 1;
+			break;
+
+		default:
+			if (isspace((unsigned char)*c)) {
+				gotend = 1;
+				break;
+			} else {
+
+				/* Invalid character, then fail. */
+				return (0);
+			}
+		}
+
+	}
+
+	switch (n) {
+	case 0:	
+		break;
+	case 1:	
+		if (val > 0xffffff || parts[0] > 0xff)
+			return (0);
+		val |= parts[0] << 24;
+		break;
+
+	case 2:	
+		if (val > 0xffff || parts[0] > 0xff || parts[1] > 0xff)
+			return (0);
+		val |= (parts[0] << 24) | (parts[1] << 16);
+		break;
+
+	case 3:	
+		if (val > 0xff || parts[0] > 0xff || parts[1] > 0xff ||
+		    parts[2] > 0xff)
+			return (0);
+		val |= (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8);
+		break;
+	}
+	if (addr != NULL)
+		addr->s_addr = htonl(val);
+	return (1);
+}

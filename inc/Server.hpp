@@ -7,14 +7,16 @@
 class Server
 {
 		unsigned long				_client_body_size;
-		std::string					_host;
-		std::string					_port;
+		uint32_t					_host;
+		uint16_t					_port;
 		std::string					_index;
 		std::string					_server_name;
 		std::string					_root;
 		std::map<int, std::string>	_error_pages;
 		bool						_directory_listing;
 		std::vector<Location>		_locations;
+		int							_fd;
+		struct sockaddr_in			_address;
 
 
 	public:
@@ -36,20 +38,24 @@ class Server
 		void						setDirectoryListing(std::string listing);
 		void						setErrorPages(std::vector<std::string> pages);
 		void						setLocation(std::string path, std::vector<std::string> data);
+		void						setFd(int value);
 
 		bool	checkHost(std::string ip);
 		void	checkSemicolon(std::string &str);
 		int		locationCheck(Location &location)const;
 		int		checkDuplicateLocationPaths(void)const;
 
-		std::string					getPort()const;
-		std::string					getHost()const;
+		uint16_t					getPort()const;
+		uint32_t					getHost()const;
 		unsigned long				getClientBodySize()const;
 		std::string					getIndex()const;
 		std::string					getServerName()const;
 		std::string					getRoot()const;
 		std::map<int, std::string>	getErrorPages()const;
 		bool						getDirectoryListing()const;
+		int							getFd()const;
+
+		void	prepareServer();
 
 };
 
