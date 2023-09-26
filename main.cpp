@@ -12,6 +12,7 @@ int	main(int ac, char **av)
 				webserv.config(av[1]);
 			else
 				webserv.config("example_config");
+			webserv.setupServers();
 		}
 		catch (std::exception &e)
 		{
@@ -23,5 +24,5 @@ int	main(int ac, char **av)
 		std::cerr << "Invalid number of arguments!" << std::endl;
 		return (1);
 	}
-	return (0);
+	exit (0);
 }
