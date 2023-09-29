@@ -1,6 +1,6 @@
 #include "../inc/Webserv.hpp"
 
-Webserv::Webserv(): _server_amount(0)
+Webserv::Webserv(): _server_amount(0), _epollfd(0), _fdamount(0)
 {}
 
 // Webserv::Webserv(Webserv const &copy)
@@ -140,6 +140,25 @@ size_t	Webserv::findBlockEnd(size_t a, std::string &content)
 	return (a);
 }
 
+void	Webserv::initEvents(struct epoll_event *ev, uint32_t flag, int fd)
+{
+	memset(ev, 0, sizeof(ev));
+	ev->events = flag;
+	ev->data.fd = fd;
+}
+
+void	Webserv::makeServerMap()
+{
+	for (std::vector<Server>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+	{
+		if (listen(it->getFd(), 512) < 0)
+			exit(1);
+		if (fcntl(it->getFd(), F_SETFL, O_NONBLOCK) < 0)
+			exit(1);
+		_servermap.insert(std::make_pair(it->getFd(), *it));
+	}
+}
+
 void	Webserv::setupServers()
 {
 	bool	a = false;
@@ -156,6 +175,93 @@ void	Webserv::setupServers()
 		}
 		if (a == false)
 			it->prepareServer();
+	}
+}
+
+int	Webserv::sameFd(int a)
+{
+	for (std::map<int, Server>::iterator it = this->_servermap.begin(); it != this->_servermap.end(); it++)
+	{
+		if (it->getFd() == a)
+			return (a);
+	}
+	return (-1);
+}
+
+void	Webserv::connectClient(int a)
+{
+	struct epoll_event	ev;
+	struct sockaddr		client_addr;
+	socklen_t			client_len = sizeof(client_addr);
+	int					client_fd;
+	Client				new_client;
+
+	if ((client_fd  = accept(a, (struct sockaddr_in *)&client_addr, &client_len)) < 0)
+		return ;
+	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		close(client_fd);
+		return ;
+	}
+	initEvents(&ev, EPOLLIN, client_fd);
+	if (epoll_ctl(this->_epollfd, EPOLL_CTL_ADD, client_fd, &ev) == -1)
+	{
+		close(client_fd);
+		return ;
+	}
+	_connections.insert(make_pair(client_fd, a));
+	return ;
+}
+
+void	Webserv::initEpoll()
+{
+	struct epoll_event ev;
+	this->_epollfd = epoll_create(10);
+	if (this->_epollfd < 0)
+		exit (1);
+	for (std::map<int, Server>::iterator it = this->_servermap.begin(); it != this->_servermap.end(); it++)
+	{
+		initEvents(&ev, EPOLLIN, it->getFd());
+		if (epoll_ctl(_epollfd, EPOLL_CTL_ADD, it->getFd(), &ev) == -1)
+			exit(1);
+	}
+	initEvents(&ev, EPOLLIN, 0);
+	if (epoll_ctl(_epollfd, EPOLL_CTL_ADD, 0, &ev) == -1)
+		exit(1);
+
+}
+
+void	Webserv::runWebserv()
+{
+	makeServerMap();
+	initEpoll();
+	while (1)
+	{
+		struct	epoll_event	events[10];
+		int		fds = 0;
+		int		a = 0;
+
+		if ((fds = epoll_wait(_epollfd, events, 10, -1)) == -1)
+			break ;
+		for (int b = 0; b < fds; b++)
+		{
+			if ((events[b].events & EPOLLHUP) || (events[b].events & EPOLLERR) || !(events[b].events & EPOLLIN))
+			{
+				close(events[b].data.fd);
+				continue;
+			}
+			else if ((a = sameFd(events[b].data.fd)) >= 0)
+				connectClient(a);
+			else if (events[b].data.fd == 0)
+			{
+				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				break;
+			}
+			else
+			{
+				handleRequest(events[b].data.fd)
+			}
+		}
 	}
 }
 

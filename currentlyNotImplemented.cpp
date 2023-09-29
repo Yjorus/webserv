@@ -175,3 +175,34 @@ int myInetAton(const char *cp, struct in_addr *addr)
 		addr->s_addr = htonl(val);
 	return (1);
 }
+
+void	Webserv::setupServers()
+{
+	bool	a = false;
+	_epollfd = epoll_create(10);
+	if (_epollfd == -1)
+		throw std::invalid_argument("Failed to create epoll fd");
+	struct  epoll_event	ev;
+	for (std::vector<Server>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+	{
+		a = false;
+		for (std::vector<Server>::iterator it2 = this->_servers.begin(); it2 != it; it2++)
+		{
+			if (it->getHost() == it2->getHost() && it->getPort() == it2->getPort())
+			{
+				a = true;
+				it->setFd(it2->getFd());
+			}
+		}
+		if (a == false)
+		{
+			it->prepareServer();
+			initEvents(&ev, EPOLLIN, it->getFd());
+			if (epoll_ctl(_epollfd, EPOLL_CTL_ADD, it->getFd(), &ev) == -1)
+				throw std::invalid_argument("Failed to add entry to interest list of epoll");
+		}
+	}
+	initEvents(&ev, EPOLLIN, 0);
+	if (epoll_ctl(_epollfd, EPOLL_CTL_ADD, 0, &ev) == -1)
+				throw std::invalid_argument("Failed to add entry to interest list of epoll");
+}
