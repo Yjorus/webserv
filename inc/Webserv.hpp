@@ -12,8 +12,8 @@ class Webserv
 		int					_epollfd;
 		size_t					_fdamount;
 		std::map<int, Client>	_clientmap;
-		std::map<int, Server>	_servermap
-		std::map<int, int>		_connections;
+		std::map<int, Server>	_servermap;
+		std::map<int, int>		_connections; //1st client second server
 		
 	public:
 		Webserv();

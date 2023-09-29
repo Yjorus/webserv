@@ -210,6 +210,7 @@ void	Webserv::connectClient(int a)
 		return ;
 	}
 	_connections.insert(make_pair(client_fd, a));
+	_clientmap.insert(client_fd, )
 	return ;
 }
 
