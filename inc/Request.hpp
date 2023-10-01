@@ -4,6 +4,7 @@ class handleRequest
 		std::string	_location; // example /index.html
 		std::string	_host; // example 127.0.0.1
 		std::string	_useragent; // example curl
+		std::string	_body;
 
 	public:
 };
