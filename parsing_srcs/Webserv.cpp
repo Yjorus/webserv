@@ -1,6 +1,6 @@
 #include "../inc/Webserv.hpp"
 
-Webserv::Webserv(): _server_amount(0), _epollfd(0), _fdamount(0)
+Webserv::Webserv(): _server_amount(0)
 {}
 
 // Webserv::Webserv(Webserv const &copy)
@@ -138,16 +138,6 @@ size_t	Webserv::findBlockEnd(size_t a, std::string &content)
 		}
 	}
 	return (a);
-}
-
-int	Webserv::sameFd(int a)
-{
-	for (std::map<int, Server>::iterator it = this->_servermap.begin(); it != this->_servermap.end(); it++)
-	{
-		if (it->getFd() == a)
-			return (a);
-	}
-	return (-1);
 }
 
 std::vector<Server>	Webserv::getServers()

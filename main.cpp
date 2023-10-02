@@ -1,5 +1,6 @@
 #include "inc/AllHeaders.hpp"
 #include "inc/Webserv.hpp"
+#include "inc/RunServer.hpp"
 
 int	main(int ac, char **av)
 {
@@ -13,7 +14,7 @@ int	main(int ac, char **av)
 				webserv.config(av[1]);
 			else
 				webserv.config("example_config");
-			run.setupServers(webserv.getServers);
+			run.setupServers(webserv.getServers());
 		}
 		catch (std::exception &e)
 		{

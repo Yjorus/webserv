@@ -1,5 +1,19 @@
+#ifndef RUNSERVER_HPP
+# define RUNSERVER_HPP
+
+# include "AllHeaders.hpp"
+# include "Client.hpp"
+# include "Server.hpp"
+
 class	RunServer
 {
+	fd_set	_read_fds;
+	fd_set	_write_fds;
+	int		_highest_fd;
+	std::vector<Server>	_servers;
+	std::map<int, Client>	_clientmap;
+	std::map<int, Server>	_servermap;
+
 	public:
 		RunServer();
 		~RunServer();
@@ -15,3 +29,5 @@ class	RunServer
 		void	setupSets();
 		void	readRequest(int a, Client &client);
 };
+
+#endif

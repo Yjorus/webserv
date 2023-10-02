@@ -1,3 +1,5 @@
+#include "../inc/RunServer.hpp"
+
 void	RunServer::setupServers(std::vector<Server> servers)
 {
 	_servers = servers;
@@ -62,7 +64,7 @@ void	RunServer::serverLoop()
 	while (1)
 	{
 		timeout.tv_sec = 1;
-		timeout.tvusec = 0;
+		timeout.tv_usec = 0;
 		read_fds = _read_fds;
 		write_fds = _write_fds;
 		if ( (a = select(_highest_fd + 1, &read_fds, &write_fds, NULL, &timeout)) < 0)
