@@ -1,5 +1,11 @@
 #include "../inc/RunServer.hpp"
 
+RunServer::RunServer()
+{}
+
+RunServer::~RunServer()
+{}
+
 void	RunServer::setupServers(std::vector<Server> servers)
 {
 	_servers = servers;
@@ -114,4 +120,24 @@ void	RunServer::setupSets()
 }
 
 void	RunServer::readRequest(int a, Client &client)
-{}
+{
+	char	buffer[10000];
+	int		read_ret_val = 0;
+	size_t	request_size = 0; 
+	std::string	request;
+	read_ret_val = read(a, buffer, 10000);
+	if (read_ret_val <= 0)
+	{
+		removeClient(a);
+		return ;
+	}
+	while (read_ret_val != 0)
+	{
+		request = buffer;
+		request_size += read_ret_val;
+		client.updateRequest(request);
+		memset(buffer, 0, sizeof(buffer));
+		read_ret_val = read(a, buffer, 10000);
+	}
+	client.getRequest().parseRequest(client.getRequestStr(), request_size);
+}

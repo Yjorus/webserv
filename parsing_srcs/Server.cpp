@@ -254,21 +254,21 @@ void	Server::setErrorPages(std::vector<std::string> pages)
 		for (size_t b = 0; b < pages[a].size(); b++)
 		{
 			if (!std::isdigit(pages[a][b]))
-				throw std::invalid_argument("1error_pages argument is invalid");
+				throw std::invalid_argument("error_pages argument is invalid");
 		}
 		if (pages[a].size() != 3)
-			throw std::invalid_argument("2error_pages argument is invalid");
+			throw std::invalid_argument("error_pages argument is invalid");
 		int code = my_stoi(pages[a]);
 		if (statusCodes(code) == "WRONG" || code < 400)
-			throw std::invalid_argument("3error_pages argument is invalid");
+			throw std::invalid_argument("error_pages argument is invalid");
 		a++;
 		if (a == pages.size() - 1)
 			checkSemicolon(pages[a]);
 		std::string	path = pages[a];
 		if (checkFile(this->_root + path) != 1)
-			throw std::invalid_argument("4error_pages argument is invalid");
+			throw std::invalid_argument("error_pages argument is invalid");
 		if (checkPath(this->_root + path, 0) == -1 || checkPath(this->_root + path, 4) == -1)
-			throw std::invalid_argument("5error_pages argument is invalid");
+			throw std::invalid_argument("error_pages argument is invalid");
 		std::map<int, std::string>::iterator it = this->_error_pages.find(code);
 		if (it != this->_error_pages.end())
 			throw std::invalid_argument("duplicate error page");
