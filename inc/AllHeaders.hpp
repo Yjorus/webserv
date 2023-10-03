@@ -23,8 +23,8 @@
 # include <fcntl.h>
 # include <sys/time.h>
 
-#include <errno.h>
-#include <stdio.h>
+# include <errno.h>
+# include <stdio.h>
 
 int				checkPath(std::string path, int flag);
 int				checkFile(std::string path);
