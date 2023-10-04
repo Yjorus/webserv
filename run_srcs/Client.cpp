@@ -5,6 +5,12 @@ Client::Client()
 	_time = time(NULL);
 }
 
+Client::Client(Server &server)
+{
+	_server = server;
+	_time = time(NULL);
+}
+
 // Client::Client(Client const &copy)
 // {}
 
@@ -16,6 +22,10 @@ Client::~Client()
 
 void	Client::setSocketFd(int fd) {
 	this->_client_fd = fd;
+}
+
+void	Client::setServer(Server &server) {
+	this->_server = server;
 }
 
 int	Client::getSocketFd() {
@@ -30,6 +40,11 @@ void	Client::refreshTime() {
 	this->_time = time(NULL);
 }
 
+Server	Client::getServer() {
+	return (this->_server);
+}
+
 time_t	Client::getTime() {
 	return (this->_time);
 }
+

@@ -31,7 +31,8 @@ Request::~Request()
 //                  ; any VCHAR, except delimiters
 
 bool	Request::isIllegalToken(int c) {
-	if (c == '!' || (c >= 35 && c <= 39) || (c >= 94 && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '*' || c == '+' || c == '-' || c == '.' || c == '|' || c == '~')
+	if (c == '!' || (c >= 35 && c <= 39) || (c >= 94 && c <= 'z') || (c >= 'A' && c <= 'Z') \
+		|| c == '*' || c == '+' || c == '-' || c == '.' || c == '|' || c == '~')
 		return (false);
 	return (true);
 }
@@ -72,7 +73,7 @@ void	Request::addToHeaders(std::string &str1, std::string &str2)
 {
 	trimWhitespace(str1);
 	trimWhitespace(str2);
-	std::cout << str1 << ": " << str2 << std::endl; 
+	// std::cout << str1 << ": " << str2 << std::endl; 
 	this->_headers[str1] = str2;
 }
 
@@ -88,17 +89,19 @@ void	Request::checkHeaders() {
 		if (_headers["Transfer-Encoding"].find_first_of("chunked") != std::string::npos)
 			_ischunked = true;
 	}
-	if (_headers.count("Host"))
-		_host = _headers["Host"];
+	if (_headers.count("Host")) {
+		size_t h = _headers["Host"].find_first_of(":");
+		_host = _headers["Host"].substr(0, h);
+	}
 }
 
 void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 	int					parsechar;
 	std::stringstream	ss;
 
+	std::cout << requeststr << std::endl;
 	for (std::string::size_type a = 0; a < requestsize; a++) {
 		parsechar = requeststr[a];
-		// std::cout << (char)parsechar << std::endl;
 		switch(_step) {
 			case start_parsing: {
 				if (parsechar == 'G')
@@ -122,7 +125,7 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 					return ;
 				}
 				if (_methodindex == _methods[_method].length()) {
-					std::cout << "method: " << _methods[_method] << std::endl;
+					// std::cout << "method: " << _methods[_method] << std::endl;
 					_step = check_first_space;
 				}
 				continue;
@@ -147,21 +150,21 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 				if (parsechar == ' ') {
 					_step = H;
 					_location.append(_buffer);
-					std::cout << "path: " << _buffer << std::endl;
+					// std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
 				else if (parsechar == '?') {
 					_step = check_path_query;
 					_location.append(_buffer);
-					std::cout << "path: " << _buffer << std::endl;
+					// std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
 				else if (parsechar == '#') {
 					_step = check_path_fragment;
 					_location.append(_buffer);
-					std::cout << "path: " << _buffer << std::endl;
+					// std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
@@ -179,14 +182,14 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 				if (parsechar == ' ') {
 					_step = H;
 					_query.append(_buffer);
-					std::cout << "query: " << _buffer << std::endl;
+					// std::cout << "query: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
 				else if (parsechar == '#') {
 					_step = check_path_fragment;
 					_query.append(_buffer);
-					std::cout << "query: " << _buffer << std::endl;
+					// std::cout << "query: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
@@ -204,7 +207,7 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 				if (parsechar == ' ') {
 					_step = H;
 					_fragment.append(_buffer);
-					std::cout << "fragment: " << _buffer << std::endl;
+					// std::cout << "fragment: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
@@ -473,6 +476,14 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 	}
 }
 
+std::string	Request::getServerName() {
+	return (this->_host);
+}
+
 int	Request::getErrorCode() {
 	return (this->_error_code);
+}
+
+bool	Request::isFinished() {
+	return (_step == request_handled);
 }

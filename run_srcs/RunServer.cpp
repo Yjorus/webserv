@@ -26,7 +26,7 @@ void	RunServer::connectClient(Server &server) {
 	struct sockaddr_in		client_addr;
 	socklen_t			client_len = sizeof(client_addr);
 	int					client_fd;
-	Client				new_client;
+	Client				new_client(server);
 
 	if ((client_fd  = accept(server.getFd(), (struct sockaddr *)&client_addr, &client_len)) < 0)
 		return ;
@@ -36,6 +36,7 @@ void	RunServer::connectClient(Server &server) {
 		close(client_fd);
 		return ;
 	}
+	// std::cout << "\nNEW CLIENT " << client_fd << std::endl;
 	new_client.setSocketFd(client_fd);
 	if (_clientmap.count(client_fd) != 0)
 		_clientmap.erase(client_fd);
@@ -47,6 +48,7 @@ void	RunServer::removeClient(int a) {
 		removeFromSet(a, _write_fds);
 	if (FD_ISSET(a, &_read_fds))
 		removeFromSet(a, _read_fds);
+	// std::cout << "\nCLOSING CONNECTION TO " << a << std::endl;
 	close(a);
 	_clientmap.erase(a);
 }
@@ -81,7 +83,6 @@ void	RunServer::serverLoop() {
 void	RunServer::disconnectTimeout() {
 	for (std::map<int, Client>::iterator it = _clientmap.begin(); it != _clientmap.end(); it++) {
 		if ( time(NULL) - it->second.getTime() > 15) {
-			std::cout << "\nTIMEOUT" << std::endl; 
 			removeClient(it->first);
 			return ;
 		}
@@ -131,5 +132,21 @@ void	RunServer::readRequest(int a, Client &client) {
 		client.refreshTime();
 		client.getRequest().parseRequest(buffer, read_ret_val);
 		memset(buffer, 0, sizeof(buffer));
+	}
+	if (client.getRequest().isFinished() || client.getRequest().getErrorCode())
+	{
+		setCorrectServerName(client);
+		std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
+		std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
+	}
+}
+
+void	RunServer::setCorrectServerName(Client &client) {
+	for (std::vector<Server>::iterator it = _servers.begin(); it != _servers.end(); it++) {
+		if (it->getHost() == client.getServer().getHost() && it->getPort() && client.getServer().getPort() \
+		&& it->getServerName() == client.getRequest().getServerName()) {
+			client.setServer(*it);
+			return ;
+		}
 	}
 }

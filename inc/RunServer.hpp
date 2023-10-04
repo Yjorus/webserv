@@ -29,6 +29,7 @@ class	RunServer
 		void	removeFromSet(int a, fd_set &set);
 		void	setupSets();
 		void	readRequest(int a, Client &client);
+		void	setCorrectServerName(Client &client);
 };
 
 #endif

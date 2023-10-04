@@ -78,7 +78,10 @@ class Request
 		void	trimWhitespace(std::string &str);
 		void	checkHeaders();
 
-		int	getErrorCode();
+		int		getErrorCode();
+		std::string	getServerName();
+		
+		bool	isFinished();
 };
 
 #endif
