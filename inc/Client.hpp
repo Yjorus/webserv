@@ -7,8 +7,8 @@
 class Client
 {
 	int			_client_fd;
-	std::string	_request_str;
 	Request		_request;
+	time_t		_time;
 
 	public:
 		
@@ -19,11 +19,11 @@ class Client
 		// Client	&operator=(Client const &assign);
 
 		void	setSocketFd(int fd);
-		void	updateRequest(std::string request);
 
 		int		getSocketFd();
-		std::string	getRequestStr();
 		Request		&getRequest();
+		void		refreshTime();
+		time_t		getTime();
 };
 
 #endif

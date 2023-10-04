@@ -23,6 +23,7 @@ class	RunServer
 		void	setupServers(std::vector<Server> servers);
 		void	connectClient(Server &server);
 		void	removeClient(int a);
+		void	disconnectTimeout();
 		void	serverLoop();
 		void	addToSet(int a, fd_set &set);
 		void	removeFromSet(int a, fd_set &set);

@@ -74,6 +74,17 @@ void	RunServer::serverLoop() {
 			else if (FD_ISSET(b, &write_fds) && _clientmap.count(b))
 			{}
 		}
+		disconnectTimeout();
+	}
+}
+
+void	RunServer::disconnectTimeout() {
+	for (std::map<int, Client>::iterator it = _clientmap.begin(); it != _clientmap.end(); it++) {
+		if ( time(NULL) - it->second.getTime() > 15) {
+			std::cout << "\nTIMEOUT" << std::endl; 
+			removeClient(it->first);
+			return ;
+		}
 	}
 }
 
@@ -117,6 +128,7 @@ void	RunServer::readRequest(int a, Client &client) {
 		return ;
 	}
 	else {
+		client.refreshTime();
 		client.getRequest().parseRequest(buffer, read_ret_val);
 		memset(buffer, 0, sizeof(buffer));
 	}
