@@ -1,7 +1,6 @@
 #include "../inc/Request.hpp"
 
-Request::Request()
-{
+Request::Request() {
 	this->_methods[0] = "GET";
 	this->_methods[1] = "POST";
 	this->_methods[2] = "DELETE";
@@ -31,8 +30,7 @@ Request::~Request()
 //                  / DIGIT / ALPHA
 //                  ; any VCHAR, except delimiters
 
-bool	Request::isIllegalToken(int c)
-{
+bool	Request::isIllegalToken(int c) {
 	if (c == '!' || (c >= 35 && c <= 39) || (c >= 94 && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '*' || c == '+' || c == '-' || c == '.' || c == '|' || c == '~')
 		return (false);
 	return (true);
@@ -40,22 +38,19 @@ bool	Request::isIllegalToken(int c)
 
 
 
-bool	Request::illegalCharLocation(int c)
-{
+bool	Request::illegalCharLocation(int c) {
 	if ((c >= '?' && c <= '[') || (c >= 'a' && c <= 'z') || (c >= '#' && c <= ';') \
 		|| c == '_' || c == ']' || c == '=' || c == '!' || c == '~')
 		return (false);
 	return (true);
 }
 
-bool	Request::checkScopePath(std::string path)
-{
+bool	Request::checkScopePath(std::string path) {
 	std::string	hold(path);
 	char	*pch;
 	pch = strtok((char *)hold.c_str(),"/");
 	int scope = 0;
-	while (pch != NULL)
-	{
+	while (pch != NULL) {
 		if (!strcmp(pch, ".."))
 			scope--;
 		else if (strcmp(pch, "."))
@@ -67,8 +62,7 @@ bool	Request::checkScopePath(std::string path)
 	return (false);
 }
 
-void	Request::trimWhitespace(std::string &str)
-{
+void	Request::trimWhitespace(std::string &str) {
 	const char *ws = " \t";
 	str.erase(0, str.find_first_not_of(ws));
 	str.erase(str.find_last_not_of(ws) + 1);
@@ -82,27 +76,23 @@ void	Request::addToHeaders(std::string &str1, std::string &str2)
 	this->_headers[str1] = str2;
 }
 
-void	Request::checkHeaders()
-{
-	if (_headers.count("content-length"))
-	{
+void	Request::checkHeaders() {
+	if (_headers.count("Content-Length")) {
 		_hasbody = true;
 		std::stringstream ss;
-		ss << _headers["content-length"];
+		ss << _headers["Content-Length"];
 		ss >> _content_length;
 	}
-	if (_headers.count("transfer-encoding"))
-	{
+	if (_headers.count("Transfer-Encoding")) {
 		_hasbody = true;
-		if (_headers["transfer-encoding"].find_first_of("chunked") != std::string::npos)
+		if (_headers["Transfer-Encoding"].find_first_of("chunked") != std::string::npos)
 			_ischunked = true;
 	}
-	if (_headers.count("host"))
-		_host = _headers["host"];
+	if (_headers.count("Host"))
+		_host = _headers["Host"];
 }
 
-void	Request::parseRequest(std::string requeststr, size_t requestsize)
-{
+void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 	int					parsechar;
 	std::stringstream	ss;
 
@@ -472,6 +462,7 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize)
 					_error_code = 400;
 					return ;
 				}
+				std::cout << _body << std::endl;
 				_step = request_handled;
 			}
 			case request_handled: {
@@ -482,7 +473,6 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize)
 	}
 }
 
-int	Request::getErrorCode()
-{
+int	Request::getErrorCode() {
 	return (this->_error_code);
 }
