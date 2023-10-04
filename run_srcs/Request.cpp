@@ -1,4 +1,4 @@
-#include "Request.hpp"
+#include "../inc/Request.hpp"
 
 Request::Request()
 {
@@ -101,213 +101,175 @@ void	Request::checkHeaders()
 		_host = _headers["host"];
 }
 
-void	Request::parseRequest(std::string requeststr, size_t request_size)
+void	Request::parseRequest(std::string requeststr, size_t requestsize)
 {
 	int					parsechar;
 	std::stringstream	ss;
 
-	for (std::string::size_type a = 0; a < requeststr.size(); a++)
-	{
+	for (std::string::size_type a = 0; a < requestsize; a++) {
 		parsechar = requeststr[a];
-		std::cout << (char)parsechar << std::endl;
-		switch(_step)
-		{
-			case start_parsing:
-			{
+		// std::cout << (char)parsechar << std::endl;
+		switch(_step) {
+			case start_parsing: {
 				if (parsechar == 'G')
 					_method = 0;
 				else if (parsechar == 'P')
 					_method = 1;
 				else if (parsechar == 'D')
 					_method = 2;
-				else
-				{
+				else {
 					_error_code = 501;
 					return ;
 				}
 				_step = check_method;
 				continue;
 			}
-			case check_method:
-			{
+			case check_method: {
 				if (parsechar == _methods[_method][_methodindex])
 					_methodindex++;
-				else
-				{
+				else {
 					_error_code = 501;
 					return ;
 				}
-				if (_methodindex == _methods[_method].length())
-				{
+				if (_methodindex == _methods[_method].length()) {
 					std::cout << "method: " << _methods[_method] << std::endl;
 					_step = check_first_space;
 				}
 				continue;
 			}
-			case check_first_space:
-			{
-				if (parsechar != ' ')
-				{
+			case check_first_space: {
+				if (parsechar != ' ') {
 					_error_code = 400;
 					return;
 				}
 				_step = check_slash_path;
 				continue;
 			}
-			case check_slash_path:
-			{
-				if (parsechar != '/')
-				{
+			case check_slash_path: {
+				if (parsechar != '/') {
 					_error_code = 400;
 					return ;
 				}
 				_step = check_path;
 				break;
 			}
-			case check_path:
-			{
-				if (parsechar == ' ')
-				{
+			case check_path: {
+				if (parsechar == ' ') {
 					_step = H;
 					_location.append(_buffer);
 					std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
-				else if (parsechar == '?')
-				{
+				else if (parsechar == '?') {
 					_step = check_path_query;
 					_location.append(_buffer);
 					std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
-				else if (parsechar == '#')
-				{
+				else if (parsechar == '#') {
 					_step = check_path_fragment;
 					_location.append(_buffer);
 					std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
-				else if (illegalCharLocation(parsechar))
-				{
+				else if (illegalCharLocation(parsechar)) {
 					_error_code = 400;
 					return;
 				}
-				else if (a > 2048)
-				{
+				else if (a > 2048) {
 					_error_code = 414;
 					return;
 				}
 				break;
 			}
-			case check_path_query:
-			{
-				if (parsechar == ' ')
-				{
+			case check_path_query: {
+				if (parsechar == ' ') {
 					_step = H;
 					_query.append(_buffer);
 					std::cout << "query: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
-				else if (parsechar == '#')
-				{
+				else if (parsechar == '#') {
 					_step = check_path_fragment;
 					_query.append(_buffer);
 					std::cout << "query: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
-				else if (illegalCharLocation(parsechar))
-				{
+				else if (illegalCharLocation(parsechar)) {
 					_error_code = 400;
 					return;
 				}
-				else if (a > 2048)
-				{
+				else if (a > 2048) {
 					_error_code = 414;
 					return;
 				}
 				break;
 			}
-			case check_path_fragment:
-			{
-				if (parsechar == ' ')
-				{
+			case check_path_fragment: {
+				if (parsechar == ' ') {
 					_step = H;
 					_fragment.append(_buffer);
 					std::cout << "fragment: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
-				else if (illegalCharLocation(parsechar))
-				{
+				else if (illegalCharLocation(parsechar)) {
 					_error_code = 400;
 					return;
 				}
-				else if (a > 2048)
-				{
+				else if (a > 2048) {
 					_error_code = 414;
 					return;
 				}
 				break;
 			}
-			case H:
-			{
-				if (checkScopePath(this->_location) || parsechar != 'H')
-				{
+			case H: {
+				if (checkScopePath(this->_location) || parsechar != 'H') {
 					_error_code = 400;
 					return ;
 				}
 				_step = HT;
 				break ;
 			}
-			case HT:
-			{
-				if (parsechar != 'T')
-				{
+			case HT: {
+				if (parsechar != 'T') {
 					_error_code = 400;
 					return ;
 				}
 				_step = HTT;
 				break;
 			}
-			case HTT:
-			{
-				if (parsechar != 'T')
-				{
+			case HTT: {
+				if (parsechar != 'T') {
 					_error_code = 400;
 					return ;
 				}
 				_step = HTTP;
 				break;
 			}
-			case HTTP:
-			{
-				if (parsechar != 'P')
-				{
+			case HTTP: {
+				if (parsechar != 'P') {
 					_error_code = 400;
 					return ;
 				}
 				_step = HTTP_slash;
 				break;
 			}
-			case HTTP_slash:
-			{
-				if (parsechar != '/')
-				{
+			case HTTP_slash: {
+				if (parsechar != '/') {
 					_error_code = 400;
 					return ;
 				}
 				_step = HTTP_major;
 				break ;
 			}
-			case HTTP_major:
-			{
-				if (parsechar != '1')
-				{
+			case HTTP_major: {
+				if (parsechar != '1') {
 					_error_code = 400;
 					return;
 				}
@@ -315,20 +277,16 @@ void	Request::parseRequest(std::string requeststr, size_t request_size)
 				_step = HTTP_dot;
 				break ;
 			}
-			case HTTP_dot:
-			{
-				if (parsechar != '.')
-				{
+			case HTTP_dot: {
+				if (parsechar != '.') {
 					_error_code = 400;
 					return ;
 				}
 				_step = HTTP_minor;
 				break ;
 			}
-			case HTTP_minor:
-			{
-				if (parsechar != '1')
-				{
+			case HTTP_minor: {
+				if (parsechar != '1') {
 					_error_code = 400;
 					return ;
 				}
@@ -336,20 +294,16 @@ void	Request::parseRequest(std::string requeststr, size_t request_size)
 				_step = first_carriage_return;
 				break ;
 			}
-			case first_carriage_return:
-			{
-				if(parsechar != '\r')
-				{
+			case first_carriage_return: {
+				if(parsechar != '\r') {
 					_error_code = 400;
 					return;
 				}
 				_step = first_new_line;
 				break ;
 			}
-			case first_new_line:
-			{
-				if (parsechar != '\n')
-				{
+			case first_new_line: {
+				if (parsechar != '\n') {
 					_error_code = 400;
 					return ;
 				}
@@ -357,65 +311,53 @@ void	Request::parseRequest(std::string requeststr, size_t request_size)
 				_buffer.clear();
 				continue ;
 			}
-			case determine_field:
-			{
+			case determine_field: {
 				if (parsechar == '\r')
 					_step = end_of_field;
 				else if (!isIllegalToken(parsechar))
 					_step = determine_field_name;
-				else
-				{
+				else {
 					_error_code = 400;
 					return ;
 				}
 				break ;
 			}
-			case end_of_field:
-			{
-				if (parsechar != '\n')
-				{
+			case end_of_field: {
+				if (parsechar != '\n') {
 					_error_code = 400;
 					return ;
 				}
-				else
-				{
+				else {
 					_buffer.clear();
 					checkHeaders();
-					if (_hasbody == true)
-					{
+					if (_hasbody == true) {
 						if (_ischunked == true)
 							_step = start_chunked;
 						else
 							_step = start_body;
 					}
-					else
-					{
+					else {
 						_step = request_handled;
 						continue ;
 					}
 				}
 				break;
 			}
-			case determine_field_name:
-			{
-				if (parsechar == ':')
-				{
+			case determine_field_name: {
+				if (parsechar == ':') {
 					_field_name_storage = _buffer;
 					_buffer.clear();
 					_step = determine_field_value;
 					continue ;
 				}
-				else if (isIllegalToken(parsechar))
-				{
+				else if (isIllegalToken(parsechar)) {
 					_error_code = 400;
 					return ;
 				}
 				break ;
 			}
-			case determine_field_value:
-			{
-				if (parsechar == '\r')
-				{
+			case determine_field_value: {
+				if (parsechar == '\r') {
 					addToHeaders(_field_name_storage, _buffer);
 					_field_name_storage.clear();
 					_buffer.clear();
@@ -424,28 +366,23 @@ void	Request::parseRequest(std::string requeststr, size_t request_size)
 				}
 				break ;
 			}
-			case check_field_end:
-			{
-				if (parsechar != '\n')
-				{
+			case check_field_end: {
+				if (parsechar != '\n') {
 					_error_code = 400;
 					return ;
 				}
 				_step = determine_field;
 				continue ;
 			}
-			case start_body:
-			{
+			case start_body: {
 				if (_body.size() < _content_length)
 					_body.push_back(parsechar);
 				if (_body.size() == _content_length)
 					_step = request_handled;
 				break;
 			}
-			case start_chunked:
-			{
-				if (!isxdigit(parsechar))
-				{
+			case start_chunked: {
+				if (!isxdigit(parsechar)) {
 					_error_code = 400;
 					return ;
 				}
@@ -459,10 +396,8 @@ void	Request::parseRequest(std::string requeststr, size_t request_size)
 					_step = get_chunk_cr;
 				continue;
 			}
-			case get_chunk_length:
-			{
-				if (isxdigit(parsechar))
-				{
+			case get_chunk_length: {
+				if (isxdigit(parsechar)) {
 					size_t	lmao = 0;
 					ss.str(std::string());
 					ss.clear();
@@ -477,26 +412,21 @@ void	Request::parseRequest(std::string requeststr, size_t request_size)
 					_step = chunk_skip;
 				continue ;
 			}
-			case chunk_skip:
-			{
+			case chunk_skip: {
 				if (parsechar == '\r')
 					_step = get_chunk_nl;
 				continue ;
 			}
-			case get_chunk_cr:
-			{
-				if (parsechar != '\r')
-				{
+			case get_chunk_cr: {
+				if (parsechar != '\r') {
 					_error_code = 400;
 					return ;
 				}
 				_step = get_chunk_nl;
 				continue ;
 			}
-			case get_chunk_nl:
-			{
-				if (parsechar != '\n')
-				{
+			case get_chunk_nl: {
+				if (parsechar != '\n') {
 					_error_code = 400;
 					return ;
 				}
@@ -506,55 +436,45 @@ void	Request::parseRequest(std::string requeststr, size_t request_size)
 					_step = get_chunk_data;
 				continue ;
 			}
-			case get_chunk_data:
-			{
+			case get_chunk_data: {
 				_body.push_back(parsechar);
 				_length_of_chunk--;
 				if (_length_of_chunk == 0)
 					_step = get_chunk_cr2;
 				continue ;
 			}
-			case get_chunk_cr2:
-			{
-				if (parsechar != '\r')
-				{
+			case get_chunk_cr2: {
+				if (parsechar != '\r') {
 					_error_code = 400;
 					return ;
 				}
 				_step = get_chunk_nl2;
 				continue ;
 			}
-			case get_chunk_nl2:
-			{
-				if (parsechar != '\n')
-				{
+			case get_chunk_nl2: {
+				if (parsechar != '\n') {
 					_error_code = 400;
 					return ;
 				}
 				_step = start_chunked;
 				continue ;
 			}
-			case end_of_chunk:
-			{
-				if (parsechar != '\r')
-				{
+			case end_of_chunk: {
+				if (parsechar != '\r') {
 					_error_code = 400;
 					return ;
 				}
 				_step = end_of_chunk2;
 				continue ;
 			}
-			case end_of_chunk2:
-			{
-				if (parsechar != '\n')
-				{
+			case end_of_chunk2: {
+				if (parsechar != '\n') {
 					_error_code = 400;
 					return ;
 				}
 				_step = request_handled;
 			}
-			case request_handled:
-			{
+			case request_handled: {
 				return ;
 			}
 		}

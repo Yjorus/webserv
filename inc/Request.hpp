@@ -45,7 +45,7 @@ enum ParseStep
 class Request
 {
 		int			_method; // 0=GET 1=POST 2=DELETE
-		int			_methodindex;
+		size_t		_methodindex;
 		int			_error_code;
 		std::string	_location; // example /index.html
 		std::string _query;
