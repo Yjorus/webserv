@@ -1,7 +1,6 @@
 #include "../inc/Location.hpp"
 
-Location::Location()
-{
+Location::Location() {
 	this->_path = "";
 	this->_root = "";
 	this->_listing = false;
@@ -13,10 +12,8 @@ Location::Location()
 	this->_methods.push_back(false);
 }
 
-Location::Location(Location const &copy)
-{
-	if (this != &copy)
-	{
+Location::Location(Location const &copy) {
+	if (this != &copy) {
 		this->_path = copy._path;
 		this->_root = copy._root;
 		this->_index = copy._index;
@@ -33,10 +30,8 @@ Location::Location(Location const &copy)
 Location::~Location()
 {}
 
-Location	&Location::operator=(Location const &assign)
-{
-	if (this != &assign)
-	{
+Location	&Location::operator=(Location const &assign) {
+	if (this != &assign) {
 		this->_path = assign._path;
 		this->_root = assign._root;
 		this->_index = assign._index;
@@ -50,35 +45,29 @@ Location	&Location::operator=(Location const &assign)
 	return (*this);
 }
 
-void	Location::setPathL(std::string path)
-{
+void	Location::setPathL(std::string path) {
 	this->_path = path;
 }
 
-void	Location::setRootL(std::string path)
-{
+void	Location::setRootL(std::string path) {
 	if (checkFile(path) != 2)
 		throw std::invalid_argument("root in location is not a directory");
 	this->_root = path;
 }
 
-void	Location::setIndexL(std::string path)
-{
+void	Location::setIndexL(std::string path) {
 	this->_index = path;
 }
 
-void	Location::setListingL(std::string option)
-{
+void	Location::setListingL(std::string option) {
 	if (option != "on" && option != "off")
 		throw std::invalid_argument("listing must be on or off");
 	else
 		this->_listing = (option == "on");
 }
 
-void	Location::setClientBodySizeL(std::string option)
-{
-	for (size_t a = 0; a < option.size(); a++)
-	{
+void	Location::setClientBodySizeL(std::string option) {
+	for (size_t a = 0; a < option.size(); a++) {
 		if (!std::isdigit(option[a]))
 			throw std::invalid_argument("invalid syntax for client body size in location");
 	}
@@ -87,23 +76,19 @@ void	Location::setClientBodySizeL(std::string option)
 	this->_client_body_size = my_stoul(option);
 }
 
-void	Location::setClientBodySizeL2(unsigned long option)
-{
+void	Location::setClientBodySizeL2(unsigned long option) {
 	this->_client_body_size = option;
 }
 
-void	Location::setRedirectionL(std::string option)
-{
+void	Location::setRedirectionL(std::string option) {
 	this->_redirection = option;
 }
 
-void	Location::setMethodsL(std::vector<std::string> methods)
-{
+void	Location::setMethodsL(std::vector<std::string> methods) {
 	this->_methods[0] = false;
 	this->_methods[1] = false;
 	this->_methods[2] = false;
-	for (size_t a = 0; a < this->_methods.size(); a++)
-	{
+	for (size_t a = 0; a < this->_methods.size(); a++) {
 		if (methods[a] == "GET" && !this->_methods[0])
 			this->_methods[0] = true;
 		else if (methods[a] == "POST" && !this->_methods[1])
@@ -115,58 +100,46 @@ void	Location::setMethodsL(std::vector<std::string> methods)
 	}
 }
 
-void	Location::setExtensionsL(std::vector<std::string> extensions)
-{
+void	Location::setExtensionsL(std::vector<std::string> extensions) {
 	this->_cgi_extensions = extensions;
 }
 
-void	Location::setCgiPathL(std::vector<std::string> paths)
-{
+void	Location::setCgiPathL(std::vector<std::string> paths) {
 	this->_cgi_paths = paths;
 }
 
-std::string					Location::getPathL() const
-{
+std::string					Location::getPathL() const {
 	return (this->_path);
 }
 
-std::string					Location::getRootL() const
-{
+std::string					Location::getRootL() const {
 	return (this->_root);
 }
 
-std::string					Location::getIndexL() const
-{
+std::string					Location::getIndexL() const {
 	return (this->_index);
 }
 
-std::string					Location::getRedirectionL() const
-{
+std::string					Location::getRedirectionL() const {
 	return (this->_redirection);
 }
 
-bool						Location::getListingL() const
-{
+bool						Location::getListingL() const {
 	return (this->_listing);
 }
 
-unsigned long				Location::getClientBodySizeL() const
-{
+unsigned long				Location::getClientBodySizeL() const {
 	return (this->_client_body_size);
 }
 
-std::vector<std::string>	Location::getCgiExtensionsL() const
-{
+std::vector<std::string>	Location::getCgiExtensionsL() const {
 	return (this->_cgi_extensions);
 }
 
-std::vector<std::string>	Location::getCgiPathsL() const
-{
+std::vector<std::string>	Location::getCgiPathsL() const {
 	return (this->_cgi_paths);
 }
 
-std::vector<bool>			Location::getMethodsL() const
-{
+std::vector<bool>			Location::getMethodsL() const {
 	return (this->_methods);
 }
-

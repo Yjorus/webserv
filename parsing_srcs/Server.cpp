@@ -1,7 +1,6 @@
 #include "../inc/Server.hpp"
 
-Server::Server()
-{
+Server::Server() {
 	this->_port = 0;
 	this->_host = 0;
 	this->_client_body_size = 0;
@@ -12,10 +11,8 @@ Server::Server()
 	this->_fd = 0;
 }
 
-Server::Server(Server const &copy)
-{
-	if (this != &copy)
-	{
+Server::Server(Server const &copy) {
+	if (this != &copy) {
 		this->_client_body_size = copy._client_body_size;
 		this->_host = copy._host;
 		this->_port = copy._port;
@@ -34,10 +31,8 @@ Server::Server(Server const &copy)
 Server::~Server()
 {}
 
-Server	&Server::operator=(Server const &assign)
-{
-	if (this != &assign)
-	{
+Server	&Server::operator=(Server const &assign) {
+	if (this != &assign) {
 		this->_client_body_size = assign._client_body_size;
 		this->_host = assign._host;
 		this->_port = assign._port;
@@ -53,13 +48,11 @@ Server	&Server::operator=(Server const &assign)
 	return (*this);
 }
 
-std::vector<std::string>	Server::configSplit(std::string config, std::string separators)
-{
+std::vector<std::string>	Server::configSplit(std::string config, std::string separators) {
 	std::vector<std::string>	split;
 	size_t a = 0,b = 0;
 
-	while (true)
-	{
+	while (true) {
 		b = config.find_first_of(separators, a);
 		if (b == std::string::npos)
 			break;
@@ -72,63 +65,52 @@ std::vector<std::string>	Server::configSplit(std::string config, std::string sep
 	return (split);
 }
 
-void	Server::config(std::string config)
-{
+void	Server::config(std::string config) {
 	std::vector<std::string>	split;
 	std::vector<std::string>	error_pages;
 	split = configSplit(config += ' ', std::string(" \n\t"));
 	bool	listing = false;
 	bool	locs = false;
 
-	for (size_t a = 0; a < split.size(); a++)
-	{
-		if (split[a] == "host" && (a + 1) < split.size() && locs == false)
-		{
+	for (size_t a = 0; a < split.size(); a++) {
+		if (split[a] == "host" && (a + 1) < split.size() && locs == false) {
 			if (this->_host)
 				throw std::invalid_argument("Multiple hosts in server block");
 			setHost(split[++a]);
 		}
-		else if (split[a] == "listen" && (a + 1) < split.size() && locs == false)
-		{
+		else if (split[a] == "listen" && (a + 1) < split.size() && locs == false) {
 			if (this->_port)
 				throw std::invalid_argument("Multiple ports in server block");
 			setPort(split[++a]);
 		}
-		else if (split[a] == "root" && (a + 1) < split.size() && locs == false)
-		{
+		else if (split[a] == "root" && (a + 1) < split.size() && locs == false) {
 			if (!this->_root.empty())
 				throw std::invalid_argument("Multiple roots in server block");
 			setRoot(split[++a]);
 		}
-		else if (split[a] == "server_name" && (a + 1) < split.size() && locs == false)
-		{
+		else if (split[a] == "server_name" && (a + 1) < split.size() && locs == false) {
 			if (!this->_server_name.empty())
 				throw std::invalid_argument("Multiple server names in server block");
 			setServerName(split[++a]);
 		}
-		else if (split[a] == "index" && (a + 1) < split.size() && locs == false)
-		{
+		else if (split[a] == "index" && (a + 1) < split.size() && locs == false) {
 			if (!this->_index.empty())
 				throw std::invalid_argument("Multiple hindexes in server block");
 			setIndex(split[++a]);
 		}
-		else if (split[a] == "client_max_body_size" && (a + 1) < split.size() && locs == false)
-		{
+		else if (split[a] == "client_max_body_size" && (a + 1) < split.size() && locs == false) {
 			if (this->_client_body_size)
 				throw std::invalid_argument("Multiple client_max_body_size in server block");
 			setClientBodySize(split[++a]);
 		}
-		else if (split[a] == "listing" && (a + 1) < split.size() && locs == false)
-		{
+		else if (split[a] == "listing" && (a + 1) < split.size() && locs == false) {
 			if (listing == true)
 				throw std::invalid_argument("Multiple directory_listings in server block");
 			setDirectoryListing(split[++a]);
 			listing = true;
 		}
-		else if (split[a] == "error_pages" && (a + 1) < split.size() && locs == false)
-		{
-			while (++a < split.size())
-			{
+		else if (split[a] == "error_pages" && (a + 1) < split.size() && locs == false) {
+			while (++a < split.size()) {
 				error_pages.push_back(split[a]);
 				if (split[a].find(';') != std::string::npos)
 					break ;
@@ -136,8 +118,7 @@ void	Server::config(std::string config)
 					throw std::invalid_argument("Invalid error pages in server block");
 			}
 		}
-		else if (split[a] == "location" && (a + 1) < split.size())
-		{
+		else if (split[a] == "location" && (a + 1) < split.size()) {
 			std::string	location_path;
 
 			if (split[++a] == "{" || split[a] == "}")
@@ -171,8 +152,7 @@ void	Server::config(std::string config)
 		this->_client_body_size = 10000; //PLACEHOLDER
 }
 
-void	Server::setHost(std::string host)
-{
+void	Server::setHost(std::string host) {
 	checkSemicolon(host);
 	if (host == "localhost")
 		host = "127.0.0.1";
@@ -183,11 +163,9 @@ void	Server::setHost(std::string host)
 		throw std::invalid_argument("invalid host");
 }
 
-void	Server::setPort(std::string port)
-{
+void	Server::setPort(std::string port) {
 	checkSemicolon(port);
-	for (size_t a = 0; a < port.size(); a++)
-	{
+	for (size_t a = 0; a < port.size(); a++) {
 		if (!std::isdigit(port[a]))
 			throw std::invalid_argument("port syntax wrong");
 	}
@@ -197,12 +175,10 @@ void	Server::setPort(std::string port)
 	this->_port = (uint16_t) b;
 }
 
-void	Server::setClientBodySize(std::string size)
-{
+void	Server::setClientBodySize(std::string size) {
 	checkSemicolon(size);
 	unsigned long	body = 0;
-	for (size_t a = 0; a < size.size(); a++)
-	{
+	for (size_t a = 0; a < size.size(); a++) {
 		if (!std::isdigit(size[a]))
 			throw std::invalid_argument("body size syntax wrong");
 	}
@@ -213,20 +189,17 @@ void	Server::setClientBodySize(std::string size)
 	
 }
 
-void	Server::setIndex(std::string index)
-{
+void	Server::setIndex(std::string index) {
 	checkSemicolon(index);
 	this->_index = index;
 }
 
-void	Server::setServerName(std::string name)
-{
+void	Server::setServerName(std::string name) {
 	checkSemicolon(name);
 	this->_server_name = name;
 }
 
-void	Server::setRoot(std::string root)
-{
+void	Server::setRoot(std::string root) {
 	checkSemicolon(root);
 	if(checkFile(root) == 2)
 		this->_root = root;
@@ -234,8 +207,7 @@ void	Server::setRoot(std::string root)
 		throw std::invalid_argument("root argument is not a directory");
 }
 
-void	Server::setDirectoryListing(std::string listing)
-{
+void	Server::setDirectoryListing(std::string listing) {
 	checkSemicolon(listing);
 	if (listing != "on" && listing != "off")
 		throw std::invalid_argument("invalid directory listing argument");
@@ -243,32 +215,29 @@ void	Server::setDirectoryListing(std::string listing)
 		this->_directory_listing = (listing == "on");
 }
 
-void	Server::setErrorPages(std::vector<std::string> pages)
-{
+void	Server::setErrorPages(std::vector<std::string> pages) {
 	if (pages.empty())
 		return ;
 	if (pages.size() % 2)
 		throw std::invalid_argument("invalid error pages argument");
-	for (size_t a = 0; a < pages.size() - 1; a++)
-	{
-		for (size_t b = 0; b < pages[a].size(); b++)
-		{
+	for (size_t a = 0; a < pages.size() - 1; a++) {
+		for (size_t b = 0; b < pages[a].size(); b++) {
 			if (!std::isdigit(pages[a][b]))
-				throw std::invalid_argument("1error_pages argument is invalid");
+				throw std::invalid_argument("error_pages argument is invalid");
 		}
 		if (pages[a].size() != 3)
-			throw std::invalid_argument("2error_pages argument is invalid");
+			throw std::invalid_argument("error_pages argument is invalid");
 		int code = my_stoi(pages[a]);
 		if (statusCodes(code) == "WRONG" || code < 400)
-			throw std::invalid_argument("3error_pages argument is invalid");
+			throw std::invalid_argument("error_pages argument is invalid");
 		a++;
 		if (a == pages.size() - 1)
 			checkSemicolon(pages[a]);
 		std::string	path = pages[a];
 		if (checkFile(this->_root + path) != 1)
-			throw std::invalid_argument("4error_pages argument is invalid");
+			throw std::invalid_argument("error_pages argument is invalid");
 		if (checkPath(this->_root + path, 0) == -1 || checkPath(this->_root + path, 4) == -1)
-			throw std::invalid_argument("5error_pages argument is invalid");
+			throw std::invalid_argument("error_pages argument is invalid");
 		std::map<int, std::string>::iterator it = this->_error_pages.find(code);
 		if (it != this->_error_pages.end())
 			throw std::invalid_argument("duplicate error page");
@@ -276,16 +245,13 @@ void	Server::setErrorPages(std::vector<std::string> pages)
 	}
 }
 
-void	Server::setLocation(std::string path, std::vector<std::string> data)
-{
+void	Server::setLocation(std::string path, std::vector<std::string> data) {
 	Location	location;
 	bool	listing  = false;
 	bool	method = false;
 	location.setPathL(path);
-	for (size_t a = 0; a < data.size(); a++)
-	{
-		if (data[a] == "listing" && a + 1 < data.size())
-		{
+	for (size_t a = 0; a < data.size(); a++) {
+		if (data[a] == "listing" && a + 1 < data.size()) {
 			if (path == "/cgi-bin")
 				throw std::invalid_argument("listing not allowed in cgi-bin");
 			if (listing == true)
@@ -294,8 +260,7 @@ void	Server::setLocation(std::string path, std::vector<std::string> data)
 			location.setListingL(data[a]);
 			listing = true;
 		}
-		else if (data[a] == "root" && a + 1 < data.size())
-		{
+		else if (data[a] == "root" && a + 1 < data.size()) {
 			if (!location.getRootL().empty())
 				throw std::invalid_argument("duplicate root argument in location");
 			checkSemicolon(data[++a]);
@@ -306,15 +271,13 @@ void	Server::setLocation(std::string path, std::vector<std::string> data)
 			else
 				throw std::invalid_argument("root argument in location is not a directory");
 		}
-		else if (data[a] == "index" && a + 1 < data.size())
-		{
+		else if (data[a] == "index" && a + 1 < data.size()) {
 			if (!location.getIndexL().empty())
 				throw std::invalid_argument("duplicate index argument in location");
 			checkSemicolon(data[++a]);
 			location.setIndexL(data[a]);
 		}
-		else if (data[a] == "redirection" && a + 1 < data.size())
-		{
+		else if (data[a] == "redirection" && a + 1 < data.size()) {
 			if (path == "/cgi-bin")
 				throw std::invalid_argument("redirection not allowed in cgi-bin");
 			if (!location.getRedirectionL().empty())
@@ -322,15 +285,12 @@ void	Server::setLocation(std::string path, std::vector<std::string> data)
 			checkSemicolon(data[++a]);
 			location.setRedirectionL(data[a]);
 		}
-		else if (data[a] == "methods" && a + 1 < data.size())
-		{
+		else if (data[a] == "methods" && a + 1 < data.size()) {
 			if (method == true)
 				throw std::invalid_argument("duplicate methods argument in location");
 			std::vector<std::string>	methods;
-			while (++a < data.size())
-			{
-				if (data[a].find(";") != std::string::npos)
-				{
+			while (++a < data.size()) {
+				if (data[a].find(";") != std::string::npos) {
 					checkSemicolon(data[a]);
 					methods.push_back(data[a]);
 					break;
@@ -342,20 +302,16 @@ void	Server::setLocation(std::string path, std::vector<std::string> data)
 			location.setMethodsL(methods);
 			method = true;
 		}
-		else if (data[a] == "client_max_body_size" && a + 1 < data.size())
-		{
+		else if (data[a] == "client_max_body_size" && a + 1 < data.size()) {
 			if (location.getClientBodySizeL())
 				throw std::invalid_argument("duplicate body_size argument in location");
 			checkSemicolon(data[++a]);
 			location.setClientBodySizeL(data[a]);
 		}
-		else if (data[a] == "cgi_extensions" && a + 1 < data.size())
-		{
+		else if (data[a] == "cgi_extensions" && a + 1 < data.size()) {
 			std::vector<std::string>	extensions;
-			while (++a < data.size())
-			{
-				if (data[a].find(";") != std::string::npos)
-				{
+			while (++a < data.size()) {
+				if (data[a].find(";") != std::string::npos) {
 					checkSemicolon(data[a]);
 					extensions.push_back(data[a]);
 					break;
@@ -366,13 +322,10 @@ void	Server::setLocation(std::string path, std::vector<std::string> data)
 			}
 			location.setExtensionsL(extensions);
 		}
-		else if (data[a] == "cgi_path" && a + 1 < data.size())
-		{
+		else if (data[a] == "cgi_path" && a + 1 < data.size()) {
 			std::vector<std::string>	cgi_paths;
-			while (++a < data.size())
-			{
-				if (data[a].find(";") != std::string::npos)
-				{
+			while (++a < data.size()) {
+				if (data[a].find(";") != std::string::npos) {
 					checkSemicolon(data[a]);
 					cgi_paths.push_back(data[a]);
 					break;
@@ -384,15 +337,13 @@ void	Server::setLocation(std::string path, std::vector<std::string> data)
 			location.setCgiPathL(cgi_paths);
 		}
 	}
-	if (!location.getClientBodySizeL())
-	{
+	if (!location.getClientBodySizeL()) {
 		if (this->_client_body_size)
 			location.setClientBodySizeL2(this->_client_body_size);
 		else
 			location.setClientBodySizeL2(1000); //PLACEHOLDER
 	}
-	if (path != "cgi-bin" && location.getIndexL().empty())
-	{
+	if (path != "cgi-bin" && location.getIndexL().empty()) {
 		if (!this->_index.empty())
 			location.setIndexL(this->_index);
 		else
@@ -410,26 +361,21 @@ void	Server::setLocation(std::string path, std::vector<std::string> data)
 	this->_locations.push_back(location);
 }
 
-void						Server::setFd(int value)
-{
+void						Server::setFd(int value) {
 	this->_fd = value;
 }
 
-int		Server::locationCheck(Location &location)const
-{
-	if (location.getPathL() == "/cgi-bin")
-	{
+int		Server::locationCheck(Location &location)const {
+	if (location.getPathL() == "/cgi-bin") {
 		if (location.getCgiPathsL().empty() || location.getCgiExtensionsL().empty() || location.getIndexL().empty())
 			return (4);
 		if (location.getCgiPathsL().size() != location.getCgiExtensionsL().size())
 			return (4);
 	}
-	else
-	{
+	else {
 		if (location.getPathL()[0] != '/')
 			return (1);
-		if (location.getRootL().empty())
-		{
+		if (location.getRootL().empty()) {
 			if (!this->_root.empty())
 				location.setRootL(this->_root);
 			else
@@ -443,16 +389,13 @@ int		Server::locationCheck(Location &location)const
 	return (0);
 }
 
-int		Server::checkDuplicateLocationPaths(void)const
-{
+int		Server::checkDuplicateLocationPaths(void)const {
 	if (this->_locations.size() < 2)
 		return (0);
 	std::vector<Location>::const_iterator	it;
 	std::vector<Location>::const_iterator	it2;
-	for (it = this->_locations.begin(); it != this->_locations.end(); it++)
-	{
-		for (it2 = it + 1; it2 != this->_locations.end(); it2++)
-		{
+	for (it = this->_locations.begin(); it != this->_locations.end(); it++) {
+		for (it2 = it + 1; it2 != this->_locations.end(); it2++) {
 			if (it->getPathL() == it2->getPathL())
 				return (1);
 		}
@@ -460,61 +403,50 @@ int		Server::checkDuplicateLocationPaths(void)const
 	return (0);
 }
 
-void	Server::checkSemicolon(std::string &str)
-{
+void	Server::checkSemicolon(std::string &str) {
 	size_t a = str.rfind(';');
 	if (a != str.size() - 1)
 		throw std::invalid_argument("Semicolon missing or in incorrect location");
 	str.erase(a);
 }
 
-uint16_t	Server::getPort()const
-{
+uint16_t	Server::getPort()const {
 	return(this->_port);
 }
 
-uint32_t	Server::getHost()const
-{
+uint32_t	Server::getHost()const {
 	return (this->_host);
 }
 
-unsigned long	Server::getClientBodySize()const
-{
+unsigned long	Server::getClientBodySize()const {
 	return (this->_client_body_size);
 }
 
-std::string	Server::getIndex()const
-{
+std::string	Server::getIndex()const {
 	return (this->_index);
 }
 
-std::string	Server::getServerName()const
-{
+std::string	Server::getServerName()const {
 	return (this->_server_name);
 }
 
-std::string	Server::getRoot()const
-{
+std::string	Server::getRoot()const {
 	return (this->_root);
 }
 
-std::map<int, std::string>	Server::getErrorPages()const
-{
+std::map<int, std::string>	Server::getErrorPages()const {
 	return (this->_error_pages);
 }
 
-bool	Server::getDirectoryListing()const
-{
+bool	Server::getDirectoryListing()const {
 	return (this->_directory_listing);
 }
 
-int	Server::getFd()const
-{
+int	Server::getFd()const {
 	return (this->_fd);
 }
 
-void	Server::prepareServer()
-{
+void	Server::prepareServer() {
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_fd == -1)
 		throw std::invalid_argument("Failed to init socket");
@@ -524,16 +456,14 @@ void	Server::prepareServer()
 	_address.sin_family = AF_INET;
 	_address.sin_port = htons(_port);
 	_address.sin_addr.s_addr = _host;
-	if (bind(_fd, (struct sockaddr *) &_address, sizeof(_address)) == -1)
-	{
+	if (bind(_fd, (struct sockaddr *) &_address, sizeof(_address)) == -1) {
 		std::string error = "failed to bind socket: ";
 		throw std::invalid_argument(error + strerror(errno));
 	}
 }
 
 
-std::ostream	&operator<<(std::ostream &o, Server const &server)
-{
+std::ostream	&operator<<(std::ostream &o, Server const &server) {
 	o << "\nport: " << server.getPort();
 	o << "\nhost: " << server.getHost();
 	o << "\nbody_size: " << server.getClientBodySize();
@@ -542,8 +472,7 @@ std::ostream	&operator<<(std::ostream &o, Server const &server)
 	o << "\nroot: " << server.getRoot();
 	o << "\nerror_pages: ";
 	std::map<int, std::string>	lmao = server.getErrorPages();
-	for (std::map<int, std::string>::const_iterator it = lmao.begin(); it != lmao.end(); ++it)
-	{
+	for (std::map<int, std::string>::const_iterator it = lmao.begin(); it != lmao.end(); ++it) {
 		o << it->first << " " << it->second << "\n";
 	}
 	o << "Listing: " << server.getDirectoryListing() << std::endl;

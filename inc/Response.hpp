@@ -6,14 +6,14 @@
 /*   By: gscarama <gscarama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 12:49:46 by gscarama          #+#    #+#             */
-/*   Updated: 2023/10/03 15:00:36 by gscarama         ###   ########.fr       */
+/*   Updated: 2023/10/03 16:11:07 by gscarama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 
-#include "Request.hpp"
+#include "AllHeaders.hpp"
 #include <map>
 #include <fstream>
 #include <ctime>
@@ -24,7 +24,7 @@ class Response
 {
 	private:
 		Request		&_request;
-		std::string	_error_msg; //From where it takes the number ?
+		// std::string	_error_msg; //From where it takes the number ?
 		std::string	_header; //HTTP/1.1 200 OK
 		std::string	_contentType;
 		std::string	_conexion;
@@ -32,7 +32,7 @@ class Response
 		std::string	_server;
 		std::string	_date;
 		std::string	_body;
-		short		_code;
+		int			_code;
 
 	public:
 		Response( void );

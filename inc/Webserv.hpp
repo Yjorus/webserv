@@ -9,10 +9,6 @@ class Webserv
 		int	_server_amount;
 		std::vector<std::string> _server_blocks;
 		std::vector<Server>	_servers;
-		int					_epollfd;
-		size_t					_fdamount;
-		std::map<int, Client>	_clientmap;
-		std::map<int, Server>	_servermap;
 		std::map<int, int>		_connections; //1st client second server
 		
 	public:
