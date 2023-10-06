@@ -446,6 +446,10 @@ int	Server::getFd()const {
 	return (this->_fd);
 }
 
+std::vector<Location>	Server::getLocation()const {
+	return (this->_locations);
+}
+
 void	Server::prepareServer() {
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_fd == -1)

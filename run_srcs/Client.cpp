@@ -1,12 +1,10 @@
 #include "../inc/Client.hpp"
 
-Client::Client()
-{
+Client::Client() {
 	_time = time(NULL);
 }
 
-Client::Client(Server &server)
-{
+Client::Client(Server &server) {
 	_server = server;
 	_time = time(NULL);
 }

@@ -133,8 +133,7 @@ void	RunServer::readRequest(int a, Client &client) {
 		client.getRequest().parseRequest(buffer, read_ret_val);
 		memset(buffer, 0, sizeof(buffer));
 	}
-	if (client.getRequest().isFinished() || client.getRequest().getErrorCode())
-	{
+	if (client.getRequest().isFinished() || client.getRequest().getErrorCode()) {
 		setCorrectServerName(client);
 		std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
 		std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
