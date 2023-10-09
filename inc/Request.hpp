@@ -91,6 +91,8 @@ class Request
 		std::string							getBody();
 		std::string							getPort();
 		std::string							getLocation();
+
+		void	clearRequest();
 		
 		bool	isFinished();
 };
