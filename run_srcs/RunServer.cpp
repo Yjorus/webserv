@@ -74,7 +74,9 @@ void	RunServer::serverLoop() {
 			else if (FD_ISSET(b, &read_fds) && _clientmap.count(b))
 				readRequest(b, _clientmap[b]);
 			else if (FD_ISSET(b, &write_fds) && _clientmap.count(b))
-			{}
+			{
+				senResponse(b, _clientmap[b]);
+			}
 		}
 		disconnectTimeout();
 	}
@@ -135,6 +137,7 @@ void	RunServer::readRequest(int a, Client &client) {
 	}
 	if (client.getRequest().isFinished() || client.getRequest().getErrorCode()) {
 		setCorrectServerName(client);
+		client.getRequest().buildResponse()
 		std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
 		std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
 	}
@@ -147,5 +150,29 @@ void	RunServer::setCorrectServerName(Client &client) {
 			client.setServer(*it);
 			return ;
 		}
+	}
+}
+
+void	Runserver::sendResponse(a, Client &client) {
+	int	write_return;
+	std::string	response = client.getResponse().getResponse();
+	if (response.length() > 10000)
+		write_return = write(a, response.c_str(), 10000);
+	else
+		write_return = wite(a, response.c_str(), response.length());
+	if (write_return < 0)
+		removeClient(a);
+	if (write_return == 0 || (size_t)write_return == response.length()) {
+		if (client.getRequest().keepAlive() == false || client.getRequest().getErrorCode() || client.getResponse().getCgiState())
+			removeClient(a);
+		else {
+			removeFromSet(a, &write_fds);
+			addToSet(a, &read_fds);
+			client.clearClient()
+		}
+	}
+	else {
+		client.refreshTime();
+		client.getResponse().cutResponse(write_return);
 	}
 }

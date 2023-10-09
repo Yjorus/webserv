@@ -7,6 +7,7 @@ Client::Client() {
 Client::Client(Server &server) {
 	_server = server;
 	_time = time(NULL);
+	_request.setAddress(server.getHost());
 }
 
 // Client::Client(Client const &copy)
@@ -44,5 +45,10 @@ Server	Client::getServer() {
 
 time_t	Client::getTime() {
 	return (this->_time);
+}
+
+void	Client::clearClient() {
+	this->getRequest().clearRequest();
+	this->getResponse().clearResponse();
 }
 

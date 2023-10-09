@@ -1,11 +1,14 @@
 class CgiManager
 {
-		pid_t	_cgi_pid;
-		char	**_env_cgi;
-		std::map<std::string>	_env_map;
-		int		_execve_return_val;
+		pid_t					_cgi_pid;
+		std::string				_body;
+		std::map<std::string>	_cgi_env;
+		int						_execve_return_val;
+		
 	public:
 };
+
+//needed for cgi : av[0] == path av[1]
 
 //    "COMSPEC", "DOCUMENT_ROOT", "GATEWAY_INTERFACE",   
 //    "HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING",             
