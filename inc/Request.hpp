@@ -90,6 +90,7 @@ class Request
 		std::string							getHeader(std::string key);
 		std::string							getBody();
 		std::string							getPort();
+		std::string							getLocation();
 		
 		bool	isFinished();
 };

@@ -532,3 +532,7 @@ std::string	Request::getBody() {
 std::string	Request::getPort() {
 	return (this->_port);
 }
+
+std::string	Request::getLocation() {
+	return (this->_location);
+}

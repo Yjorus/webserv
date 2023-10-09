@@ -4,6 +4,7 @@
 # include "AllHeaders.hpp"
 # include "Server.hpp"
 # include "Request.hpp"
+# include "Response.hpp"
 
 class Client
 {
