@@ -11,6 +11,7 @@ class Client
 	Request		_request;
 	time_t		_time;
 	Server		_server;
+	response	_response;
 
 	public:
 		

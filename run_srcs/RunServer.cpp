@@ -137,7 +137,8 @@ void	RunServer::readRequest(int a, Client &client) {
 	}
 	if (client.getRequest().isFinished() || client.getRequest().getErrorCode()) {
 		setCorrectServerName(client);
-		client.getRequest().buildResponse()
+		client.getResponse().initializeResponse(client.getServer().getErrorPages(), client.getRequest());
+		client.getResponse().buildResponse();
 		std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
 		std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
 	}
