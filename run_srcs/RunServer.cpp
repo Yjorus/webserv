@@ -139,8 +139,8 @@ void	RunServer::readRequest(int a, Client &client) {
 		setCorrectServerName(client);
 		client.getResponse().initializeResponse(client.getServer().getErrorPages(), client.getRequest());
 		client.getResponse().buildResponse();
-		removeFromSet(a, &_read_fds);
-		addToSet(a, &_write_fds);
+		removeFromSet(a, _read_fds);
+		addToSet(a, _write_fds);
 		std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
 		std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
 	}
@@ -156,7 +156,7 @@ void	RunServer::setCorrectServerName(Client &client) {
 	}
 }
 
-void	Runserver::sendResponse(a, Client &client) {
+void	RunServer::sendResponse(int a, Client &client) {
 	int	write_return;
 	std::string	response = client.getResponse().getResponse();
 	if (response.length() > 10000)
@@ -169,9 +169,9 @@ void	Runserver::sendResponse(a, Client &client) {
 		if (client.getRequest().keepAlive() == false || client.getRequest().getErrorCode() || client.getResponse().getCgiState())
 			removeClient(a);
 		else {
-			removeFromSet(a, &_write_fds);
-			addToSet(a, &_read_fds);
-			client.clearClient()
+			removeFromSet(a, _write_fds);
+			addToSet(a, _read_fds);
+			client.clearClient();
 		}
 	}
 	else {
