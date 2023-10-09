@@ -159,14 +159,14 @@ void	RunServer::setCorrectServerName(Client &client) {
 void	RunServer::sendResponse(int a, Client &client) {
 	int	write_return;
 	std::string	response = client.getResponse().getResponse();
-	if (response.length() > 10000)
-		write_return = write(a, response.c_str(), 10000);
-	else
-		write_return = wite(a, response.c_str(), response.length());
+	// if (response.length() > 10000)
+	// 	write_return = write(a, response.c_str(), 10000);
+	// else
+	write_return = wite(a, response.c_str(), response.length());
 	if (write_return < 0)
 		removeClient(a);
 	if (write_return == 0 || (size_t)write_return == response.length()) {
-		if (client.getRequest().keepAlive() == false || client.getRequest().getErrorCode() || client.getResponse().getCgiState())
+		if (client.getRequest().getErrorCode()) // client.getRequest().keepAlive() == false || client.getResponse().getCgiState()
 			removeClient(a);
 		else {
 			removeFromSet(a, _write_fds);
@@ -174,8 +174,8 @@ void	RunServer::sendResponse(int a, Client &client) {
 			client.clearClient();
 		}
 	}
-	else {
-		client.refreshTime();
-		client.getResponse().cutResponse(write_return);
-	}
+	// else {
+	// 	client.refreshTime();
+	// 	client.getResponse().cutResponse(write_return);
+	// }
 }
