@@ -6,7 +6,7 @@
 /*   By: gscarama <gscarama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 12:49:46 by gscarama          #+#    #+#             */
-/*   Updated: 2023/10/03 16:11:07 by gscarama         ###   ########.fr       */
+/*   Updated: 2023/10/09 15:24:44 by gscarama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,39 +14,39 @@
 #define RESPONSE_HPP
 
 #include "AllHeaders.hpp"
-#include <map>
-#include <fstream>
-#include <ctime>
-#include <cstdlib>
-#include <sstream>
+#include "Request.hpp"
 
 class Response
 {
 	private:
-		Request		&_request;
-		// std::string	_error_msg; //From where it takes the number ?
-		std::string	_header; //HTTP/1.1 200 OK
-		std::string	_contentType;
-		std::string	_conexion;
-		size_t		_content_lenght;
-		std::string	_server;
-		std::string	_date;
-		std::string	_body;
-		int			_code;
+		Request						_request;
+		std::map<int, std::string>	_error_pages;
+		std::string					_status_msg;
+		std::string					_header;
+		std::string					_contentType;
+		std::string					_conexion;
+		std::string					_server;
+		std::string					_date;
+		std::string					_body;
+		std::string					_content_lenght;
+		int							_code;
 
 	public:
 		Response( void );
-		Response( Request request );
+		Response( Request request, std::map<int, std::string> error_pages);
 		Response( Response const &other );
 		Response& operator=( Response const &other );
-		void	findErrorMsg();
-		void	buildHeader();
-		void	defineType();
-		void	setConection();
-		void	findLenght();
-		void	setServer();
-		void	setDate();
-		void	buildBody();
+		void		findStatusMsg();
+		void		buildHeader();
+		void		defineType();
+		void		setConnection();
+		void		findLenght();
+		void		setServer();
+		void		setDate();
+		void		buildBody();
+		void		buildErrorBody();
+		const char	*buildResponse();
+		void		clearResponse();
 };
 
 #endif

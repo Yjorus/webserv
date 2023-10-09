@@ -476,6 +476,10 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 	}
 }
 
+std::string Request::getLocation() {
+	return (this->_location);
+}
+
 std::string	Request::getServerName() {
 	return (this->_host);
 }

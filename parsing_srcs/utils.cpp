@@ -26,6 +26,16 @@ int my_stoi(std::string str) {
 	return (a);
 }
 
+std::string	to_String(int nbr)
+{
+	std::string			str;
+	std::stringstream	ss;
+
+	ss << nbr;
+	ss >> str;
+	return (str);
+}
+
 int checkFile(std::string path) {
 	struct stat	a;
 

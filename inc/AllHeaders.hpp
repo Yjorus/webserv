@@ -22,6 +22,7 @@
 # include <sys/select.h>
 # include <fcntl.h>
 # include <sys/time.h>
+#include <ctime>
 
 # include <errno.h>
 # include <stdio.h>
@@ -33,5 +34,6 @@ std::string		statusCodes(int code);
 int				my_stoi(std::string str);
 int				checkPathAndFile(std::string path, std::string file);
 int 			myInetAton(const char *cp, struct in_addr *addr);
+std::string		to_String(int nbr);
 
 #endif

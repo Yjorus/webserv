@@ -6,32 +6,31 @@
 /*   By: gscarama <gscarama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 12:51:12 by gscarama          #+#    #+#             */
-/*   Updated: 2023/10/03 16:11:35 by gscarama         ###   ########.fr       */
+/*   Updated: 2023/10/09 15:29:40 by gscarama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Response.hpp"
 
-Response::Response( void ) : _request(Request req())
+Response::Response( void )
 {
-	 // does it need a get element ?
-	// this->_request();
-
 	//Return a error ? OR just set all to null, send a response error?
 	throw std::invalid_argument("Error: Response class not initialized");
 }
 
-Response::Response( Request request ) : _request(request)
+Response::Response( Request request, std::map<int, std::string> error_pages) : _request(request)
 {
-	// Check if theres a error in request
-	if(_request._code != 0)
-		
-	this->defineType();
-	this->setConection();
-	this->setDate();
-	this->setConection();
-	this->findLenght();
-	//Just set some stuff, majory of it will be seted in build body
+	this->_error_pages = error_pages;
+	this->_server = "";
+	this->_code = 0;
+	this->_status_msg = "";
+	this->_header = "";
+	this->_contentType = "";
+	this->_conexion = "";
+	this->_date = "";
+	this->_body = "";
+	this->_content_lenght = "";
+	this->_code = 0;
 }
 
 Response::Response( Response const &other ) : _request(other._request)
@@ -41,10 +40,10 @@ Response::Response( Response const &other ) : _request(other._request)
 
 Response& Response::operator=( Response const &other )
 {
-	if (this != &other)
+	if (this != &other) //Add geter for all this ?
 	{
 		this->_request = other._request;
-		this->_error_msg = other._error_msg;
+		this->_status_msg = other._status_msg;
 		this->_header = other._header;
 		this->_contentType = other._contentType;
 		this->_conexion = other._conexion;
@@ -56,112 +55,105 @@ Response& Response::operator=( Response const &other )
 	return (*this);
 }
 
-void	Response::findErrorMsg() //receive the errors page and try to find witch ine matchs
+void	Response::findStatusMsg()
 {
-	//Try to find it inside map, if not found set default page
-	//Pointe to the resault saving memory
-	//If no one matcher send 502 Bad Gatey as ettpt
+	if (this->_request.getErrorCode() != 0)
+		this->_status_msg = statusCodes(_request.getErrorCode());
+	else
+		this->_status_msg = statusCodes(this->_code);
 }
 
 void	Response::buildHeader()
 {
-	std::stringstream	code;
-	std::string			tmp;
-
-	
 	this->_header = "HTTP/1.1 ";
-	code << _code;
-	code >> tmp;
-	_header.append(tmp);
+	_header.append(to_String(_code));
 	this->_header.append(" ");
 	this->_header += statusCodes(_code);
-	this->_header.append("\r\n\0"); // Is the final correct ?
-	//Test if it has the good result adter the changes
+	this->_header.append("\r\n");
 }
 
-void	Response::defineType()
+void	Response::defineType() // add contetnt type
 {
 	std::string		ext;
 	std::ifstream	file;
 
-	if (file.open(_request._location))//Does file exist ?
+	file.open(_request.getLocation());
+	this->_contentType.append("Content-Type: ");
+	if (file.fail())
 	{
 		this->_code = 404;
 		this->_contentType = "text/html";
+		return ;
 	}
 	else
 	{
-		ext = _request._location.find('.');
+		ext = _request.getLocation().find('.');
 		if (ext == ".html" || ext == "htm")
-			this->_contentType = "text/html"; //charset=UTF-8 ??
+			this->_contentType = "text/html;charset=UTF - 8"; //Add -utf-08
 		else if (ext == ".css")
-			this->_contentType = "text/css";
+			this->_contentType.append("text/css");
 		else if (ext == ".js")
-			this->_contentType = "text/html";
+			this->_contentType.append("text/html"); // ??????????
 		else if (ext == ".jpeg")
-			this->_contentType = "image/jpeg";
+			this->_contentType.append("image/jpeg");
 		else if (ext == ".png")
-			this->_contentType = "image/png";
+			this->_contentType.append("image/png");
 		else if (ext == ".ico")
-			this->_contentType = "image/x-icon"; //Check for more possibble extentions
+			this->_contentType.append("image/x-icon");
 		else
-			this->_contentType = "text/html";
-		this->_code = 200; //What is the possile codes i can return here ?
+			this->_contentType.append("text/html");
 	}
-
-	//Html/css/img/script
+	this->_contentType.append("\r\n");
 }
 
-void	Response::setConection()
+void	Response::setConnection()
 {
-	// what is the diferent types of connection ?
-	// keep-alive
-	this->_conexion = "keep-alive";
+	this->_conexion = "Connection: keep-alive\r\n";
 }
 
 void	Response::findLenght()
 {
-	size_t	lenght;
-
-	// lenght = response file size
-	//Calculate the lenght from the content
-	//add lenght to body
-	this->_content_lenght = lenght;
+	this->_content_lenght = "Content-Lenght: ";
+	this->_content_lenght.append(to_String(this->_body.length()));
+	this->_content_lenght.append("\r\n");
 }
 
 void	Response::setServer()
 {
-	
-	//How to get the server name ?
+	if (_request.getServerName() != "")
+		this->_server = _request.getServerName();
+	else
+		this->_server = "WebServ";
+	this->_server.append("\r\n");
 }
 
 void	Response::setDate()
 {
 	time_t now = time(0);
+	std::string	utc;
 
 	tm* gmtm = gmtime(&now);
 	if (gmtm != NULL)
-		this->_date = asctime(gmtm);
+		utc = asctime(gmtm);
 	else
 	{
-		this->_code = 501; // Correct code ?
+		this->_code = 501;
 		return ;
 	}
-	if (this->_date[8] == ' ')
-		this->_date.replace(8, 1,"0");
-	this->_date.insert(3,",");
-	this->_date.insert(8, &this->_date[20]);
-	this->_date.erase(13, 1);
-	this->_date.erase(25, 6);
-	this->_date.append(" UTC"); //Need to a add a /n/0 in the end ?
+	if (utc[8] == ' ')
+		utc.replace(8, 1, "0");
+	utc.insert(3,",");
+	utc.insert(8, &utc[20]);
+	utc.erase(13, 1);
+	utc.erase(25, 6);
+	utc.append(" UTC");
+	utc.append("\r\n");
+	this->_date = "Date: ";
+	this->_date.append(utc);
 }
 
 void	Response::buildBody()
 {
-	//Initialize all the variables
-
-	this->findErrorMsg();
-	this->buildHeader();
 	//Error found inside the response
 	//Outise the response
 	//error body
@@ -173,8 +165,72 @@ void	Response::buildBody()
 
 	//Send this to where
 	// how to send
+	std::ifstream file("./rootdir/index.html");
+	std::ostringstream		str;
 	
-
+	this->_code = 200;
+	str << file.rdbuf();
+	_body = str.str();
+	file.close();
 	// /r/n in the end of header content
 	//Check if error page exist, if dont return a 502 Error Bad Gatway // TODO Where
+}
+
+void	Response::buildErrorBody()
+{
+	std::fstream	file;
+	std::string		str;
+
+	if (this->_error_pages.count(this->_code))
+		file.open("./rootdir/" + this->_error_pages[this->_code]); //Check if i do it correctly
+	else if (checkFile("./rootdir/error/" + to_String(_code) + ".html"))
+		file.open("./rootdir/error/" + to_String(_code) + ".html");
+	else
+	{
+		file.open("./rootdir/error/502.html");
+		this->_code = 502;
+	}
+	while (!file.eof())
+	{
+		file >> str;
+		this->_body.append(str);
+	}
+}
+
+const char	*Response::buildResponse()
+{
+	this->defineType();
+	this->setDate();
+	this->setConnection();
+	// if(_request.getErrorCode() != 0 || this->_code != 0)
+	// 	this->buildErrorBody();
+	// else
+		this->buildBody();
+	this->findLenght();
+	this->findStatusMsg();
+	this->buildHeader();
+
+	this->_header.append(this->_conexion);
+	this->_header.append(this->_contentType);
+	this->_header.append(this->_date);
+	this->_header.append(this->_content_lenght);
+	this->_header.append("\r\n");
+	this->_header.append(this->_body);
+	
+	std::cout << this->_header << std::endl;
+	return(this->_header.c_str());
+}
+
+void	Response::clearResponse()
+{
+	this->_server = "";
+	this->_code = 0;
+	this->_status_msg = "";
+	this->_header = "";
+	this->_contentType = "";
+	this->_conexion = "";
+	this->_date = "";
+	this->_body = "";
+	this->_content_lenght = "";
+	this->_code = 0;
 }

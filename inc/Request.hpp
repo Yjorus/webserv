@@ -79,6 +79,7 @@ class Request
 		void	checkHeaders();
 
 		int		getErrorCode();
+		std::string getLocation();
 		std::string	getServerName();
 		
 		bool	isFinished();

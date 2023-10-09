@@ -1,0 +1,5 @@
+CGI will print the resoult page in the standard output
+
+And will be accessed by a HTML request href= "path to the desired CGI"
+
+Create a process to execute the CGI

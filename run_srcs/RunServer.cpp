@@ -1,4 +1,5 @@
 #include "../inc/RunServer.hpp"
+#include "../inc/Response.hpp"
 
 RunServer::RunServer()
 {}
@@ -136,8 +137,10 @@ void	RunServer::readRequest(int a, Client &client) {
 	if (client.getRequest().isFinished() || client.getRequest().getErrorCode())
 	{
 		setCorrectServerName(client);
-		std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
-		std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
+		Response response (client.getRequest(), client.getServer().getErrorPages());
+		response.buildResponse();
+		// std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
+		// std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
 	}
 }
 
