@@ -6,7 +6,7 @@
 /*   By: gscarama <gscarama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 12:51:12 by gscarama          #+#    #+#             */
-/*   Updated: 2023/10/09 15:29:40 by gscarama         ###   ########.fr       */
+/*   Updated: 2023/10/09 15:36:04 by gscarama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,6 @@
 
 Response::Response( void )
 {
-	//Return a error ? OR just set all to null, send a response error?
-	throw std::invalid_argument("Error: Response class not initialized");
-}
-
-Response::Response( Request request, std::map<int, std::string> error_pages) : _request(request)
-{
-	this->_error_pages = error_pages;
 	this->_server = "";
 	this->_code = 0;
 	this->_status_msg = "";
@@ -53,6 +46,12 @@ Response& Response::operator=( Response const &other )
 		this->_body = other._body;
 	}
 	return (*this);
+}
+
+void	Response::initializeResponse( Request request, std::map<int, std::string> error_pages)
+{
+	this->_request = request;
+	this->_error_pages = error_pages;
 }
 
 void	Response::findStatusMsg()
