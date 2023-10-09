@@ -1,0 +1,38 @@
+
+
+#smmfmk
+
+
+server {
+	listen 2000;
+	server_name	Wahoo.com;
+	root	rootdir/;
+	host	127.0.0.1;
+	index	index.html;
+	client_max_body_size 1;
+	#ooooooo
+	listing on;
+	error_pages
+	404	folder/file.html
+	400	folder/file2.html;
+	location / {#WOW
+		index index.html;
+	}
+}
+server {
+	index	index.html;
+	root	rootdir/;
+	listen	2000;
+	host	127.0.0.1;
+	server_name	Wahoo.be;
+	location /cgi-bin {
+		index	index.html;
+		cgi_path	a/;
+		cgi_extensions	.py;
+	}
+}
+
+
+
+
+
