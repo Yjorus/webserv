@@ -47,6 +47,10 @@ time_t	Client::getTime() {
 	return (this->_time);
 }
 
+Response &Client::getResponse(){
+	return (this->_response);
+}
+
 void	Client::clearClient() {
 	this->getRequest().clearRequest();
 	this->getResponse().clearResponse();

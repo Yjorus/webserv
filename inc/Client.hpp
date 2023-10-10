@@ -12,7 +12,7 @@ class Client
 	Request		_request;
 	time_t		_time;
 	Server		_server;
-	response	_response;
+	Response	_response;
 
 	public:
 		
@@ -31,6 +31,7 @@ class Client
 		void		refreshTime();
 		time_t		getTime();
 		Server		getServer();
+		Response	&getResponse();
 };
 
 #endif
