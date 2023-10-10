@@ -48,7 +48,7 @@ Response& Response::operator=( Response const &other )
 	return (*this);
 }
 
-void	Response::initializeResponse( Request &request, std::map<int, std::string> &error_pages)
+void	Response::initializeResponse( Request &request, std::map<int, std::string> error_pages)
 {
 	this->_request = request;
 	this->_error_pages = error_pages;
@@ -190,7 +190,7 @@ void	Response::buildErrorBody()
 
 void	Response::buildResponse()
 {
-	if (_request.CGI)
+	// if (_request.CGI)
 		//execute the cgi
 	this->defineType();
 	this->setDate();

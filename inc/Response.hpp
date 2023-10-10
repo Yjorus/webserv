@@ -32,7 +32,7 @@ class Response
 		Response( Request request, std::map<int, std::string> error_pages);
 		Response( Response const &other );
 		Response& operator=( Response const &other );
-		void		initializeResponse( Request &request, std::map<int, std::string> &error_pages);
+		void		initializeResponse( Request &request, std::map<int, std::string> error_pages);
 		void		buildResponse();
 		void		clearResponse();
 		std::string	getResponse();

@@ -543,7 +543,7 @@ void	Request::clearRequest() {
 	this->_error_code = 0;
 	this->_location.clear();
 	this->_query.clear();
-	this->_fragment.clear()
+	this->_fragment.clear();
 	this->_body.clear();
 	this->_host.clear();
 	this->_port.clear();

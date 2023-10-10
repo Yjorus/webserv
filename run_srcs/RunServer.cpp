@@ -137,7 +137,7 @@ void	RunServer::readRequest(int a, Client &client) {
 	}
 	if (client.getRequest().isFinished() || client.getRequest().getErrorCode()) {
 		setCorrectServerName(client);
-		client.getResponse().initializeResponse(client.getServer().getErrorPages(), client.getRequest());
+		client.getResponse().initializeResponse(client.getRequest(), client.getServer().getErrorPages());
 		client.getResponse().buildResponse();
 		removeFromSet(a, _read_fds);
 		addToSet(a, _write_fds);
@@ -162,7 +162,7 @@ void	RunServer::sendResponse(int a, Client &client) {
 	// if (response.length() > 10000)
 	// 	write_return = write(a, response.c_str(), 10000);
 	// else
-	write_return = wite(a, response.c_str(), response.length());
+	write_return = write(a, response.c_str(), response.length());
 	if (write_return < 0)
 		removeClient(a);
 	if (write_return == 0 || (size_t)write_return == response.length()) {

@@ -34,7 +34,6 @@ class Client
 		Server		getServer();
 
 		void		clearClient();
-		Response	&getResponse();
 };
 
 #endif
