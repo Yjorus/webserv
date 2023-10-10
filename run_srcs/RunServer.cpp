@@ -75,7 +75,7 @@ void	RunServer::serverLoop() {
 				readRequest(b, _clientmap[b]);
 			else if (FD_ISSET(b, &write_fds) && _clientmap.count(b))
 			{
-				sendResponse(b, _clientmap[b]);
+				sendResponse(b, _clientmap[b]); // Segfault inside
 			}
 		}
 		disconnectTimeout();
@@ -167,11 +167,11 @@ void	RunServer::sendResponse(int a, Client &client) {
 		removeClient(a);
 	if (write_return == 0 || (size_t)write_return == response.length()) {
 		if (client.getRequest().getErrorCode()) // client.getRequest().keepAlive() == false || client.getResponse().getCgiState()
-			removeClient(a);
+				removeClient(a);
 		else {
 			removeFromSet(a, _write_fds);
 			addToSet(a, _read_fds);
-			client.clearClient();
+			// client.clearClient(); //crash here
 		}
 	}
 	// else {

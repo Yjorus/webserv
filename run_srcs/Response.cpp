@@ -75,34 +75,26 @@ void	Response::buildHeader()
 void	Response::defineType()
 {
 	std::string		ext;
-	std::ifstream	file;
+	int				i;
 
-	file.open(_request.getLocation());
+	ext = _request.getLocation();
+	i = ext.find('.');
+	ext.erase(0, i);
 	this->_contentType.append("Content-Type: ");
-	if (file.fail())
-	{
-		this->_code = 404;
-		this->_contentType = "text/html";
-		return ;
-	}
-	else
-	{
-		ext = _request.getLocation().find('.');
-		if (ext == ".html" || ext == ".htm")
-			this->_contentType = "text/html; charset=UTF-8";
-		else if (ext == ".css")
-			this->_contentType.append("text/css");
-		else if (ext == ".js")
-			this->_contentType.append("text/javascript");
-		else if (ext == ".jpeg")
-			this->_contentType.append("image/jpeg");
-		else if (ext == ".png")
-			this->_contentType.append("image/png");
-		else if (ext == ".ico")
-			this->_contentType.append("image/x-icon");
-		else
-			this->_contentType.append("text/html");
-	}
+	if (ext == ".html" || ext == ".htm")
+		this->_contentType = "text/html; charset=UTF-8";
+	else if (ext == ".css")
+		this->_contentType.append("text/css");
+	else if (ext == ".js")
+		this->_contentType.append("text/javascript");
+	else if (ext == ".jpeg")
+		this->_contentType.append("image/jpeg");
+	else if (ext == ".png")
+		this->_contentType.append("image/png");
+	else if (ext == ".ico")
+		this->_contentType.append("image/x-icon");
+	else // this = error
+		this->_contentType.append("text/html");
 	this->_contentType.append("\r\n");
 }
 
@@ -113,7 +105,7 @@ void	Response::setConnection()
 
 void	Response::findLenght()
 {
-	this->_content_lenght = "Content-Lenght: ";
+	this->_content_lenght = "Content-Lenght: "; //Is it with the corect value ?
 	this->_content_lenght.append(to_String(this->_body.length()));
 	this->_content_lenght.append("\r\n");
 }
@@ -154,9 +146,13 @@ void	Response::setDate()
 
 void	Response::buildBody()
 {
-	std::ifstream file(_request.getLocation());
+	std::ifstream file;
 	std::ostringstream		str;
 
+	if (_request.getLocation() == "/")
+		file.open("./rootdir/index.html");
+	else
+		file.open("./rootdir" + _request.getLocation());
 	if(file.fail())
 	{
 		file.open("./rootdir/error/404.html");
@@ -169,8 +165,8 @@ void	Response::buildBody()
 
 void	Response::buildErrorBody()
 {
-	std::fstream	file;
-	std::string		str;
+	std::ifstream		file;
+	std::ostringstream	str;
 
 	if (this->_error_pages.count(this->_code))
 		file.open("./rootdir/" + this->_error_pages[this->_code]);
@@ -181,11 +177,9 @@ void	Response::buildErrorBody()
 		file.open("./rootdir/error/502.html");
 		this->_code = 502;
 	}
-	while (!file.eof())
-	{
-		file >> str;
-		this->_body.append(str);
-	}
+	str << file.rdbuf();
+	_body = str.str();
+	file.close();
 }
 
 void	Response::buildResponse()
