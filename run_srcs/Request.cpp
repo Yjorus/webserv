@@ -536,3 +536,23 @@ std::string	Request::getPort() {
 std::string	Request::getLocation() {
 	return (this->_location);
 }
+
+void	Request::clearRequest() {
+	this->_method = -1;
+	this->_methodindex = 1;
+	this->_error_code = 0;
+	this->_location.clear();
+	this->_query.clear();
+	this->_fragment.clear()
+	this->_body.clear();
+	this->_host.clear();
+	this->_port.clear();
+	this->_hasbody = false;
+	this->_ischunked = false;
+	this->_step = start_parsing;
+	this->_http_major = false;
+	this->_http_minor = false;
+	this->_field_name_storage.clear();
+	this->_content_length = 0;
+	this->_length_of_chunk = 0;
+}

@@ -30,6 +30,7 @@ class	RunServer
 		void	setupSets();
 		void	readRequest(int a, Client &client);
 		void	setCorrectServerName(Client &client);
+		void	sendResponse(int a, Client &client);
 };
 
 #endif

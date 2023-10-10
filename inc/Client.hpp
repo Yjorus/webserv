@@ -28,9 +28,12 @@ class Client
 
 		int			getSocketFd();
 		Request		&getRequest();
+		Response	&getResponse();
 		void		refreshTime();
 		time_t		getTime();
 		Server		getServer();
+
+		void		clearClient();
 		Response	&getResponse();
 };
 
