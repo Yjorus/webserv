@@ -36,6 +36,7 @@ class Response
 		void		buildResponse();
 		void		clearResponse();
 		std::string	getResponse();
+		void		cutResponse(size_t a);
 		// void		cutResponse(int nbr);
 	private:
 		Request						_request;

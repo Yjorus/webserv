@@ -220,6 +220,10 @@ std::string	Response::getResponse()
 	return(this->_header);
 }
 
+void	Response::cutResponse(size_t a) {
+	this->_header = this->_header.substr(a);
+}
+
 void	Response::clearResponse()
 {
 	// Request	*ptr;
