@@ -171,7 +171,7 @@ void	RunServer::sendResponse(int a, Client &client) {
 		else {
 			removeFromSet(a, _write_fds);
 			addToSet(a, _read_fds);
-			// client.clearClient(); //crash here
+			client.clearClient();
 		}
 	}
 	// else {

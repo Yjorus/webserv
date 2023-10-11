@@ -56,8 +56,10 @@ void	Response::initializeResponse( Request &request, std::map<int, std::string> 
 
 void	Response::findStatusMsg()
 {
+	std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
 	if (this->_request.getErrorCode() != 0)
 		this->_code = _request.getErrorCode();
+	std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
 	this->_status_msg = statusCodes(this->_code);
 }
 
@@ -105,7 +107,7 @@ void	Response::setConnection()
 
 void	Response::findLenght()
 {
-	this->_content_lenght = "Content-Lenght: "; //Is it with the corect value ?
+	this->_content_lenght = "Content-Length: ";
 	this->_content_lenght.append(to_String(this->_body.length()));
 	this->_content_lenght.append("\r\n");
 }
@@ -189,6 +191,7 @@ void	Response::buildResponse()
 	this->defineType();
 	this->setDate();
 	this->setConnection();
+	std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
 	if(_request.getErrorCode() != 0 || this->_code != 0)
 		this->buildErrorBody();
 	else
@@ -219,18 +222,18 @@ std::string	Response::getResponse()
 
 void	Response::clearResponse()
 {
-	Request	*ptr;
+	// Request	*ptr;
 
-	ptr = NULL;
-	this->_request = *ptr;
-	this->_server = "";
+	// ptr = new(Request);
+	// ptr = NULL;
+	// this->_request = *ptr;
+	this->_server.clear();
 	this->_code = 0;
-	this->_status_msg = "";
-	this->_header = "";
-	this->_contentType = "";
-	this->_conexion = "";
-	this->_date = "";
-	this->_body = "";
-	this->_content_lenght = "";
-	this->_code = 0;
+	this->_status_msg.clear();
+	this->_header.clear();
+	this->_contentType.clear();
+	this->_conexion.clear();
+	this->_date.clear();
+	this->_body.clear();
+	this->_content_lenght.clear();
 }
