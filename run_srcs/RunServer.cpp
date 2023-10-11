@@ -1,5 +1,4 @@
 #include "../inc/RunServer.hpp"
-#include "../inc/Response.hpp"
 
 RunServer::RunServer()
 {}
@@ -75,7 +74,9 @@ void	RunServer::serverLoop() {
 			else if (FD_ISSET(b, &read_fds) && _clientmap.count(b))
 				readRequest(b, _clientmap[b]);
 			else if (FD_ISSET(b, &write_fds) && _clientmap.count(b))
-			{}
+			{
+				sendResponse(b, _clientmap[b]); // Segfault inside
+			}
 		}
 		disconnectTimeout();
 	}
@@ -134,13 +135,14 @@ void	RunServer::readRequest(int a, Client &client) {
 		client.getRequest().parseRequest(buffer, read_ret_val);
 		memset(buffer, 0, sizeof(buffer));
 	}
-	if (client.getRequest().isFinished() || client.getRequest().getErrorCode())
-	{
+	if (client.getRequest().isFinished() || client.getRequest().getErrorCode()) {
 		setCorrectServerName(client);
-		Response response (client.getRequest(), client.getServer().getErrorPages());
-		response.buildResponse();
-		// std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
-		// std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
+		client.getResponse().initializeResponse(client.getRequest(), client.getServer().getErrorPages());
+		client.getResponse().buildResponse();
+		removeFromSet(a, _read_fds);
+		addToSet(a, _write_fds);
+		std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
+		std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
 	}
 }
 
@@ -151,5 +153,29 @@ void	RunServer::setCorrectServerName(Client &client) {
 			client.setServer(*it);
 			return ;
 		}
+	}
+}
+
+void	RunServer::sendResponse(int a, Client &client) {
+	int	write_return;
+	std::string	response = client.getResponse().getResponse();
+	if (response.length() > 10000)
+		write_return = write(a, response.c_str(), 10000);
+	else
+	write_return = write(a, response.c_str(), response.length());
+	if (write_return < 0)
+		removeClient(a);
+	if (write_return == 0 || (size_t)write_return == response.length()) {
+		if (client.getRequest().getErrorCode()) // client.getRequest().keepAlive() == false || client.getResponse().getCgiState()
+				removeClient(a);
+		else {
+			removeFromSet(a, _write_fds);
+			addToSet(a, _read_fds);
+			client.clearClient();
+		}
+	}
+	else {
+		client.refreshTime();
+		client.getResponse().cutResponse(write_return);
 	}
 }

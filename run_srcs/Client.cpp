@@ -1,14 +1,13 @@
 #include "../inc/Client.hpp"
 
-Client::Client()
-{
+Client::Client() {
 	_time = time(NULL);
 }
 
-Client::Client(Server &server)
-{
+Client::Client(Server &server) {
 	_server = server;
 	_time = time(NULL);
+	_request.setAddress(server.getHost());
 }
 
 // Client::Client(Client const &copy)
@@ -46,5 +45,14 @@ Server	Client::getServer() {
 
 time_t	Client::getTime() {
 	return (this->_time);
+}
+
+Response &Client::getResponse(){
+	return (this->_response);
+}
+
+void	Client::clearClient() {
+	this->getRequest().clearRequest();
+	this->getResponse().clearResponse();
 }
 

@@ -11,6 +11,8 @@ Request::Request() {
 	this->_query = "";
 	this->_fragment = "";
 	this->_body = "";
+	this->_host = "";
+	this->_port = "";
 	this->_hasbody = false;
 	this->_ischunked = false;
 	this->_step = start_parsing;
@@ -92,6 +94,7 @@ void	Request::checkHeaders() {
 	if (_headers.count("Host")) {
 		size_t h = _headers["Host"].find_first_of(":");
 		_host = _headers["Host"].substr(0, h);
+		_port = _headers["Host"].substr(h + 1);
 	}
 }
 
@@ -476,18 +479,80 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 	}
 }
 
-std::string Request::getLocation() {
-	return (this->_location);
+void	Request::setAddress(uint32_t address) {
+    int		octet[4];
+	char	ip[50];
+    octet[3] = (address & 0xff000000) >> 24;
+    octet[2] = (address & 0x00ff0000) >> 16;
+    octet[1] = (address & 0x0000ff00) >> 8;
+    octet[0] = (address & 0x000000ff);
+	sprintf (ip, "%d.%d.%d.%d", octet[0], octet[1], octet[2], octet[3]);
+	std::string lol(ip);
+	this->_address = lol;
 }
 
 std::string	Request::getServerName() {
 	return (this->_host);
 }
 
+std::string	Request::getAddress() {
+	return (this->_address);
+}
+
 int	Request::getErrorCode() {
 	return (this->_error_code);
 }
 
+std::string	Request::getMethod() {
+	return (this->_methods[this->_method]);
+}
+
+std::string	Request::getQuery() {
+	return (this->_query);
+}
+
+std::map<std::string, std::string>	Request::getHeaders() {
+	return (this->_headers);
+}
+
+std::string	Request::getHeader(std::string key) {
+	if (_headers.count(key))
+		return (_headers[key]);
+	return ("");
+}
+
 bool	Request::isFinished() {
 	return (_step == request_handled);
+}
+
+std::string	Request::getBody() {
+	return (this->_body);
+}
+
+std::string	Request::getPort() {
+	return (this->_port);
+}
+
+std::string	Request::getLocation() {
+	return (this->_location);
+}
+
+void	Request::clearRequest() {
+	this->_method = -1;
+	this->_methodindex = 1;
+	this->_error_code = 0;
+	this->_location.clear();
+	this->_query.clear();
+	this->_fragment.clear();
+	this->_body.clear();
+	this->_host.clear();
+	this->_port.clear();
+	this->_hasbody = false;
+	this->_ischunked = false;
+	this->_step = start_parsing;
+	this->_http_major = false;
+	this->_http_minor = false;
+	this->_field_name_storage.clear();
+	this->_content_length = 0;
+	this->_length_of_chunk = 0;
 }

@@ -4,6 +4,7 @@
 # include "AllHeaders.hpp"
 # include "Server.hpp"
 # include "Request.hpp"
+# include "Response.hpp"
 
 class Client
 {
@@ -11,6 +12,7 @@ class Client
 	Request		_request;
 	time_t		_time;
 	Server		_server;
+	Response	_response;
 
 	public:
 		
@@ -26,9 +28,12 @@ class Client
 
 		int			getSocketFd();
 		Request		&getRequest();
+		Response	&getResponse();
 		void		refreshTime();
 		time_t		getTime();
 		Server		getServer();
+
+		void		clearClient();
 };
 
 #endif

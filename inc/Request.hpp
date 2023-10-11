@@ -51,6 +51,8 @@ class Request
 		std::string _query;
 		std::string _fragment;
 		std::string	_host; // example 127.0.0.1
+		std::string _port;
+		std::string	_address;
 		std::string	_useragent; // example curl
 		std::string	_buffer;
 		std::string	_body;
@@ -77,10 +79,20 @@ class Request
 		void	addToHeaders(std::string &str1, std::string &str2);
 		void	trimWhitespace(std::string &str);
 		void	checkHeaders();
+		void	setAddress(uint32_t address);
 
-		int		getErrorCode();
-		std::string getLocation();
-		std::string	getServerName();
+		int									getErrorCode();
+		std::string							getServerName();
+		std::string							getAddress();
+		std::string							getMethod();
+		std::string							getQuery();
+		std::map<std::string, std::string>	getHeaders();
+		std::string							getHeader(std::string key);
+		std::string							getBody();
+		std::string							getPort();
+		std::string							getLocation();
+
+		void	clearRequest();
 		
 		bool	isFinished();
 };
