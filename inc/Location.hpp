@@ -14,6 +14,7 @@ class Location
 		std::vector<std::string>	_cgi_extensions;
 		std::vector<std::string>	_cgi_paths;
 		std::vector<bool>			_methods;
+		std::map<std::string, std::string>	_cgimap;
 
 	public:
 
@@ -33,6 +34,7 @@ class Location
 		void	setMethodsL(std::vector<std::string> methods);
 		void	setExtensionsL(std::vector<std::string> extensions);
 		void	setCgiPathL(std::vector<std::string> paths);
+		void	setCgiMap(std::map<std::string, std::string> map);
 
 		std::string					getPathL() const;
 		std::string					getRootL() const;
@@ -43,5 +45,9 @@ class Location
 		std::vector<std::string>	getCgiExtensionsL() const;
 		std::vector<std::string>	getCgiPathsL() const;
 		std::vector<bool>			getMethodsL() const;
+		std::map<std::string, std::string>	getCgiMap()const;
 };
+
+std::ostream	&operator<<(std::ostream &o, Location const &location);
+
 #endif

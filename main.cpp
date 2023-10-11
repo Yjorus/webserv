@@ -2,9 +2,6 @@
 #include "inc/Webserv.hpp"
 #include "inc/RunServer.hpp"
 
-void	ignoresigpipe(int sig) {
-	if (sig) {}
-}
 
 int	main(int ac, char **av)
 {
@@ -12,7 +9,6 @@ int	main(int ac, char **av)
 	{
 		Webserv	webserv;
 		RunServer	run;
-		signal(SIGPIPE, ignoresigpipe);
 		try
 		{
 			if (ac == 2)

@@ -102,7 +102,7 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 	int					parsechar;
 	std::stringstream	ss;
 
-	std::cout << requeststr << std::endl;
+	// std::cout << requeststr << std::endl;
 	for (std::string::size_type a = 0; a < requestsize; a++) {
 		parsechar = requeststr[a];
 		switch(_step) {

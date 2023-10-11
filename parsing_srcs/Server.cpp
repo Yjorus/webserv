@@ -371,6 +371,38 @@ int		Server::locationCheck(Location &location)const {
 			return (4);
 		if (location.getCgiPathsL().size() != location.getCgiExtensionsL().size())
 			return (4);
+		std::vector<std::string>::const_iterator it;
+		for (it = location.getCgiPathsL().begin(); it != location.getCgiPathsL().end(); it++) {
+			if (checkFile(*it) < 0)
+				return (4);
+		}
+		std::vector<std::string>::const_iterator it2;
+		std::map<std::string, std::string> temp_map;
+		for (it = location.getCgiExtensionsL().begin(); it != location.getCgiExtensionsL().end(); it++) {
+			std::string	hold = *it;
+			if ( hold != ".pl" && hold != ".py") {
+				return (4);
+			}
+			bool	lmao = false;
+			for (it2 = location.getCgiPathsL().begin(); it2 != location.getCgiPathsL().end(); it2++) {
+				std::string hold2 = *it2;
+				if (hold == ".pl" && hold2 != "/usr/bin/perl") {
+					if (lmao)
+						return (4);
+					lmao = true;
+				}
+				else if (hold == ".pl")
+					temp_map.insert(std::make_pair(hold, hold2));
+				if (hold == ".py" && hold2 != "/usr/bin/python3") {
+					if (lmao)
+						return (4);
+					lmao = true;
+				}
+				else if (hold == ".py")
+					temp_map.insert(std::make_pair(hold, hold2));
+			}
+		}
+		location.setCgiMap(temp_map);
 	}
 	else {
 		if (location.getPathL()[0] != '/')
@@ -478,6 +510,10 @@ std::ostream	&operator<<(std::ostream &o, Server const &server) {
 	std::map<int, std::string>	lmao = server.getErrorPages();
 	for (std::map<int, std::string>::const_iterator it = lmao.begin(); it != lmao.end(); ++it) {
 		o << it->first << " " << it->second << "\n";
+	}
+	std::vector<Location> lol = server.getLocation();
+	for (std::vector<Location>:: const_iterator it2 = lol.begin(); it2 != lol.end(); ++it2) {
+		o << *it2 << "\n";
 	}
 	o << "Listing: " << server.getDirectoryListing() << std::endl;
 	return (o);

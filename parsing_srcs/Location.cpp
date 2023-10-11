@@ -23,6 +23,7 @@ Location::Location(Location const &copy) {
 		this->_cgi_extensions = copy._cgi_extensions;
 		this->_cgi_paths = copy._cgi_paths;
 		this->_methods = copy._methods;
+		this->_cgimap = copy._cgimap;
 	}
 	return ;
 }
@@ -41,6 +42,7 @@ Location	&Location::operator=(Location const &assign) {
 		this->_cgi_extensions = assign._cgi_extensions;
 		this->_cgi_paths = assign._cgi_paths;
 		this->_methods = assign._methods;
+		this->_cgimap = assign._cgimap;
 	}
 	return (*this);
 }
@@ -108,6 +110,10 @@ void	Location::setCgiPathL(std::vector<std::string> paths) {
 	this->_cgi_paths = paths;
 }
 
+void	Location::setCgiMap(std::map<std::string, std::string> map) {
+	this->_cgimap = map;
+}
+
 std::string					Location::getPathL() const {
 	return (this->_path);
 }
@@ -142,4 +148,20 @@ std::vector<std::string>	Location::getCgiPathsL() const {
 
 std::vector<bool>			Location::getMethodsL() const {
 	return (this->_methods);
+}
+
+std::map<std::string, std::string>	Location::getCgiMap() const{
+	return (this->_cgimap);
+}
+
+std::ostream	&operator<<(std::ostream &o, Location const &location) {
+	o << "\npath: " << location.getPathL();
+	o << "\nroot: " << location.getRootL();
+	o << "\nindex: " << location.getIndexL() << "\n";
+
+	std::map<std::string, std::string>	lmao = location.getCgiMap();
+	for (std::map<std::string, std::string>::const_iterator it = lmao.begin(); it != lmao.end(); ++it) {
+		o << it->first << " " << it->second << "\n";
+	}
+	return (o);
 }
