@@ -159,9 +159,9 @@ void	RunServer::setCorrectServerName(Client &client) {
 void	RunServer::sendResponse(int a, Client &client) {
 	int	write_return;
 	std::string	response = client.getResponse().getResponse();
-	// if (response.length() > 10000)
-	// 	write_return = write(a, response.c_str(), 10000);
-	// else
+	if (response.length() > 10000)
+		write_return = write(a, response.c_str(), 10000);
+	else
 	write_return = write(a, response.c_str(), response.length());
 	if (write_return < 0)
 		removeClient(a);
@@ -174,8 +174,8 @@ void	RunServer::sendResponse(int a, Client &client) {
 			client.clearClient();
 		}
 	}
-	// else {
-	// 	client.refreshTime();
-	// 	client.getResponse().cutResponse(write_return);
-	// }
+	else {
+		client.refreshTime();
+		client.getResponse().cutResponse(write_return);
+	}
 }
