@@ -60,6 +60,7 @@ void	RunServer::serverLoop() {
 	_highest_fd = 0;
 	setupSets();
 	struct timeval timeout;
+	signal(SIGPIPE, SIG_IGN);
 
 	while (1) {
 		timeout.tv_sec = 1;
@@ -122,15 +123,15 @@ void	RunServer::readRequest(int a, Client &client) {
 	int		read_ret_val = 0; 
 	std::string	request;
 	read_ret_val = read(a, buffer, 10000);
-	if (read_ret_val <= 0) {
-		removeClient(a);
-		return ;
-	}
 	if (read_ret_val == 0) {
 		removeClient(a);
 		return ;
 	}
-	else {
+	else if (read_ret_val < 0) {
+		removeClient(a);
+		return ;
+	}
+	else if (read_ret_val != 0){
 		client.refreshTime();
 		client.getRequest().parseRequest(buffer, read_ret_val);
 		memset(buffer, 0, sizeof(buffer));
@@ -141,8 +142,8 @@ void	RunServer::readRequest(int a, Client &client) {
 		client.getResponse().buildResponse();
 		removeFromSet(a, _read_fds);
 		addToSet(a, _write_fds);
-		std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
-		std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
+		// std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
+		// std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
 	}
 }
 
@@ -156,16 +157,16 @@ void	RunServer::setCorrectServerName(Client &client) {
 	}
 }
 
-void	RunServer::sendResponse(int a, Client &client) {
+void	RunServer::sendResponse(const int &a, Client &client) {
 	int	write_return;
 	std::string	response = client.getResponse().getResponse();
-	if (response.length() > 10000)
+	if (response.length() >= 10000)
 		write_return = write(a, response.c_str(), 10000);
 	else
-	write_return = write(a, response.c_str(), response.length());
+		write_return = write(a, response.c_str(), response.length());
 	if (write_return < 0)
 		removeClient(a);
-	if (write_return == 0 || (size_t)write_return == response.length()) {
+	else if (write_return == 0 || (size_t)write_return == response.length()) {
 		if (client.getRequest().getErrorCode()) // client.getRequest().keepAlive() == false || client.getResponse().getCgiState()
 				removeClient(a);
 		else {

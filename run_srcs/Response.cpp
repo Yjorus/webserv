@@ -60,7 +60,7 @@ void	Response::initializeResponse( Request &request, Server server)
 
 void	Response::findStatusMsg()
 {
-	std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
+	// std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
 	if (this->_request.getErrorCode() != 0)
 		this->_code = _request.getErrorCode();
 	this->_status_msg = statusCodes(this->_code);

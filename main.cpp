@@ -2,12 +2,17 @@
 #include "inc/Webserv.hpp"
 #include "inc/RunServer.hpp"
 
+void	ignoresigpipe(int sig) {
+	if (sig) {}
+}
+
 int	main(int ac, char **av)
 {
 	if (ac == 1 || ac == 2)
 	{
 		Webserv	webserv;
 		RunServer	run;
+		signal(SIGPIPE, ignoresigpipe);
 		try
 		{
 			if (ac == 2)
