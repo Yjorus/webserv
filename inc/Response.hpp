@@ -41,6 +41,7 @@ class Response
 	private:
 		Server						_server;
 		Request						_request;
+		std::string					_root;
 		std::map<int, std::string>	_error_pages;
 		std::string					_status_msg;
 		std::string					_header;

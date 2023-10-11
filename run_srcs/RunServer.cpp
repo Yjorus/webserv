@@ -137,7 +137,7 @@ void	RunServer::readRequest(int a, Client &client) {
 	}
 	if (client.getRequest().isFinished() || client.getRequest().getErrorCode()) {
 		setCorrectServerName(client);
-		client.getResponse().initializeResponse(client.getRequest(), client.getServer().getErrorPages());
+		client.getResponse().initializeResponse(client.getRequest(), client.getServer());
 		client.getResponse().buildResponse();
 		removeFromSet(a, _read_fds);
 		addToSet(a, _write_fds);

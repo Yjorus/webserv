@@ -23,6 +23,7 @@ Response::Response( void )
 	this->_date = "";
 	this->_body = "";
 	this->_content_lenght = "";
+	this->_root = "";
 	this->_code = 0;
 }
 
@@ -54,6 +55,7 @@ void	Response::initializeResponse( Request &request, Server server)
 	this->_request = request;
 	this->_server = server;
 	this->_error_pages = server.getErrorPages();
+	this->_root = "./" + server.getRoot();
 }
 
 void	Response::findStatusMsg()
@@ -151,12 +153,12 @@ void	Response::buildBody()
 	std::ifstream		file;
 
 	if (_request.getLocation() == "/")
-		file.open("./rootdir/index.html");
+		file.open(_root + "index.html");
 	else
-		file.open("./rootdir" + _request.getLocation());
+		file.open(_root + _request.getLocation());
 	if(file.fail())
 	{
-		file.open("./rootdir/error/404.html");
+		file.open(_root + "error/404.html");
 		this->_code = 404;
 	}
 	this->_body = readFile(file);
@@ -167,12 +169,12 @@ void	Response::buildErrorBody()
 	std::ifstream		file;
 
 	if (this->_error_pages.count(this->_code))
-		file.open("./rootdir/" + this->_error_pages[this->_code]);
-	else if (checkFile("./rootdir/error/" + to_String(_code) + ".html"))
-		file.open("./rootdir/error/" + to_String(_code) + ".html");
+		file.open(_root + this->_error_pages[this->_code]);
+	else if (checkFile(_root + "error/" + to_String(_code) + ".html"))
+		file.open(_root + "error/" + to_String(_code) + ".html");
 	if (!file.good())
 	{
-		file.open("./rootdir/error/502.html");
+		file.open(_root + "error/502.html");
 		this->_code = 502;
 	}
 	this->_body = readFile(file);
@@ -212,8 +214,8 @@ void	Response::cutResponse(size_t a) {
 
 void	Response::clearResponse()
 {
-	this->_host.clear();
 	this->_code = 0;
+	this->_host.clear();
 	this->_status_msg.clear();
 	this->_header.clear();
 	this->_contentType.clear();
