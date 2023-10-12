@@ -16,6 +16,7 @@
 # include <stdexcept>
 # include <vector>
 # include <map>
+# include <algorithm>
 # include <sys/socket.h>
 # include <arpa/inet.h>
 # include <netdb.h>

@@ -24,7 +24,9 @@ Response::Response( void )
 	this->_body = "";
 	this->_content_lenght = "";
 	this->_root = "";
-	this->_code = 0;
+	this->_listing = false;
+	this->_full_path = "";
+	this->_location = "";
 }
 
 Response::Response( Response const &other ) : _request(other._request)
@@ -58,22 +60,20 @@ void	Response::initializeResponse( Request &request, Server server)
 	this->_root = "./" + server.getRoot();
 }
 
-void	Response::findStatusMsg()
-{
-	// std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
-	if (this->_request.getErrorCode() != 0)
-		this->_code = _request.getErrorCode();
-	this->_status_msg = statusCodes(this->_code);
-}
+// void	Response::findStatusMsg()
+// {
+// 	// std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
+// 	if (this->_request.getErrorCode() != 0)
+// 		this->_code = _request.getErrorCode();
+// 	this->_status_msg = statusCodes(this->_code);
+// }
 
 void	Response::buildHeader()
 {
-	if (_code == 0)
-		_code = 200;
 	this->_header = "HTTP/1.1 ";
-	_header.append(to_String(_code));
+	_header.append(to_String(this->_code));
 	this->_header.append(" ");
-	this->_header.append(statusCodes(_code));
+	this->_header.append(statusCodes(this->_code));
 	this->_header.append("\r\n");
 }
 
@@ -149,53 +149,235 @@ void	Response::setDate()
 	this->_date.append(utc);
 }
 
-void	Response::buildBody()
-{
-	std::ifstream		file;
+void	Response::getLocationPath(std::string path, std::vector<Location> locations, std::string &locationpath) {
+	size_t a = 0;
 
-	if (_request.getLocation() == "/")
-		file.open(_root + "index.html");
-	else
-		file.open(_root + _request.getLocation());
-	if(file.fail())
-	{
-		file.open(_root + "error/404.html");
-		this->_code = 404;
+	for (std::vector<Location>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+		if (path.find(it->getPathL()) == 0){
+			if (it->getPathL() == "/" || path.length() == it->getPathL().length() || path[it->getPathL().length()] == '/') {
+				if (it->getPathL().length() > a) {
+					a = it->getPathL().length();
+					locationpath = it->getPathL();
+				}
+			}
+		}
 	}
-	this->_body = readFile(file);
 }
 
-void	Response::buildErrorBody()
-{
-	std::ifstream		file;
-
-	if (this->_error_pages.count(this->_code))
-		file.open(_root + this->_error_pages[this->_code]);
-	else if (checkFile(_root + "error/" + to_String(_code) + ".html"))
-		file.open(_root + "error/" + to_String(_code) + ".html");
-	if (!file.good())
-	{
-		file.open(_root + "error/502.html");
-		this->_code = 502;
+bool	Response::checkMethod(std::string method, std::vector<bool> allowed) {
+	if ((method == "GET" && allowed[0] != true) || (method == "POST" && allowed[1] != true) || (method == "DELETE" && allowed[2] != true)) {
+		this->_code = 405;
+		return (1);
 	}
-	this->_body = readFile(file);
+	return (0);
 }
 
-void	Response::buildResponse()
+bool	Response::checkRedirection(Location location) {
+	if (!location.getRedirectionL().empty()) {
+		this->_code = 301;
+		this->_location = location.getRedirectionL();
+		if (this->_location[0] != '/')
+			this->_location.insert(this->_location.begin(), '/');
+		return (1);
+	}
+	return (0);
+}
+
+std::string Response::combinePaths(std::string str1, std::string str2, std::string str3)
 {
-	// if (_request.CGI)
-		//execute the cgi
-	this->defineType();
-	this->setDate();
-	this->setConnection();
-	if(_request.getErrorCode() != 0 || this->_code != 0)
-		this->buildErrorBody();
-	else
-		this->buildBody();
+    std::string	combined;
+    size_t		len1;
+    size_t		len2;
+
+    len1 = str1.length();
+    len2 = str2.length();
+    if (str1[len1 - 1] == '/' && (!str2.empty() && str2[0] == '/') )
+        str2.erase(0, 1);
+    if (str1[len1 - 1] != '/' && (!str2.empty() && str2[0] != '/'))
+        str1.insert(str1.end(), '/');
+    if (str2[len2 - 1] == '/' && (!str3.empty() && str3[0] == '/') )
+        str3.erase(0, 1);
+    if (str2[len2 - 1] != '/' && (!str3.empty() && str3[0] != '/'))
+        str2.insert(str1.end(), '/');
+    combined = str1 + str2 + str3;
+    return (combined);
+}
+
+void	Response::combineRootPath(Location location) {
+	this->_full_path = combinePaths(location.getRootL(), this->_request.getLocation(), "");
+}
+
+bool Response::isDir(std::string path)
+{
+    struct stat file_stat;
+    if (stat(path.c_str(), &file_stat) != 0)
+        return (false);
+
+    return (S_ISDIR(file_stat.st_mode));
+}
+
+bool Response::realFile (const std::string& f) {
+    std::ifstream file(f.c_str());
+    return (file.good());
+}
+
+bool	Response::checkLocation() {
+	std::string	locationpath;
+	getLocationPath(this->_request.getLocation(), this->_server.getLocation(), locationpath);
+	if (locationpath.length() > 0) {
+		Location	response_location = this->_server.getLocationByPath(locationpath);
+		if (checkMethod(this->_request.getMethod(), response_location.getMethodsL()))
+			return (1);
+		if (this->_request.getBody().length() > response_location.getClientBodySizeL()) {
+			this->_code = 413;
+			return (1);
+		}
+		if (checkRedirection(response_location))
+			return (1);
+		if (response_location.getPathL().find("cgi-bin") != std::string::npos)
+			return (1); // SOMETHING CGI HERE
+		combineRootPath(response_location);
+		if (isDir(this->_full_path)) {
+			if (this->_full_path[this->_full_path.length() - 1] != '/') {
+				this->_code = 301;
+				this->_location = this->_request.getLocation() + "/";
+				return (1);
+			}
+			if (!response_location.getIndexL().empty())
+				this->_full_path += response_location.getIndexL();
+			else
+				this->_full_path += this->_server.getIndex();
+			if (!realFile(this->_full_path)) {
+				if (response_location.getListingL()) {
+					this->_full_path.erase(this->_full_path.find_last_of('/') + 1);
+					this->_listing = true;
+					return (0);
+				}
+				else {
+					this->_code = 403;
+					return (1);
+				}
+			}
+			if (isDir(this->_full_path)) {
+				this->_code = 301;
+				if (!response_location.getIndexL().empty())
+					this->_location = combinePaths(this->_request.getLocation(), response_location.getIndexL(), "");
+				else
+					this->_location = combinePaths(this->_request.getLocation(), this->_server.getIndex(), "");
+				if (this->_location[this->_location.length() - 1] != '/')
+					this->_location.insert(this->_location.end(), '/');
+				return (1);
+			}
+		}
+	}
+	else {
+		this->_full_path = combinePaths(this->_server.getRoot(), this->_request.getLocation(), "");
+		if (isDir(this->_full_path)) {
+			if (this->_full_path[this->_full_path.length() - 1] != '/') {
+				this->_code = 301;
+				this->_location = this->_request.getLocation() + "/";
+				return (1);
+			}
+			this->_full_path += this->_server.getIndex();
+			if (!realFile(this->_full_path)) {
+				this->_code = 403;
+				return (1);
+			}
+			if (isDir(this->_full_path))
+            {
+                this->_code = 301;
+                this->_location = combinePaths(this->_request.getLocation(), this->_server.getIndex(), "");
+                if(this->_location[this->_location.length() - 1] != '/')
+                    this->_location.insert(this->_location.end(), '/');
+                return (1);
+            }
+		}
+	}
+	return (0);
+}
+
+bool	Response::buildBody() {
+	if (this->_request.getBody().length() > this->_server.getClientBodySize()) {
+		this->_code = 413;
+		return (1);
+	}
+	if (checkLocation())
+		return (1);
+	if (this->_listing || this->_code)
+		return (0);
+	if (this->_request.getMethod() == "GET") {
+		std::ifstream	file(this->_full_path.c_str());
+		if (file.fail()) {
+			this->_code = 404;
+			return (1);
+		}
+		this->_body = readFile(file);
+	}
+	else if (this->_request.getMethod() == "POST") {
+		if (realFile(this->_full_path)) {
+			this->_code = 204;
+			return (0);
+		}
+		std::ofstream file(this->_full_path, std::ios::binary);
+		if (file.fail()) {
+			this->_code = 404;
+			return (1);
+		}
+		file.write(this->_request.getBody().c_str(), this->_request.getBody().length());
+	}
+	else if (this->_request.getMethod() == "DELETE") {
+		if (!realFile(this->_full_path)) {
+			this->_code = 404;
+			return (1);
+		}
+		if (remove (this->_full_path.c_str()) != 0) {
+			this->_code = 500;
+			return (1);
+		}
+	}
+	this->_code = 200;
+	return (0);
+}
+
+void	Response::buildErrorBody() {
+	if (!this->_error_pages.count(this->_code) || this->_error_pages.at(this->_code).empty() || this->_request.getMethod() == "POST" || this->_request.getMethod() == "DELETE")
+		this->_body = statusCodes(this->_code);
+	else {
+		if (this->_code >= 400 && this->_code < 500) {
+			this->_location = this->_error_pages.at(this->_code);
+			if (this->_location[0] != '/')
+				this->_location.insert(this->_location.begin(), '/');
+			this->_code = 302;
+		}
+		this->_full_path = this->_server.getRoot() + this->_error_pages.at(this->_code);
+		std::ifstream	file(this->_full_path.c_str());
+		if (file.fail())
+			this->_body = statusCodes(this->_code);
+		else
+			this->_body = readFile(file);
+	}
+}
+
+bool	Response::checkErrorCode() {
+	if (this->_request.getErrorCode()) {
+		this->_code = this->_request.getErrorCode();
+		return (1);
+	}
+	return (0);
+}
+
+void	Response::buildResponse() {
+	if (checkErrorCode() || buildBody()) {
+		buildErrorBody();
+	}
+	if (this->_listing) {
+		// PLACEHOLDER, STILL NEEDS TO BE DONE
+	}
 	this->findLenght();
-	this->findStatusMsg();
-	this->buildHeader();
-
+	this->setDate();
+	this->_header.append(this->_conexion);
+	this->_status_msg = statusCodes(this->_code);
+	buildHeader();
 	this->_header.append(this->_conexion);
 	this->_header.append(this->_contentType);
 	this->_header.append(this->_date);
@@ -203,6 +385,61 @@ void	Response::buildResponse()
 	this->_header.append("\r\n");
 	this->_header.append(this->_body);
 }
+
+// void	Response::buildBody()
+// {
+// 	std::ifstream		file;
+
+// 	if (_request.getLocation() == "/")
+// 		file.open(_root + "index.html");
+// 	else
+// 		file.open(_root + _request.getLocation());
+// 	if(file.fail())
+// 	{
+// 		file.open(_root + "error/404.html");
+// 		this->_code = 404;
+// 	}
+// 	this->_body = readFile(file);
+// }
+
+// void	Response::buildErrorBody()
+// {
+// 	std::ifstream		file;
+
+// 	if (this->_error_pages.count(this->_code))
+// 		file.open(_root + this->_error_pages[this->_code]);
+// 	else if (checkFile(_root + "error/" + to_String(_code) + ".html"))
+// 		file.open(_root + "error/" + to_String(_code) + ".html");
+// 	if (!file.good())
+// 	{
+// 		file.open(_root + "error/502.html");
+// 		this->_code = 502;
+// 	}
+// 	this->_body = readFile(file);
+// }
+
+// void	Response::buildResponse()
+// {
+// 	// if (_request.CGI)
+// 		//execute the cgi
+// 	this->defineType();
+// 	this->setDate();
+// 	this->setConnection();
+// 	if(_request.getErrorCode() != 0 || this->_code != 0)
+// 		this->buildErrorBody();
+// 	else
+// 		this->buildBody();
+// 	this->findLenght();
+// 	this->findStatusMsg();
+// 	this->buildHeader();
+
+// 	this->_header.append(this->_conexion);
+// 	this->_header.append(this->_contentType);
+// 	this->_header.append(this->_date);
+// 	this->_header.append(this->_content_lenght);
+// 	this->_header.append("\r\n");
+// 	this->_header.append(this->_body);
+// }
 
 std::string	Response::getResponse()
 {
@@ -224,4 +461,7 @@ void	Response::clearResponse()
 	this->_date.clear();
 	this->_body.clear();
 	this->_content_lenght.clear();
+	this->_listing = false;
+	this->_location.clear();
+	this->_full_path.clear();
 }

@@ -498,6 +498,15 @@ void	Server::prepareServer() {
 	}
 }
 
+Location	Server::getLocationByPath(std::string path) {
+	std::vector<Location>::iterator it;
+	for (it = this->_locations.begin(); it != this->_locations.end(); it++) {
+		if (it->getPathL() == path)
+			return (*it);
+	}
+	throw std::invalid_argument(strerror(errno));
+}
+
 
 std::ostream	&operator<<(std::ostream &o, Server const &server) {
 	o << "\nport: " << server.getPort();

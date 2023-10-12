@@ -9,7 +9,7 @@ server {
 	root	rootdir/;
 	host	127.0.0.1;
 	index	index.html;
-	client_max_body_size 1;
+	client_max_body_size 100;
 	#ooooooo
 	listing on;
 	error_pages
@@ -17,7 +17,13 @@ server {
 	400	folder/file2.html;
 	location / {#WOW
 		index index.html;
+		methods	GET POST DELETE;
 	}
+
+#location /upload {
+#	index upload.html;
+#	methods	GET POST DELETE;
+#}
 
 	location /cgi-bin {
 		root	./;
