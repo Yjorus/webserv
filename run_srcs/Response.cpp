@@ -182,8 +182,8 @@ void	Response::buildErrorBody()
 
 void	Response::buildResponse()
 {
-	// if (_request.CGI)
-		//execute the cgi
+	if (_request.getMethod() == "POST") //Execut the CGI
+		std::cout << "BODY: " <<  _request.getBody() << std::endl;
 	this->defineType();
 	this->setDate();
 	this->setConnection();

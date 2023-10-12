@@ -141,8 +141,6 @@ void	RunServer::readRequest(int a, Client &client) {
 		client.getResponse().buildResponse();
 		removeFromSet(a, _read_fds);
 		addToSet(a, _write_fds);
-		std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
-		std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
 	}
 }
 
@@ -166,6 +164,7 @@ void	RunServer::sendResponse(int a, Client &client) {
 	if (write_return < 0)
 		removeClient(a);
 	if (write_return == 0 || (size_t)write_return == response.length()) {
+		
 		if (client.getRequest().getErrorCode()) // client.getRequest().keepAlive() == false || client.getResponse().getCgiState()
 				removeClient(a);
 		else {

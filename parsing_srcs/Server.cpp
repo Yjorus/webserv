@@ -466,7 +466,6 @@ void	Server::prepareServer() {
 	}
 }
 
-
 std::ostream	&operator<<(std::ostream &o, Server const &server) {
 	o << "\nport: " << server.getPort();
 	o << "\nhost: " << server.getHost();
