@@ -23,7 +23,6 @@ Response::Response( void )
 	this->_date = "";
 	this->_body = "";
 	this->_content_lenght = "";
-	this->_root = "";
 	this->_listing = false;
 	this->_full_path = "";
 	this->_location = "";
@@ -51,13 +50,11 @@ Response& Response::operator=( Response const &other )
 	return (*this);
 }
 
-void	Response::initializeResponse( Request &request, Server server)
+void	Response::initializeResponse( Request &request)
 {
 	this->_code = 0;
 	this->_request = request;
-	this->_server = server;
-	this->_error_pages = server.getErrorPages();
-	this->_root = "./" + server.getRoot();
+	this->_error_pages = _server.getErrorPages();
 }
 
 // void	Response::findStatusMsg()
@@ -345,16 +342,21 @@ void	Response::buildErrorBody() {
 	else {
 		if (this->_code >= 400 && this->_code < 500) {
 			this->_location = this->_error_pages.at(this->_code);
-			if (this->_location[0] != '/')
+			if (this->_location[0] != '/') {
 				this->_location.insert(this->_location.begin(), '/');
-			this->_code = 302;
+				this->_code = 302;
+			}
 		}
-		this->_full_path = this->_server.getRoot() + this->_error_pages.at(this->_code);
-		std::ifstream	file(this->_full_path.c_str());
-		if (file.fail())
+		if (!this->_error_pages.count(this->_code) || this->_error_pages.at(this->_code).empty())
 			this->_body = statusCodes(this->_code);
-		else
-			this->_body = readFile(file);
+		else {
+			this->_full_path = this->_server.getRoot() + this->_error_pages.at(this->_code);
+			std::ifstream	file(this->_full_path.c_str());
+			if (file.fail())
+				this->_body = statusCodes(this->_code);
+			else
+				this->_body = readFile(file);
+		}
 	}
 }
 
@@ -444,6 +446,14 @@ void	Response::buildResponse() {
 std::string	Response::getResponse()
 {
 	return(this->_header);
+}
+
+void	Response::setServer(Server &server) {
+	this->_server = server;
+}
+
+Server	Response::getServer() {
+	return (this->_server);
 }
 
 void	Response::cutResponse(size_t a) {

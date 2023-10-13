@@ -33,7 +33,7 @@ class Response
 		Response( Request request, std::map<int, std::string> error_pages);
 		Response( Response const &other );
 		Response& operator=( Response const &other );
-		void		initializeResponse( Request &request, Server server);
+		void		initializeResponse( Request &request);
 		void		buildResponse();
 		void		clearResponse();
 		std::string	getResponse();
@@ -49,10 +49,12 @@ class Response
 		bool	checkLocation();
 		bool	checkErrorCode();
 
+		void	setServer(Server &server);
+		Server	getServer();
+
 	private:
 		Server						_server;
 		Request						_request;
-		std::string					_root;
 		std::map<int, std::string>	_error_pages;
 		std::string					_status_msg;
 		std::string					_header;

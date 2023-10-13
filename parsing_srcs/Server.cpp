@@ -369,7 +369,7 @@ int		Server::locationCheck(Location &location)const {
 	if (location.getPathL() == "/cgi-bin") {
 		if (location.getCgiPathsL().empty() || location.getCgiExtensionsL().empty() || location.getIndexL().empty())
 			return (4);
-		if (location.getCgiPathsL().size() != location.getCgiExtensionsL().size())
+		if (location.getCgiPathsL().size() != location.getCgiExtensionsL().size() || location.getCgiPathsL().size() > 2)
 			return (4);
 		std::vector<std::string>::const_iterator it;
 		for (it = location.getCgiPathsL().begin(); it != location.getCgiPathsL().end(); it++) {
@@ -391,15 +391,21 @@ int		Server::locationCheck(Location &location)const {
 						return (4);
 					lmao = true;
 				}
-				else if (hold == ".pl")
+				else if (hold == ".pl") {
+					if (temp_map.count(".pl"))
+						return (4);
 					temp_map.insert(std::make_pair(hold, hold2));
+					}
 				if (hold == ".py" && hold2 != "/usr/bin/python3") {
 					if (lmao)
 						return (4);
 					lmao = true;
 				}
-				else if (hold == ".py")
+				else if (hold == ".py") {
+					if (temp_map.count(".py"))
+						return (4);
 					temp_map.insert(std::make_pair(hold, hold2));
+				}
 			}
 		}
 		location.setCgiMap(temp_map);

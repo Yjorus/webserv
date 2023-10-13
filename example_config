@@ -13,7 +13,7 @@ server {
 	#ooooooo
 	listing on;
 	error_pages
-	404	folder/file.html
+	404	/error/404.html
 	400	folder/file2.html;
 	location / {#WOW
 		index index.html;
@@ -28,7 +28,7 @@ server {
 	location /cgi-bin {
 		root	./;
 		index	hello_world.pl;
-		cgi_path	/usr/bin/perl /usr/bin/python3;
+		cgi_path	/usr/bin/perl  /usr/bin/python3;
 		cgi_extensions	.pl .py;
 	}
 }

@@ -30,12 +30,13 @@ void	RunServer::connectClient(Server &server) {
 
 	if ((client_fd  = accept(server.getFd(), (struct sockaddr *)&client_addr, &client_len)) < 0)
 		return ;
-	addToSet(client_fd, _read_fds);
+	// addToSet(client_fd, _read_fds);
 	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0) {
-		removeFromSet(client_fd, _read_fds);
+		// removeFromSet(client_fd, _read_fds);
 		close(client_fd);
 		return ;
 	}
+	addToSet(client_fd, _read_fds);
 	// std::cout << "\nNEW CLIENT " << client_fd << std::endl;
 	new_client.setSocketFd(client_fd);
 	if (_clientmap.count(client_fd) != 0)
@@ -138,7 +139,7 @@ void	RunServer::readRequest(int a, Client &client) {
 	}
 	if (client.getRequest().isFinished() || client.getRequest().getErrorCode()) {
 		setCorrectServerName(client);
-		client.getResponse().initializeResponse(client.getRequest(), client.getServer());
+		client.getResponse().initializeResponse(client.getRequest());
 		client.getResponse().buildResponse();
 		removeFromSet(a, _read_fds);
 		addToSet(a, _write_fds);
@@ -167,7 +168,7 @@ void	RunServer::sendResponse(const int &a, Client &client) {
 	if (write_return < 0)
 		removeClient(a);
 	else if (write_return == 0 || (size_t)write_return == response.length()) {
-		if (client.getRequest().getErrorCode()) // client.getRequest().keepAlive() == false || client.getResponse().getCgiState()
+		if (client.getRequest().getErrorCode() || client.getRequest().keepAlive() == false) // client.getRequest().keepAlive() == false || client.getResponse().getCgiState()
 				removeClient(a);
 		else {
 			removeFromSet(a, _write_fds);
