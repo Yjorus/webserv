@@ -17,7 +17,7 @@ server {
 	400	folder/file2.html;
 	location / {#WOW
 		index index.html;
-		methods	GET POST DELETE;
+		methods	GET POST;
 	}
 
 #location /upload {
@@ -28,7 +28,7 @@ server {
 	location /cgi-bin {
 		root	./;
 		index	hello_world.pl;
-		cgi_path	/usr/bin/perl  /usr/bin/python3;
+		cgi_path	/usr/bin/perl /usr/bin/python3;
 		cgi_extensions	.pl .py;
 	}
 }

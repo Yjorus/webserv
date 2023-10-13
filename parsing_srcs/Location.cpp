@@ -90,7 +90,7 @@ void	Location::setMethodsL(std::vector<std::string> methods) {
 	this->_methods[0] = false;
 	this->_methods[1] = false;
 	this->_methods[2] = false;
-	for (size_t a = 0; a < this->_methods.size(); a++) {
+	for (size_t a = 0; a < methods.size(); a++) {
 		if (methods[a] == "GET" && !this->_methods[0])
 			this->_methods[0] = true;
 		else if (methods[a] == "POST" && !this->_methods[1])
