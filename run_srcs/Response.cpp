@@ -408,19 +408,16 @@ int	Response::buildDirectoryListing(std::string path, std::string &listingbody) 
         listingbody.append(item->d_name);
         if (S_ISDIR(file_stat.st_mode))
             listingbody.append("/");
-        listingbody.append("</a>\n</td>\n");
-        listingbody.append("<td style = \"border: 1px solid black\">\n");
+        listingbody.append("</a>\n</td>\n<td style = \"border: 1px solid black\">\n");
         if (!S_ISDIR(file_stat.st_mode))
             listingbody.append(to_String(file_stat.st_size));
 		else
 			listingbody.append("Directory");
-        listingbody.append("</td>\n");
-		listingbody.append("<td style = \"border: 1px solid black\">\n");
+		listingbody.append("</td>\n<td style = \"border: 1px solid black\">\n");
 		listingbody.append(ctime(&file_stat.st_mtime));
         listingbody.append("</td>\n</tr>\n");
     }
     listingbody.append("</table>\n</body>\n</html>\n");
-
     return (0);
 }
 
