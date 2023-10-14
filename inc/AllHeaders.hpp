@@ -27,6 +27,7 @@
 
 # include <errno.h>
 # include <stdio.h>
+# include <dirent.h>
 
 int				checkPath(std::string path, int flag);
 int				checkFile(std::string path);

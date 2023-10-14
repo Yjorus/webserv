@@ -19,6 +19,18 @@ server {
 		index index.html;
 		methods	GET POST;
 	}
+	location /test/ {#WOW
+		listing on;
+		index test.html;
+		methods	GET POST;
+	}
+
+	location /lol/ {
+		listing on;
+		index lol.html;
+		proxy /test/lol/;
+		methods GET;
+	}
 
 #location /upload {
 #	index upload.html;

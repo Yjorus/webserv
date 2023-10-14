@@ -25,6 +25,7 @@ Response::Response( void )
 	this->_content_lenght = "";
 	this->_listing = false;
 	this->_full_path = "";
+	this->_listingbody = "";
 	this->_location = "";
 }
 
@@ -152,7 +153,7 @@ void	Response::getLocationPath(std::string path, std::vector<Location> locations
 
 	for (std::vector<Location>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 		if (path.find(it->getPathL()) == 0){
-			if (it->getPathL() == "/" || path.length() == it->getPathL().length() || path[it->getPathL().length()] == '/') {
+			if (it->getPathL() == "/" || path.length() == it->getPathL().length() || path[it->getPathL().length() - 1] == '/') {
 				if (it->getPathL().length() > a) {
 					a = it->getPathL().length();
 					locationpath = it->getPathL();
@@ -201,6 +202,11 @@ std::string Response::combinePaths(std::string str1, std::string str2, std::stri
     return (combined);
 }
 
+void	Response::replaceProxy(Location location) {
+	this->_full_path = combinePaths(location.getProxyL(), this->_request.getLocation().substr(location.getPathL().length()), "");
+	this->_full_path = combinePaths(location.getRootL(), this->_full_path, "");
+}
+
 void	Response::combineRootPath(Location location) {
 	this->_full_path = combinePaths(location.getRootL(), this->_request.getLocation(), "");
 }
@@ -223,7 +229,7 @@ bool	Response::checkLocation() {
 	std::string	locationpath;
 	getLocationPath(this->_request.getLocation(), this->_server.getLocation(), locationpath);
 	if (locationpath.length() > 0) {
-		Location	response_location = this->_server.getLocationByPath(locationpath);
+		Location	response_location = *this->_server.getLocationByPath(locationpath);
 		if (checkMethod(this->_request.getMethod(), response_location.getMethodsL()))
 			return (1);
 		if (this->_request.getBody().length() > response_location.getClientBodySizeL()) {
@@ -234,7 +240,10 @@ bool	Response::checkLocation() {
 			return (1);
 		if (response_location.getPathL().find("cgi-bin") != std::string::npos)
 			return (1); // SOMETHING CGI HERE
-		combineRootPath(response_location);
+		if (!response_location.getProxyL().empty())
+			replaceProxy(response_location);
+		else
+			combineRootPath(response_location);
 		if (isDir(this->_full_path)) {
 			if (this->_full_path[this->_full_path.length() - 1] != '/') {
 				this->_code = 301;
@@ -369,12 +378,65 @@ bool	Response::checkErrorCode() {
 	return (0);
 }
 
+int	Response::buildDirectoryListing(std::string path, std::string &listingbody) {
+	DIR				*dir;
+	struct dirent	*item;
+
+	dir = opendir(path.c_str());
+	if (dir == NULL)
+		return (1);
+	listingbody.append("<html>\n<head>\n<title> Index of" + path + "</title>\n</head>\n<body >\n<h1> Index of " + path + "</h1>\n");
+	listingbody.append("<table style=\"width:80%; font-size: 20px; border: 2px solid black; border-collapse: collapse\">\n");
+    listingbody.append("<th style=\"text-align:left; background-color: lightblue; border: 1px solid black\"> File Name </th>\n");
+	listingbody.append("<th style=\"text-align:left; background-color: lightblue; border: 1px solid black\"> File Size </th>\n");
+    listingbody.append("<th style=\"text-align:left; background-color: lightblue; border: 1px solid black\"> Last Modification  </th>\n");
+
+    struct stat file_stat;
+    std::string file_path;
+
+    while((item = readdir(dir)) != NULL)
+    {
+        if(strcmp(item->d_name, ".") == 0)
+            continue;
+        file_path = path + item->d_name;
+        stat(file_path.c_str() , &file_stat);
+        listingbody.append("<tr>\n<td style = \"border: 1px solid black\">\n<a href=\"");
+        listingbody.append(item->d_name);
+        if (S_ISDIR(file_stat.st_mode))
+            listingbody.append("/");
+        listingbody.append("\">");
+        listingbody.append(item->d_name);
+        if (S_ISDIR(file_stat.st_mode))
+            listingbody.append("/");
+        listingbody.append("</a>\n</td>\n");
+        listingbody.append("<td style = \"border: 1px solid black\">\n");
+        if (!S_ISDIR(file_stat.st_mode))
+            listingbody.append(to_String(file_stat.st_size));
+		else
+			listingbody.append("Directory");
+        listingbody.append("</td>\n");
+		listingbody.append("<td style = \"border: 1px solid black\">\n");
+		listingbody.append(ctime(&file_stat.st_mtime));
+        listingbody.append("</td>\n</tr>\n");
+    }
+    listingbody.append("</table>\n</body>\n</html>\n");
+
+    return (0);
+}
+
 void	Response::buildResponse() {
 	if (checkErrorCode() || buildBody()) {
 		buildErrorBody();
 	}
 	if (this->_listing == true) {
-		// PLACEHOLDER, STILL NEEDS TO BE DONE
+		if (buildDirectoryListing(this->_full_path, this->_listingbody)) {
+			this->_code = 500;
+			buildErrorBody();
+		}
+		else {
+			this->_code = 200;
+			this->_body.insert(0, this->_listingbody);
+		}
 	}
 	this->findLenght();
 	this->setDate();
@@ -475,4 +537,5 @@ void	Response::clearResponse()
 	this->_listing = false;
 	this->_location.clear();
 	this->_full_path.clear();
+	this->_listingbody.clear();
 }

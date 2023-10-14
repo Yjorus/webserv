@@ -6,6 +6,7 @@ Location::Location() {
 	this->_listing = false;
 	this->_index = "";
 	this->_redirection = "";
+	this->_proxy = "";
 	this->_client_body_size = 0;
 	this->_methods.push_back(true);
 	this->_methods.push_back(false);
@@ -18,6 +19,7 @@ Location::Location(Location const &copy) {
 		this->_root = copy._root;
 		this->_index = copy._index;
 		this->_redirection = copy._redirection;
+		this->_proxy = copy._proxy;
 		this->_listing = copy._listing;
 		this->_client_body_size = copy._client_body_size;
 		this->_cgi_extensions = copy._cgi_extensions;
@@ -37,6 +39,7 @@ Location	&Location::operator=(Location const &assign) {
 		this->_root = assign._root;
 		this->_index = assign._index;
 		this->_redirection = assign._redirection;
+		this->_proxy = assign._proxy;
 		this->_listing = assign._listing;
 		this->_client_body_size = assign._client_body_size;
 		this->_cgi_extensions = assign._cgi_extensions;
@@ -86,6 +89,10 @@ void	Location::setRedirectionL(std::string option) {
 	this->_redirection = option;
 }
 
+void	Location::setProxyL(std::string option) {
+	this->_proxy = option;
+}
+
 void	Location::setMethodsL(std::vector<std::string> methods) {
 	this->_methods[0] = false;
 	this->_methods[1] = false;
@@ -128,6 +135,10 @@ std::string					Location::getIndexL() const {
 
 std::string					Location::getRedirectionL() const {
 	return (this->_redirection);
+}
+
+std::string					Location::getProxyL() const {
+	return (this->_proxy);
 }
 
 bool						Location::getListingL() const {

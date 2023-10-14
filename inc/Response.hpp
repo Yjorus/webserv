@@ -44,11 +44,13 @@ class Response
 		bool	checkMethod(std::string method, std::vector<bool> allowed);
 		bool	checkRedirection(Location location);
 		std::string combinePaths(std::string str1, std::string str2, std::string str3);
+		void	replaceProxy(Location location);
 		void	combineRootPath(Location location);
 		bool 	isDir(std::string path);
 		bool 	realFile (const std::string& f);
 		bool	checkLocation();
 		bool	checkErrorCode();
+		int		buildDirectoryListing(std::string path, std::string &listingbody);
 
 		void	setServer(Server &server);
 		Server	getServer();
@@ -67,6 +69,7 @@ class Response
 		std::string					_content_lenght;
 		std::string					_location;
 		std::string					_full_path;
+		std::string					_listingbody;
 		int							_code;
 		bool						_listing;
 };

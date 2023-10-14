@@ -285,6 +285,15 @@ void	Server::setLocation(std::string path, std::vector<std::string> data) {
 			checkSemicolon(data[++a]);
 			location.setRedirectionL(data[a]);
 		}
+		else if (data[a] == "proxy" && (a + 1) < data.size())
+		{
+			if (path == "/cgi-bin")
+				throw std::invalid_argument("proxy not allowed in cgi-bin");
+			if (!location.getProxyL().empty())
+				throw std::invalid_argument("duplicate proxy argument in location");
+			checkSemicolon(data[++a]);
+			location.setProxyL(data[a]);
+		}
 		else if (data[a] == "methods" && a + 1 < data.size()) {
 			if (method == true)
 				throw std::invalid_argument("duplicate methods argument in location");
@@ -344,10 +353,7 @@ void	Server::setLocation(std::string path, std::vector<std::string> data) {
 			location.setClientBodySizeL2(1000); //PLACEHOLDER
 	}
 	if (path != "cgi-bin" && location.getIndexL().empty()) {
-		if (!this->_index.empty())
-			location.setIndexL(this->_index);
-		else
-			location.setIndexL("index.html");
+		location.setIndexL(this->_index);
 	}
 	int check = locationCheck(location);
 	if (check == 1)
@@ -420,8 +426,10 @@ int		Server::locationCheck(Location &location)const {
 				location.setRootL("/");
 		}
 		if (checkPathAndFile(location.getRootL() + location.getPathL() + "/", location.getIndexL()))
-			return (2);
+			return (5);
 		if (!location.getRedirectionL().empty() && checkPathAndFile(location.getRootL(), location.getRedirectionL()))
+			return (3);
+		if (!location.getProxyL().empty() && checkPathAndFile(location.getRootL(), location.getProxyL()))
 			return (3);
 	}
 	return (0);
@@ -504,11 +512,11 @@ void	Server::prepareServer() {
 	}
 }
 
-Location	Server::getLocationByPath(std::string path) {
+std::vector<Location>::iterator	Server::getLocationByPath(std::string path) {
 	std::vector<Location>::iterator it;
 	for (it = this->_locations.begin(); it != this->_locations.end(); it++) {
 		if (it->getPathL() == path)
-			return (*it);
+			return (it);
 	}
 	throw std::invalid_argument(strerror(errno));
 }

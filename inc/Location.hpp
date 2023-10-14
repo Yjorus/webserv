@@ -9,6 +9,7 @@ class Location
 		std::string					_root;
 		std::string					_index;
 		std::string					_redirection;
+		std::string					_proxy;
 		bool						_listing;
 		unsigned long				_client_body_size;
 		std::vector<std::string>	_cgi_extensions;
@@ -31,6 +32,7 @@ class Location
 		void	setClientBodySizeL(std::string option);
 		void	setClientBodySizeL2(unsigned long option);
 		void	setRedirectionL(std::string option);
+		void	setProxyL(std::string option);
 		void	setMethodsL(std::vector<std::string> methods);
 		void	setExtensionsL(std::vector<std::string> extensions);
 		void	setCgiPathL(std::vector<std::string> paths);
@@ -40,6 +42,7 @@ class Location
 		std::string					getRootL() const;
 		std::string					getIndexL() const;
 		std::string					getRedirectionL() const;
+		std::string					getProxyL() const;
 		bool						getListingL() const;
 		unsigned long				getClientBodySizeL() const;
 		const std::vector<std::string>	&getCgiExtensionsL() const;
