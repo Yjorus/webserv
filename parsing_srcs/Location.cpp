@@ -138,11 +138,11 @@ unsigned long				Location::getClientBodySizeL() const {
 	return (this->_client_body_size);
 }
 
-std::vector<std::string>	Location::getCgiExtensionsL() const {
+const std::vector<std::string>	&Location::getCgiExtensionsL() const {
 	return (this->_cgi_extensions);
 }
 
-std::vector<std::string>	Location::getCgiPathsL() const {
+const std::vector<std::string>	&Location::getCgiPathsL() const {
 	return (this->_cgi_paths);
 }
 

@@ -119,21 +119,19 @@ void	RunServer::setupSets() {
 	_highest_fd = _servers.back().getFd();
 }
 
-void	RunServer::readRequest(int a, Client &client) {
+void	RunServer::readRequest(const int &a, Client &client) {
 	char	buffer[10000];
+	memset(buffer, 0, sizeof(buffer));
 	int		read_ret_val = 0; 
-	std::string	request;
+	// std::string	request;
 	read_ret_val = read(a, buffer, 10000);
-	if (read_ret_val == 0) {
-		removeClient(a);
-		return ;
-	}
-	else if (read_ret_val < 0) {
+	if (read_ret_val <= 0) {
 		removeClient(a);
 		return ;
 	}
 	else if (read_ret_val != 0){
 		client.refreshTime();
+		// client.getRequest();
 		client.getRequest().parseRequest(buffer, read_ret_val);
 		memset(buffer, 0, sizeof(buffer));
 	}

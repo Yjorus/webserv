@@ -29,6 +29,7 @@ class Response
 		bool		buildBody();
 		void		buildErrorBody();
 	public:
+	
 		Response( void );
 		Response( Request request, std::map<int, std::string> error_pages);
 		Response( Response const &other );

@@ -42,8 +42,8 @@ class Location
 		std::string					getRedirectionL() const;
 		bool						getListingL() const;
 		unsigned long				getClientBodySizeL() const;
-		std::vector<std::string>	getCgiExtensionsL() const;
-		std::vector<std::string>	getCgiPathsL() const;
+		const std::vector<std::string>	&getCgiExtensionsL() const;
+		const std::vector<std::string>	&getCgiPathsL() const;
 		std::vector<bool>			getMethodsL() const;
 		std::map<std::string, std::string>	getCgiMap()const;
 };

@@ -372,13 +372,13 @@ int		Server::locationCheck(Location &location)const {
 		if (location.getCgiPathsL().size() != location.getCgiExtensionsL().size() || location.getCgiPathsL().size() > 2)
 			return (4);
 		std::vector<std::string>::const_iterator it;
-		for (it = location.getCgiPathsL().begin(); it != location.getCgiPathsL().end(); it++) {
+		for (it = location.getCgiPathsL().begin(); it != location.getCgiPathsL().end(); ++it) {
 			if (checkFile(*it) < 0)
 				return (4);
 		}
 		std::vector<std::string>::const_iterator it2;
 		std::map<std::string, std::string> temp_map;
-		for (it = location.getCgiExtensionsL().begin(); it != location.getCgiExtensionsL().end(); it++) {
+		for (it = location.getCgiExtensionsL().begin(); it != location.getCgiExtensionsL().end(); ++it) {
 			std::string	hold = *it;
 			if ( hold != ".pl" && hold != ".py") {
 				return (4);

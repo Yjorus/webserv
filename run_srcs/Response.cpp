@@ -54,6 +54,7 @@ void	Response::initializeResponse( Request &request)
 {
 	this->_code = 0;
 	this->_request = request;
+	this->_listing = false;
 	this->_error_pages = _server.getErrorPages();
 }
 
@@ -300,7 +301,7 @@ bool	Response::buildBody() {
 	}
 	if (checkLocation())
 		return (1);
-	if (this->_listing || this->_code)
+	if (this->_listing == true || this->_code)
 		return (0);
 	if (this->_request.getMethod() == "GET") {
 		std::ifstream	file(this->_full_path.c_str());
@@ -372,7 +373,7 @@ void	Response::buildResponse() {
 	if (checkErrorCode() || buildBody()) {
 		buildErrorBody();
 	}
-	if (this->_listing) {
+	if (this->_listing == true) {
 		// PLACEHOLDER, STILL NEEDS TO BE DONE
 	}
 	this->findLenght();
