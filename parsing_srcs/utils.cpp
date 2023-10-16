@@ -31,7 +31,6 @@ std::string	readFile(std::ifstream &file)
 	std::ostringstream	str;
 
 	str << file.rdbuf();
-	file.close();
 	return (str.str());
 }
 

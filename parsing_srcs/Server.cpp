@@ -285,6 +285,15 @@ void	Server::setLocation(std::string path, std::vector<std::string> data) {
 			checkSemicolon(data[++a]);
 			location.setRedirectionL(data[a]);
 		}
+		else if (data[a] == "proxy" && (a + 1) < data.size())
+		{
+			if (path == "/cgi-bin")
+				throw std::invalid_argument("proxy not allowed in cgi-bin");
+			if (!location.getProxyL().empty())
+				throw std::invalid_argument("duplicate proxy argument in location");
+			checkSemicolon(data[++a]);
+			location.setProxyL(data[a]);
+		}
 		else if (data[a] == "methods" && a + 1 < data.size()) {
 			if (method == true)
 				throw std::invalid_argument("duplicate methods argument in location");
@@ -344,10 +353,7 @@ void	Server::setLocation(std::string path, std::vector<std::string> data) {
 			location.setClientBodySizeL2(1000); //PLACEHOLDER
 	}
 	if (path != "cgi-bin" && location.getIndexL().empty()) {
-		if (!this->_index.empty())
-			location.setIndexL(this->_index);
-		else
-			location.setIndexL("index.html");
+		location.setIndexL(this->_index);
 	}
 	int check = locationCheck(location);
 	if (check == 1)
@@ -369,8 +375,46 @@ int		Server::locationCheck(Location &location)const {
 	if (location.getPathL() == "/cgi-bin") {
 		if (location.getCgiPathsL().empty() || location.getCgiExtensionsL().empty() || location.getIndexL().empty())
 			return (4);
-		if (location.getCgiPathsL().size() != location.getCgiExtensionsL().size())
+		if (location.getCgiPathsL().size() != location.getCgiExtensionsL().size() || location.getCgiPathsL().size() > 2)
 			return (4);
+		std::vector<std::string>::const_iterator it;
+		for (it = location.getCgiPathsL().begin(); it != location.getCgiPathsL().end(); ++it) {
+			if (checkFile(*it) < 0)
+				return (4);
+		}
+		std::vector<std::string>::const_iterator it2;
+		std::map<std::string, std::string> temp_map;
+		for (it = location.getCgiExtensionsL().begin(); it != location.getCgiExtensionsL().end(); ++it) {
+			std::string	hold = *it;
+			if ( hold != ".pl" && hold != ".py") {
+				return (4);
+			}
+			bool	lmao = false;
+			for (it2 = location.getCgiPathsL().begin(); it2 != location.getCgiPathsL().end(); it2++) {
+				std::string hold2 = *it2;
+				if (hold == ".pl" && hold2 != "/usr/bin/perl") {
+					if (lmao)
+						return (4);
+					lmao = true;
+				}
+				else if (hold == ".pl") {
+					if (temp_map.count(".pl"))
+						return (4);
+					temp_map.insert(std::make_pair(hold, hold2));
+					}
+				if (hold == ".py" && hold2 != "/usr/bin/python3") {
+					if (lmao)
+						return (4);
+					lmao = true;
+				}
+				else if (hold == ".py") {
+					if (temp_map.count(".py"))
+						return (4);
+					temp_map.insert(std::make_pair(hold, hold2));
+				}
+			}
+		}
+		location.setCgiMap(temp_map);
 	}
 	else {
 		if (location.getPathL()[0] != '/')
@@ -382,8 +426,10 @@ int		Server::locationCheck(Location &location)const {
 				location.setRootL("/");
 		}
 		if (checkPathAndFile(location.getRootL() + location.getPathL() + "/", location.getIndexL()))
-			return (2);
+			return (5);
 		if (!location.getRedirectionL().empty() && checkPathAndFile(location.getRootL(), location.getRedirectionL()))
+			return (3);
+		if (!location.getProxyL().empty() && checkPathAndFile(location.getRootL(), location.getProxyL()))
 			return (3);
 	}
 	return (0);
@@ -466,6 +512,16 @@ void	Server::prepareServer() {
 	}
 }
 
+std::vector<Location>::iterator	Server::getLocationByPath(std::string path) {
+	std::vector<Location>::iterator it;
+	for (it = this->_locations.begin(); it != this->_locations.end(); it++) {
+		if (it->getPathL() == path)
+			return (it);
+	}
+	throw std::invalid_argument(strerror(errno));
+}
+
+
 std::ostream	&operator<<(std::ostream &o, Server const &server) {
 	o << "\nport: " << server.getPort();
 	o << "\nhost: " << server.getHost();
@@ -477,6 +533,10 @@ std::ostream	&operator<<(std::ostream &o, Server const &server) {
 	std::map<int, std::string>	lmao = server.getErrorPages();
 	for (std::map<int, std::string>::const_iterator it = lmao.begin(); it != lmao.end(); ++it) {
 		o << it->first << " " << it->second << "\n";
+	}
+	std::vector<Location> lol = server.getLocation();
+	for (std::vector<Location>:: const_iterator it2 = lol.begin(); it2 != lol.end(); ++it2) {
+		o << *it2 << "\n";
 	}
 	o << "Listing: " << server.getDirectoryListing() << std::endl;
 	return (o);

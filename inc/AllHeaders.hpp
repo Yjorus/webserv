@@ -16,6 +16,7 @@
 # include <stdexcept>
 # include <vector>
 # include <map>
+# include <algorithm>
 # include <sys/socket.h>
 # include <arpa/inet.h>
 # include <netdb.h>
@@ -26,6 +27,7 @@
 
 # include <errno.h>
 # include <stdio.h>
+# include <dirent.h>
 
 int				checkPath(std::string path, int flag);
 int				checkFile(std::string path);
