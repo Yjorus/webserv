@@ -26,6 +26,15 @@ int my_stoi(std::string str) {
 	return (a);
 }
 
+std::string	readFile(std::ifstream &file)
+{
+	std::ostringstream	str;
+
+	str << file.rdbuf();
+	file.close();
+	return (str.str());
+}
+
 std::string	to_String(int nbr)
 {
 	std::string			str;

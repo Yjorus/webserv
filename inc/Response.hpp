@@ -15,6 +15,7 @@
 
 #include "AllHeaders.hpp"
 #include "Request.hpp"
+#include "Server.hpp"
 
 class Response
 {
@@ -32,20 +33,21 @@ class Response
 		Response( Request request, std::map<int, std::string> error_pages);
 		Response( Response const &other );
 		Response& operator=( Response const &other );
-		void		initializeResponse( Request &request, std::map<int, std::string> error_pages);
+		void		initializeResponse( Request &request, Server server);
 		void		buildResponse();
 		void		clearResponse();
 		std::string	getResponse();
 		void		cutResponse(size_t a);
-		// void		cutResponse(int nbr);
 	private:
+		Server						_server;
 		Request						_request;
+		std::string					_root;
 		std::map<int, std::string>	_error_pages;
 		std::string					_status_msg;
 		std::string					_header;
 		std::string					_contentType;
 		std::string					_conexion;
-		std::string					_server;
+		std::string					_host;
 		std::string					_date;
 		std::string					_body;
 		std::string					_content_lenght;

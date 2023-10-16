@@ -14,7 +14,7 @@
 
 Response::Response( void )
 {
-	this->_server = "";
+	this->_host = "";
 	this->_code = 0;
 	this->_status_msg = "";
 	this->_header = "";
@@ -23,6 +23,7 @@ Response::Response( void )
 	this->_date = "";
 	this->_body = "";
 	this->_content_lenght = "";
+	this->_root = "";
 	this->_code = 0;
 }
 
@@ -48,10 +49,13 @@ Response& Response::operator=( Response const &other )
 	return (*this);
 }
 
-void	Response::initializeResponse( Request &request, std::map<int, std::string> error_pages)
+void	Response::initializeResponse( Request &request, Server server)
 {
+	this->_code = 0;
 	this->_request = request;
-	this->_error_pages = error_pages;
+	this->_server = server;
+	this->_error_pages = server.getErrorPages();
+	this->_root = "./" + server.getRoot();
 }
 
 void	Response::findStatusMsg()
@@ -59,7 +63,6 @@ void	Response::findStatusMsg()
 	std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
 	if (this->_request.getErrorCode() != 0)
 		this->_code = _request.getErrorCode();
-	std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
 	this->_status_msg = statusCodes(this->_code);
 }
 
@@ -97,6 +100,20 @@ void	Response::defineType()
 		this->_contentType.append("image/x-icon");
 	else // this = error
 		this->_contentType.append("text/html");
+	if (ext == ".html" || ext == ".htm")
+		this->_contentType = "text/html; charset=UTF-8";
+	else if (ext == ".css")
+		this->_contentType.append("text/css");
+	else if (ext == ".js")
+		this->_contentType.append("text/javascript");
+	else if (ext == ".jpeg")
+		this->_contentType.append("image/jpeg");
+	else if (ext == ".png")
+		this->_contentType.append("image/png");
+	else if (ext == ".ico")
+		this->_contentType.append("image/x-icon");
+	else 
+		this->_contentType.append("text/html");
 	this->_contentType.append("\r\n");
 }
 
@@ -115,15 +132,17 @@ void	Response::findLenght()
 void	Response::setServer()
 {
 	if (_request.getServerName() != "")
-		this->_server = _request.getServerName();
+		this->_host = _request.getServerName();
 	else
 		this->_server = "LulzSec Server";
 	this->_server.append("\r\n");
+		this->_host = "LulzSec Server";
+	this->_host.append("\r\n");
 }
 
 void	Response::setDate()
 {
-	time_t now = time(0);
+	time_t		now = time(0);
 	std::string	utc;
 
 	tm* gmtm = gmtime(&now);
@@ -148,50 +167,43 @@ void	Response::setDate()
 
 void	Response::buildBody()
 {
-	std::ifstream file;
-	std::ostringstream		str;
+	std::ifstream		file;
 
 	if (_request.getLocation() == "/")
-		file.open("./rootdir/index.html");
+		file.open(_root + "index.html");
 	else
-		file.open("./rootdir" + _request.getLocation());
+		file.open(_root + _request.getLocation());
 	if(file.fail())
 	{
-		file.open("./rootdir/error/404.html");
+		file.open(_root + "error/404.html");
 		this->_code = 404;
 	}
-	str << file.rdbuf();
-	_body = str.str();
-	file.close();
+	this->_body = readFile(file);
 }
 
 void	Response::buildErrorBody()
 {
 	std::ifstream		file;
-	std::ostringstream	str;
 
 	if (this->_error_pages.count(this->_code))
-		file.open("./rootdir/" + this->_error_pages[this->_code]);
-	else if (checkFile("./rootdir/error/" + to_String(_code) + ".html"))
-		file.open("./rootdir/error/" + to_String(_code) + ".html");
+		file.open(_root + this->_error_pages[this->_code]);
+	else if (checkFile(_root + "error/" + to_String(_code) + ".html"))
+		file.open(_root + "error/" + to_String(_code) + ".html");
 	if (!file.good())
 	{
-		file.open("./rootdir/error/502.html");
+		file.open(_root + "error/502.html");
 		this->_code = 502;
 	}
-	str << file.rdbuf();
-	_body = str.str();
-	file.close();
+	this->_body = readFile(file);
 }
 
 void	Response::buildResponse()
 {
-	// if (_request.CGI)
-		//execute the cgi
+	if (_request.getMethod() == "POST") //Execut the CGI
+		std::cout << "BODY: " <<  _request.getBody() << std::endl;
 	this->defineType();
 	this->setDate();
 	this->setConnection();
-	std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
 	if(_request.getErrorCode() != 0 || this->_code != 0)
 		this->buildErrorBody();
 	else
@@ -206,14 +218,7 @@ void	Response::buildResponse()
 	this->_header.append(this->_content_lenght);
 	this->_header.append("\r\n");
 	this->_header.append(this->_body);
-
-	std::cout << this->_header << std::endl;
 }
-
-// void	Response::cutResponse(int nbr)
-// {
-// 	this->_header.erase(nbr);
-// }
 
 std::string	Response::getResponse()
 {
@@ -226,13 +231,8 @@ void	Response::cutResponse(size_t a) {
 
 void	Response::clearResponse()
 {
-	// Request	*ptr;
-
-	// ptr = new(Request);
-	// ptr = NULL;
-	// this->_request = *ptr;
-	this->_server.clear();
 	this->_code = 0;
+	this->_host.clear();
 	this->_status_msg.clear();
 	this->_header.clear();
 	this->_contentType.clear();
