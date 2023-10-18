@@ -1,7 +1,7 @@
 #include "../inc/RunServer.hpp"
 
 RunServer::RunServer()
-{}
+{} //Simplify some stuff to be added here
 
 RunServer::~RunServer()
 {}
@@ -30,12 +30,13 @@ void	RunServer::connectClient(Server &server) {
 
 	if ((client_fd  = accept(server.getFd(), (struct sockaddr *)&client_addr, &client_len)) < 0)
 		return ;
-	addToSet(client_fd, _read_fds);
+	// addToSet(client_fd, _read_fds);
 	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0) {
-		removeFromSet(client_fd, _read_fds);
+		// removeFromSet(client_fd, _read_fds);
 		close(client_fd);
 		return ;
 	}
+	addToSet(client_fd, _read_fds);
 	// std::cout << "\nNEW CLIENT " << client_fd << std::endl;
 	new_client.setSocketFd(client_fd);
 	if (_clientmap.count(client_fd) != 0)
@@ -60,6 +61,7 @@ void	RunServer::serverLoop() {
 	_highest_fd = 0;
 	setupSets();
 	struct timeval timeout;
+	signal(SIGPIPE, SIG_IGN);
 
 	while (1) {
 		timeout.tv_sec = 1;
@@ -117,21 +119,19 @@ void	RunServer::setupSets() {
 	_highest_fd = _servers.back().getFd();
 }
 
-void	RunServer::readRequest(int a, Client &client) {
+void	RunServer::readRequest(const int &a, Client &client) {
 	char	buffer[10000];
+	memset(buffer, 0, sizeof(buffer));
 	int		read_ret_val = 0; 
-	std::string	request;
+	// std::string	request;
 	read_ret_val = read(a, buffer, 10000);
 	if (read_ret_val <= 0) {
 		removeClient(a);
 		return ;
 	}
-	if (read_ret_val == 0) {
-		removeClient(a);
-		return ;
-	}
-	else {
+	else if (read_ret_val != 0){
 		client.refreshTime();
+		// client.getRequest();
 		client.getRequest().parseRequest(buffer, read_ret_val);
 		memset(buffer, 0, sizeof(buffer));
 	}
@@ -154,18 +154,20 @@ void	RunServer::setCorrectServerName(Client &client) {
 	}
 }
 
-void	RunServer::sendResponse(int a, Client &client) {
-	int	write_return;
+//Does we return the correct error codes and where its needed
+
+void	RunServer::sendResponse(const int &a, Client &client) {
+	int			write_return;
 	std::string	response = client.getResponse().getResponse();
-	if (response.length() > 10000)
+
+	if (response.length() >= 10000)
 		write_return = write(a, response.c_str(), 10000);
 	else
-	write_return = write(a, response.c_str(), response.length());
+		write_return = write(a, response.c_str(), response.length());
 	if (write_return < 0)
 		removeClient(a);
-	if (write_return == 0 || (size_t)write_return == response.length()) {
-		
-		if (client.getRequest().getErrorCode()) // client.getRequest().keepAlive() == false || client.getResponse().getCgiState()
+	else if (write_return == 0 || (size_t)write_return == response.length()) {
+		if (client.getRequest().getErrorCode() || client.getRequest().keepAlive() == false)
 				removeClient(a);
 		else {
 			removeFromSet(a, _write_fds);

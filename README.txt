@@ -1,3 +1,8 @@
-TODO for parsing
+TODO
 
-figure out what kind of cgi will be used and add parsing/ validation for those
+figure out how to setup env of cgi correctly and exec cgi correctly
+
+Make webpages more pretier, and implement one more page
+Log
+Error managmente and tests
+Leaks in memory

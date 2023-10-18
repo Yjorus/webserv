@@ -11,7 +11,6 @@ class Client
 	int			_client_fd;
 	Request		_request;
 	time_t		_time;
-	Server		_server;
 	Response	_response;
 
 	public:

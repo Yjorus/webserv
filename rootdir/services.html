@@ -4,45 +4,42 @@
 		<meta charset="utf-8">
 		<meta name="author" content="anonymous">
 		<title>Privacy Serivces</title>
-		<link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
-		<link href="base.css" rel="stylesheet" type="text/css">
-		<!-- Add another css style for it -->
+		<link href="./css/base.css" rel="stylesheet" type="text/css">
+		<link href="./css/services.css" rel="stylesheet" type="text/css">
 	</head>
-	<body style="background-color:gray ;">
+	<body>
 		<header>
 			<div id ="headBlock">
-				<nav>
+				<nav class="menu">
 					<ul>
 						<li class="hackermen"><a href="index.html">HACKERMEN</a></li>
 						<li><a href="index.html">HOME</a></li>
-						<li><a href="./services.html">SERVICES</a></li>
+						<li><a href="services.html">SERVICES</a></li>
 						<li><a href="../error/404.html">ABOUT</a></li>
 						<li><a href="../error/404.html">CONTACT</a></li>
-						<li><a href="../error/404.html">ACCOUNT</a></li>
+						<li><a href="leaks.html">LEAKS</a></li>
 					</ul>
 				</nav>
 			</div>
 		</header>
 		<main>
-			<div class="fullscreen-bg">
-				<img src="matrix.gif" alt="Get Out the Matrix">
-			</div>
-			<h2>Our Services: </h2>
-			<h3>Have I Been Pwned ?</h3>
-			<p>Is a servise that will allow you to check in all the data from the whole world if you informacao have been leaked through a hacker attack</p>
+			<h1><span>';--have i been pwned?</span></h1>
+			<h2>Check if your email address is in a data breach</h2>
 			<form style="text-align: left;" action="/action_page.py" method="post"> 
-				<label for="email">Email: </label>
-				<input class="box" type="text" id="email" name="email">
-				<input class="button" type="submit">
-				<!-- <label for="img">Put image: </label> -->
-				<!-- <input type="image" id="img" name="img"> -->
-				<fieldset>
-				<legend>Do you agree to the terms?</legend>
-					<label><input type="radio" name="radio" value="yes" /> Yes</label>
-					<label><input type="radio" name="radio" value="no" /> No</label>
-				</fieldset>
+				<div class="form-group">
+					<input class="form-field" style="width:50%;" type="email" placeholder="Email">
+					<span>@gmail.com</span>
+					<input class="form-field" style="width:10%;" type="submit">
+				</div>
+				<h4><span>Do you agree to the terms?</span></h4>
+				<div class="checkbox-wrapper-10">
+					<input class="tgl tgl-flip" id="cb5" type="checkbox" checked />
+					<label class="tgl-btn" data-tg-off="Nope" data-tg-on="Yeah!" for="cb5"></label>
+				</div>
 			</form>
-			<p>Using Have I Been Pwned is subject to the terms of use</p>
 		</main>
+		<footer>
+			<p>Using Have I Been Pwned is subject to the terms of use</p>
+		</footer>
 	</body>
 </html>

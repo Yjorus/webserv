@@ -6,6 +6,7 @@ Location::Location() {
 	this->_listing = false;
 	this->_index = "";
 	this->_redirection = "";
+	this->_proxy = "";
 	this->_client_body_size = 0;
 	this->_methods.push_back(true);
 	this->_methods.push_back(false);
@@ -18,11 +19,13 @@ Location::Location(Location const &copy) {
 		this->_root = copy._root;
 		this->_index = copy._index;
 		this->_redirection = copy._redirection;
+		this->_proxy = copy._proxy;
 		this->_listing = copy._listing;
 		this->_client_body_size = copy._client_body_size;
 		this->_cgi_extensions = copy._cgi_extensions;
 		this->_cgi_paths = copy._cgi_paths;
 		this->_methods = copy._methods;
+		this->_cgimap = copy._cgimap;
 	}
 	return ;
 }
@@ -36,11 +39,13 @@ Location	&Location::operator=(Location const &assign) {
 		this->_root = assign._root;
 		this->_index = assign._index;
 		this->_redirection = assign._redirection;
+		this->_proxy = assign._proxy;
 		this->_listing = assign._listing;
 		this->_client_body_size = assign._client_body_size;
 		this->_cgi_extensions = assign._cgi_extensions;
 		this->_cgi_paths = assign._cgi_paths;
 		this->_methods = assign._methods;
+		this->_cgimap = assign._cgimap;
 	}
 	return (*this);
 }
@@ -84,11 +89,15 @@ void	Location::setRedirectionL(std::string option) {
 	this->_redirection = option;
 }
 
+void	Location::setProxyL(std::string option) {
+	this->_proxy = option;
+}
+
 void	Location::setMethodsL(std::vector<std::string> methods) {
 	this->_methods[0] = false;
 	this->_methods[1] = false;
 	this->_methods[2] = false;
-	for (size_t a = 0; a < this->_methods.size(); a++) {
+	for (size_t a = 0; a < methods.size(); a++) {
 		if (methods[a] == "GET" && !this->_methods[0])
 			this->_methods[0] = true;
 		else if (methods[a] == "POST" && !this->_methods[1])
@@ -108,6 +117,10 @@ void	Location::setCgiPathL(std::vector<std::string> paths) {
 	this->_cgi_paths = paths;
 }
 
+void	Location::setCgiMap(std::map<std::string, std::string> map) {
+	this->_cgimap = map;
+}
+
 std::string					Location::getPathL() const {
 	return (this->_path);
 }
@@ -124,6 +137,10 @@ std::string					Location::getRedirectionL() const {
 	return (this->_redirection);
 }
 
+std::string					Location::getProxyL() const {
+	return (this->_proxy);
+}
+
 bool						Location::getListingL() const {
 	return (this->_listing);
 }
@@ -132,14 +149,30 @@ unsigned long				Location::getClientBodySizeL() const {
 	return (this->_client_body_size);
 }
 
-std::vector<std::string>	Location::getCgiExtensionsL() const {
+const std::vector<std::string>	&Location::getCgiExtensionsL() const {
 	return (this->_cgi_extensions);
 }
 
-std::vector<std::string>	Location::getCgiPathsL() const {
+const std::vector<std::string>	&Location::getCgiPathsL() const {
 	return (this->_cgi_paths);
 }
 
 std::vector<bool>			Location::getMethodsL() const {
 	return (this->_methods);
+}
+
+std::map<std::string, std::string>	Location::getCgiMap() const{
+	return (this->_cgimap);
+}
+
+std::ostream	&operator<<(std::ostream &o, Location const &location) {
+	o << "\npath: " << location.getPathL();
+	o << "\nroot: " << location.getRootL();
+	o << "\nindex: " << location.getIndexL() << "\n";
+
+	std::map<std::string, std::string>	lmao = location.getCgiMap();
+	for (std::map<std::string, std::string>::const_iterator it = lmao.begin(); it != lmao.end(); ++it) {
+		o << it->first << " " << it->second << "\n";
+	}
+	return (o);
 }

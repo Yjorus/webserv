@@ -537,6 +537,14 @@ std::string	Request::getLocation() {
 	return (this->_location);
 }
 
+bool	Request::keepAlive() {
+	if (_headers.count("Connection")) {
+		if (_headers["connection"].find("close", 0) != std::string::npos)
+            return (false);
+	}
+	return (true);
+}
+
 void	Request::clearRequest() {
 	this->_method = -1;
 	this->_methodindex = 1;

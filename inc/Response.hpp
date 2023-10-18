@@ -19,18 +19,18 @@
 
 class Response
 {
-		void		findStatusMsg();
+		// void		findStatusMsg();
 		void		buildHeader();
 		void		defineType();
 		void		setConnection();
 		void		findLenght();
 		void		setServer();
 		void		setDate();
-		void		buildBody();
+		bool		buildBody();
 		void		buildErrorBody();
 	public:
+	
 		Response( void );
-		Response( Request request, std::map<int, std::string> error_pages);
 		Response( Response const &other );
 		Response& operator=( Response const &other );
 		void		initializeResponse( Request &request, Server server);
@@ -38,10 +38,26 @@ class Response
 		void		clearResponse();
 		std::string	getResponse();
 		void		cutResponse(size_t a);
+
+		void	getLocationPath(std::string path, std::vector<Location> locations, std::string &locationpath);
+		bool	checkMethod(std::string method, std::vector<bool> allowed);
+		bool	checkRedirection(Location location);
+		std::string combinePaths(std::string str1, std::string str2, std::string str3);
+		void	replaceProxy(Location location);
+		void	combineRootPath(Location location);
+		bool 	isDir(std::string path);
+		void	findStatusMsg();
+		bool 	realFile (const std::string& f);
+		bool	checkLocation();
+		bool	checkErrorCode();
+		int		buildDirectoryListing(std::string path, std::string &listingbody);
+
+		void	setServer(Server &server);
+		Server	getServer();
+
 	private:
 		Server						_server;
 		Request						_request;
-		std::string					_root;
 		std::map<int, std::string>	_error_pages;
 		std::string					_status_msg;
 		std::string					_header;
@@ -51,7 +67,11 @@ class Response
 		std::string					_date;
 		std::string					_body;
 		std::string					_content_lenght;
+		std::string					_location;
+		std::string					_full_path;
+		std::string					_listingbody;
 		int							_code;
+		bool						_listing;
 };
 
 #endif

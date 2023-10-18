@@ -5,9 +5,9 @@ Client::Client() {
 }
 
 Client::Client(Server &server) {
-	_server = server;
 	_time = time(NULL);
 	_request.setAddress(server.getHost());
+	_response.setServer(server);
 }
 
 // Client::Client(Client const &copy)
@@ -24,7 +24,7 @@ void	Client::setSocketFd(int fd) {
 }
 
 void	Client::setServer(Server &server) {
-	this->_server = server;
+	this->_response.setServer(server);
 }
 
 int	Client::getSocketFd() {
@@ -40,7 +40,7 @@ void	Client::refreshTime() {
 }
 
 Server	Client::getServer() {
-	return (this->_server);
+	return (this->_response.getServer());
 }
 
 time_t	Client::getTime() {

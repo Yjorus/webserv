@@ -55,6 +55,7 @@ class Server
 		bool						getDirectoryListing()const;
 		int							getFd()const;
 		std::vector<Location>		getLocation()const;
+		std::vector<Location>::iterator					getLocationByPath(std::string path);
 
 		void	prepareServer();
 

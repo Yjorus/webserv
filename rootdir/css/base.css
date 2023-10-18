@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css?family=Rubik+Glitch');
+@import url('https://fonts.googleapis.com/css?family=Shadows+Into+Light');
+
+html,body
+{
+	margin:0;padding:0;
+	font-family: sans-serif;
+}
+
+p
+{
+	padding: 1em;
+}
+
+#headBlock
+{
+	width:100%;
+	height:6vw;
+	margin: 0;
+	background-color: slateblue;
+	opacity: 90%;
+	margin-top: 0.5vw;
+	padding-bottom: 1vw;
+}
+
+header
+{
+	text-align:center;
+}
+h1:hover{
+	
+	transition-duration: 0.3s
+}
+
+nav ul
+{
+	list-style: none;
+	margin-bottom: 0em;
+	padding:0;
+	border: 1px solid black;
+	height: 6.9vw;
+}
+
+nav ul li
+{
+	display:inline;
+	list-style-type: none;
+	display:inline-block;
+	padding: 1em;
+}
+
+nav ul li a
+{
+	font-size: 2.5vw;
+	text-decoration: none;
+	color:black;
+}
+
+nav ul li:hover
+{
+	opacity: 90%;
+	transition-duration:.7s;
+	border-radius: 0.5em;
+}
+
+nav ul li a:hover
+{
+	transition-duration:0.7s;
+	border-bottom:0.1em solid #163735;
+}
+
+.box
+{
+	align-self: center;
+	width: 60%;
+	height: 7vw;
+	background-color: rgb(189, 216, 203);
+	border-top:0.1vw solid #000;
+	border-bottom:0.41vw solid #fff;
+	border-radius: 3%;
+	padding-left: 10%;
+}
+
+.button
+{
+	align-self: center;
+	width: 10%;
+	height: 7em;
+	background-color: rgb(189, 216, 203);
+	border-top:0.1em solid #000;
+	border-bottom:0.1em solid #fff;
+	border-radius: 10%;
+}
+
+.fullscreen-bg
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+	overflow: hidden;
+}
+
+.fullscreen-bg img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center center;
+}
+
+.hackermen
+{
+	width: 40%;
+	text-align: left;
+	font-size: 2.5vw;
+	font-family: "Rubik Glitch";
+}
+
+.menu
+{
+	font-family: "Shadows Into Light";
+	text-align: right;
+}
