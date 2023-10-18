@@ -63,14 +63,6 @@ void	Response::initializeResponse( Request &request)
 	this->_error_pages = _server.getErrorPages();
 }
 
-// void	Response::findStatusMsg()
-// {
-// 	// std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
-// 	if (this->_request.getErrorCode() != 0)
-// 		this->_code = _request.getErrorCode();
-// 	this->_status_msg = statusCodes(this->_code);
-// }
-
 void	Response::buildHeader()
 {
 	this->_header = "HTTP/1.1 ";

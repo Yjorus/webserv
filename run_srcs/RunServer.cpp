@@ -150,8 +150,6 @@ void	RunServer::readRequest(const int &a, Client &client) {
 		}
 		removeFromSet(a, _read_fds);
 		addToSet(a, _write_fds);
-		// std::cout << "SERVER_NAME: " << client.getServer().getServerName() << std::endl;
-		// std::cout << "ERROR_CODE: " << client.getRequest().getErrorCode() << std::endl;
 	}
 }
 
