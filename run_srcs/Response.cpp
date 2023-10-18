@@ -54,7 +54,7 @@ Response& Response::operator=( Response const &other )
 	return (*this);
 }
 
-void	Response::initializeResponse( Request &request)
+void	Response::initializeResponse( Request &request, Server server)
 {
 	this->_code = 0;
 	this->_cgi_flag = 0;
@@ -63,13 +63,13 @@ void	Response::initializeResponse( Request &request)
 	this->_error_pages = _server.getErrorPages();
 }
 
-// void	Response::findStatusMsg()
-// {
-// 	// std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
-// 	if (this->_request.getErrorCode() != 0)
-// 		this->_code = _request.getErrorCode();
-// 	this->_status_msg = statusCodes(this->_code);
-// }
+void	Response::findStatusMsg()
+{
+	std::cout << "Request: " << _request.getErrorCode() << "Response: " << this->_code << std::endl;
+	if (this->_request.getErrorCode() != 0)
+		this->_code = _request.getErrorCode();
+	this->_status_msg = statusCodes(this->_code);
+}
 
 void	Response::buildHeader()
 {
