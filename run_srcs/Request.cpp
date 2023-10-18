@@ -525,8 +525,14 @@ bool	Request::isFinished() {
 	return (_step == request_handled);
 }
 
-std::string	Request::getBody() {
+std::string	&Request::getBody() {
 	return (this->_body);
+}
+
+void	Request::setBody(std::string body) {
+	this->_body.clear();
+	this->_body.insert(this->_body.begin(), this->_body.begin(), this->_body.end());
+	this->_body = body;
 }
 
 std::string	Request::getPort() {

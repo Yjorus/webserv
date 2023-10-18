@@ -11,11 +11,12 @@
 /* ************************************************************************** */
 
 #ifndef RESPONSE_HPP
-#define RESPONSE_HPP
+# define RESPONSE_HPP
 
-#include "AllHeaders.hpp"
-#include "Request.hpp"
-#include "Server.hpp"
+# include "AllHeaders.hpp"
+# include "Request.hpp"
+# include "Server.hpp"
+# include "CgiManager.hpp"
 
 class Response
 {
@@ -39,6 +40,7 @@ class Response
 		void		clearResponse();
 		std::string	getResponse();
 		void		cutResponse(size_t a);
+		void		updateResponse(char *buffer, int a);
 
 		void	getLocationPath(std::string path, std::vector<Location> locations, std::string &locationpath);
 		bool	checkMethod(std::string method, std::vector<bool> allowed);
@@ -49,15 +51,26 @@ class Response
 		bool 	isDir(std::string path);
 		bool 	realFile (const std::string& f);
 		bool	checkLocation();
+		bool	checkCgi(std::string &locationpath);
 		bool	checkErrorCode();
 		int		buildDirectoryListing(std::string path, std::string &listingbody);
+
+		void	setCgiErrorResponse(int a);
 
 		void	setServer(Server &server);
 		Server	getServer();
 
+		void		setCgiFlag(int a);
+		int			getCgiFlag();
+
+		CgiManager	&getCgiManager();
+
 	private:
 		Server						_server;
 		Request						_request;
+		CgiManager					_cgi_manager;
+		int							_cgi_flag;
+		int							_cgi_fd[2];
 		std::map<int, std::string>	_error_pages;
 		std::string					_status_msg;
 		std::string					_header;
