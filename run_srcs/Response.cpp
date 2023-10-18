@@ -273,7 +273,7 @@ bool	Response::checkLocation() {
 		else
 			combineRootPath(response_location);
 		if (response_location.getPathL().find("cgi-bin") != std::string::npos)
-			return (checkCgi(locationpath)); // SOMETHING CGI HERE
+			return (checkCgi(locationpath));
 		if (isDir(this->_full_path)) {
 			if (this->_full_path[this->_full_path.length() - 1] != '/') {
 				this->_location = this->_request.getLocation() + "/";

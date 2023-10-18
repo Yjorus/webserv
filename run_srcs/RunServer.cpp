@@ -30,14 +30,11 @@ void	RunServer::connectClient(Server &server) {
 
 	if ((client_fd  = accept(server.getFd(), (struct sockaddr *)&client_addr, &client_len)) < 0)
 		return ;
-	// addToSet(client_fd, _read_fds);
 	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0) {
-		// removeFromSet(client_fd, _read_fds);
 		close(client_fd);
 		return ;
 	}
 	addToSet(client_fd, _read_fds);
-	// std::cout << "\nNEW CLIENT " << client_fd << std::endl;
 	new_client.setSocketFd(client_fd);
 	if (_clientmap.count(client_fd) != 0)
 		_clientmap.erase(client_fd);
@@ -49,7 +46,6 @@ void	RunServer::removeClient(int a) {
 		removeFromSet(a, _write_fds);
 	if (FD_ISSET(a, &_read_fds))
 		removeFromSet(a, _read_fds);
-	// std::cout << "\nCLOSING CONNECTION TO " << a << std::endl;
 	close(a);
 	_clientmap.erase(a);
 }

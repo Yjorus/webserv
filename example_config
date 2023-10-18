@@ -9,7 +9,7 @@ server {
 	root	rootdir/;
 	host	127.0.0.1;
 	index	index.html;
-	client_max_body_size 100;
+	client_max_body_size 1000000000;
 	#ooooooo
 	listing on;
 	error_pages

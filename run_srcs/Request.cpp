@@ -75,7 +75,6 @@ void	Request::addToHeaders(std::string &str1, std::string &str2)
 {
 	trimWhitespace(str1);
 	trimWhitespace(str2);
-	// std::cout << str1 << ": " << str2 << std::endl; 
 	this->_headers[str1] = str2;
 }
 
@@ -102,7 +101,6 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 	int					parsechar;
 	std::stringstream	ss;
 
-	// std::cout << requeststr << std::endl;
 	for (std::string::size_type a = 0; a < requestsize; a++) {
 		parsechar = requeststr[a];
 		switch(_step) {
@@ -127,10 +125,8 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 					_error_code = 501;
 					return ;
 				}
-				if (_methodindex == _methods[_method].length()) {
-					// std::cout << "method: " << _methods[_method] << std::endl;
+				if (_methodindex == _methods[_method].length())
 					_step = check_first_space;
-				}
 				continue;
 			}
 			case check_first_space: {
@@ -153,21 +149,18 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 				if (parsechar == ' ') {
 					_step = H;
 					_location.append(_buffer);
-					// std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
 				else if (parsechar == '?') {
 					_step = check_path_query;
 					_location.append(_buffer);
-					// std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
 				else if (parsechar == '#') {
 					_step = check_path_fragment;
 					_location.append(_buffer);
-					// std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
@@ -185,14 +178,12 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 				if (parsechar == ' ') {
 					_step = H;
 					_query.append(_buffer);
-					// std::cout << "query: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
 				else if (parsechar == '#') {
 					_step = check_path_fragment;
 					_query.append(_buffer);
-					// std::cout << "query: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
@@ -210,7 +201,6 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 				if (parsechar == ' ') {
 					_step = H;
 					_fragment.append(_buffer);
-					// std::cout << "fragment: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
@@ -468,7 +458,6 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 					_error_code = 400;
 					return ;
 				}
-				std::cout << _body << std::endl;
 				_step = request_handled;
 			}
 			case request_handled: {
