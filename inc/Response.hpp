@@ -54,6 +54,7 @@ class Response
 		bool	checkCgi(std::string &locationpath);
 		bool	checkErrorCode();
 		int		buildDirectoryListing(std::string path, std::string &listingbody);
+		std::string	handleBoundary(std::string content, std::string boundary);
 
 		void	setCgiErrorResponse(int a);
 

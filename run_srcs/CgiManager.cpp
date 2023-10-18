@@ -81,6 +81,15 @@ void	CgiManager::setupEnvCgi(Request &request, std::string extension, Location l
 	this->_cgi_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	this->_cgi_env["SERVER_SOFTWARE"] = "LulzSec Server";
 
+	std::map<std::string, std::string> request_headers = request.getHeaders();
+	for(std::map<std::string, std::string>::iterator it = request_headers.begin(); it != request_headers.end(); ++it)
+	{
+		std::string name = it->first;
+		std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+		std::string key = "HTTP_" + name;
+		this->_cgi_env[key] = it->second;
+	}
+
 	this->_env = mapToCStrArray();
 	this->_av = new char *[3];
 	this->_av[0] = new char[path.size() + 1];

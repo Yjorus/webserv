@@ -18,6 +18,8 @@ Request::Request() {
 	this->_step = start_parsing;
 	this->_http_major = false;
 	this->_http_minor = false;
+	this->_multipart = false;
+	this->_boundary = "";
 	this->_field_name_storage = "";
 	this->_content_length = 0;
 	this->_length_of_chunk = 0;
@@ -95,6 +97,13 @@ void	Request::checkHeaders() {
 		_host = _headers["Host"].substr(0, h);
 		_port = _headers["Host"].substr(h + 1);
 	}
+	if (_headers.count("content-type") && _headers["content-type"].find("multipart/form-data") != std::string::npos)
+    {
+        size_t pos = _headers["content-type"].find("boundary=", 0);
+        if (pos != std::string::npos)
+            this->_boundary = _headers["content-type"].substr(pos + 9, _headers["content-type"].size());
+        this->_multipart = true;
+    }
 }
 
 void	Request::parseRequest(std::string requeststr, size_t requestsize) {
@@ -532,6 +541,14 @@ std::string	Request::getLocation() {
 	return (this->_location);
 }
 
+bool	Request::getMultiPart() {
+	return (this->_multipart);
+}
+
+std::string	Request::getBoundary() {
+	return (this->_boundary);
+}
+
 bool	Request::keepAlive() {
 	if (_headers.count("Connection")) {
 		if (_headers["connection"].find("close", 0) != std::string::npos)
@@ -550,8 +567,10 @@ void	Request::clearRequest() {
 	this->_body.clear();
 	this->_host.clear();
 	this->_port.clear();
+	this->_boundary.clear();
 	this->_hasbody = false;
 	this->_ischunked = false;
+	this->_multipart = false;
 	this->_step = start_parsing;
 	this->_http_major = false;
 	this->_http_minor = false;
