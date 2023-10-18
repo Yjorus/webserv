@@ -25,7 +25,7 @@ server {
 		methods	GET POST;
 	}
 
-	location /lol/ {
+	location /lmao/ {
 		listing on;
 		index lol.html;
 		proxy /test/lol/;
@@ -37,9 +37,9 @@ server {
 #	methods	GET POST DELETE;
 #}
 
-	location /cgi-bin {
-		root	./;
-		index	hello_world.pl;
+	location /cgi-bin/ {
+		root:	rootdir/;
+		index	time.py;
 		cgi_path	/usr/bin/perl /usr/bin/python3;
 		cgi_extensions	.pl .py;
 	}

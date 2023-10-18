@@ -80,6 +80,7 @@ class Request
 		void	trimWhitespace(std::string &str);
 		void	checkHeaders();
 		void	setAddress(uint32_t address);
+		void	setBody(std::string body);
 
 		int									getErrorCode();
 		std::string							getServerName();
@@ -88,7 +89,7 @@ class Request
 		std::string							getQuery();
 		std::map<std::string, std::string>	getHeaders();
 		std::string							getHeader(std::string key);
-		std::string							getBody();
+		std::string							&getBody();
 		std::string							getPort();
 		std::string							getLocation();
 		bool								keepAlive();

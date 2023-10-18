@@ -16,6 +16,7 @@ Response::Response( void )
 {
 	this->_host = "";
 	this->_code = 0;
+	this->_cgi_flag = 0;
 	this->_status_msg = "";
 	this->_header = "";
 	this->_contentType = "";
@@ -39,6 +40,8 @@ Response& Response::operator=( Response const &other )
 	if (this != &other)
 	{
 		this->_request = other._request;
+		this->_code = other._code;
+		this->_cgi_flag = other._cgi_flag;
 		this->_status_msg = other._status_msg;
 		this->_header = other._header;
 		this->_contentType = other._contentType;
@@ -54,6 +57,7 @@ Response& Response::operator=( Response const &other )
 void	Response::initializeResponse( Request &request)
 {
 	this->_code = 0;
+	this->_cgi_flag = 0;
 	this->_request = request;
 	this->_listing = false;
 	this->_error_pages = _server.getErrorPages();
@@ -225,6 +229,40 @@ bool Response::realFile (const std::string& f) {
     return (file.good());
 }
 
+bool	Response::checkCgi(std::string &locationpath) {
+	size_t a;
+	std::string path = this->_full_path;
+
+	if (path[path.size() - 1] == '/')
+		path += this->_server.getLocationByPath(locationpath)->getIndexL();
+	a = path.rfind('.');
+	if (a == std::string::npos) {
+		this->_code = 406;
+		return (1);
+	}
+	std::string	extension = path.substr(a);
+	if (extension != ".pl" && extension != ".py") {
+		this->_code = 501;
+		return (1);
+	}
+	if (checkFile(path) != 1 || checkPath(path, 1) == -1 || checkPath(path, 3) == -1) {
+		this->_code = 404;
+		return (1);
+	}
+	if (checkMethod(this->_request.getMethod(), this->_server.getLocationByPath(locationpath)->getMethodsL()))
+		return (1);
+	this->_cgi_manager.clearCgi();
+	this->_cgi_manager.setPath(path);
+	this->_cgi_flag = 1;
+	if (pipe(this->_cgi_fd) < 0) {
+		this->_code = 500;
+		return (1);
+	}
+	this->_cgi_manager.setupEnvCgi(this->_request, extension, *this->_server.getLocationByPath(locationpath));
+	this->_cgi_manager.executeCgi(this->_code);
+	return (0);
+}
+
 bool	Response::checkLocation() {
 	std::string	locationpath;
 	getLocationPath(this->_request.getLocation(), this->_server.getLocation(), locationpath);
@@ -238,16 +276,16 @@ bool	Response::checkLocation() {
 		}
 		if (checkRedirection(response_location))
 			return (1);
-		if (response_location.getPathL().find("cgi-bin") != std::string::npos)
-			return (1); // SOMETHING CGI HERE
 		if (!response_location.getProxyL().empty())
 			replaceProxy(response_location);
 		else
 			combineRootPath(response_location);
+		if (response_location.getPathL().find("cgi-bin") != std::string::npos)
+			return (checkCgi(locationpath)); // SOMETHING CGI HERE
 		if (isDir(this->_full_path)) {
 			if (this->_full_path[this->_full_path.length() - 1] != '/') {
-				this->_code = 301;
 				this->_location = this->_request.getLocation() + "/";
+				this->_code = 301;
 				return (1);
 			}
 			if (!response_location.getIndexL().empty())
@@ -266,13 +304,13 @@ bool	Response::checkLocation() {
 				}
 			}
 			if (isDir(this->_full_path)) {
-				this->_code = 301;
 				if (!response_location.getIndexL().empty())
 					this->_location = combinePaths(this->_request.getLocation(), response_location.getIndexL(), "");
 				else
 					this->_location = combinePaths(this->_request.getLocation(), this->_server.getIndex(), "");
 				if (this->_location[this->_location.length() - 1] != '/')
 					this->_location.insert(this->_location.end(), '/');
+				this->_code = 301;
 				return (1);
 			}
 		}
@@ -281,8 +319,8 @@ bool	Response::checkLocation() {
 		this->_full_path = combinePaths(this->_server.getRoot(), this->_request.getLocation(), "");
 		if (isDir(this->_full_path)) {
 			if (this->_full_path[this->_full_path.length() - 1] != '/') {
-				this->_code = 301;
 				this->_location = this->_request.getLocation() + "/";
+				this->_code = 301;
 				return (1);
 			}
 			this->_full_path += this->_server.getIndex();
@@ -292,10 +330,10 @@ bool	Response::checkLocation() {
 			}
 			if (isDir(this->_full_path))
             {
-                this->_code = 301;
                 this->_location = combinePaths(this->_request.getLocation(), this->_server.getIndex(), "");
                 if(this->_location[this->_location.length() - 1] != '/')
                     this->_location.insert(this->_location.end(), '/');
+				this->_code = 301;
                 return (1);
             }
 		}
@@ -310,7 +348,7 @@ bool	Response::buildBody() {
 	}
 	if (checkLocation())
 		return (1);
-	if (this->_listing == true || this->_code)
+	if (this->_listing == true || this->_code || this->_cgi_flag)
 		return (0);
 	if (this->_request.getMethod() == "GET") {
 		std::ifstream	file(this->_full_path.c_str());
@@ -425,6 +463,8 @@ void	Response::buildResponse() {
 	if (checkErrorCode() || buildBody()) {
 		buildErrorBody();
 	}
+	if (this->_cgi_flag)
+		return ;
 	if (this->_listing == true) {
 		if (buildDirectoryListing(this->_full_path, this->_listingbody)) {
 			this->_code = 500;
@@ -448,63 +488,25 @@ void	Response::buildResponse() {
 	this->_header.append(this->_body);
 }
 
-// void	Response::buildBody()
-// {
-// 	std::ifstream		file;
+void	Response::setCgiErrorResponse(int a) {
+	this->_header = "";
+	this->_code = a;
+	this->_body = "";
+	buildErrorBody();
+	this->findLenght();
+	this->setDate();
+	this->_header.append(this->_conexion);
+	this->_status_msg = statusCodes(this->_code);
+	buildHeader();
+	this->_header.append(this->_conexion);
+	this->_header.append(this->_contentType);
+	this->_header.append(this->_date);
+	this->_header.append(this->_content_lenght);
+	this->_header.append("\r\n");
+	this->_header.append(this->_body);
+}
 
-// 	if (_request.getLocation() == "/")
-// 		file.open(_root + "index.html");
-// 	else
-// 		file.open(_root + _request.getLocation());
-// 	if(file.fail())
-// 	{
-// 		file.open(_root + "error/404.html");
-// 		this->_code = 404;
-// 	}
-// 	this->_body = readFile(file);
-// }
-
-// void	Response::buildErrorBody()
-// {
-// 	std::ifstream		file;
-
-// 	if (this->_error_pages.count(this->_code))
-// 		file.open(_root + this->_error_pages[this->_code]);
-// 	else if (checkFile(_root + "error/" + to_String(_code) + ".html"))
-// 		file.open(_root + "error/" + to_String(_code) + ".html");
-// 	if (!file.good())
-// 	{
-// 		file.open(_root + "error/502.html");
-// 		this->_code = 502;
-// 	}
-// 	this->_body = readFile(file);
-// }
-
-// void	Response::buildResponse()
-// {
-// 	// if (_request.CGI)
-// 		//execute the cgi
-// 	this->defineType();
-// 	this->setDate();
-// 	this->setConnection();
-// 	if(_request.getErrorCode() != 0 || this->_code != 0)
-// 		this->buildErrorBody();
-// 	else
-// 		this->buildBody();
-// 	this->findLenght();
-// 	this->findStatusMsg();
-// 	this->buildHeader();
-
-// 	this->_header.append(this->_conexion);
-// 	this->_header.append(this->_contentType);
-// 	this->_header.append(this->_date);
-// 	this->_header.append(this->_content_lenght);
-// 	this->_header.append("\r\n");
-// 	this->_header.append(this->_body);
-// }
-
-std::string	Response::getResponse()
-{
+std::string	Response::getResponse() {
 	return(this->_header);
 }
 
@@ -520,9 +522,26 @@ void	Response::cutResponse(size_t a) {
 	this->_header = this->_header.substr(a);
 }
 
+void	Response::updateResponse(char *buffer, int a) {
+	this->_header.append(buffer, a);
+}
+
+void		Response::setCgiFlag(int a) {
+	this->_cgi_flag = a;
+}
+
+int		Response::getCgiFlag() {
+	return (this->_cgi_flag);
+}
+
+CgiManager	&Response::getCgiManager() {
+	return (this->_cgi_manager);
+}
+
 void	Response::clearResponse()
 {
 	this->_code = 0;
+	this->_cgi_flag = 0;
 	this->_host.clear();
 	this->_status_msg.clear();
 	this->_header.clear();

@@ -4,6 +4,7 @@
 # include "AllHeaders.hpp"
 # include "Client.hpp"
 # include "Server.hpp"
+# include "CgiManager.hpp"
 
 class	RunServer
 {
@@ -31,6 +32,9 @@ class	RunServer
 		void	readRequest(const int &a, Client &client);
 		void	setCorrectServerName(Client &client);
 		void	sendResponse(const int &a, Client &client);
+		void	sendCgiRequest(Client &client, CgiManager &manager);
+		void	handleCgiResponse(Client &client, CgiManager &manager);
+		void	handleCgiRequest(Client & client);
 };
 
 #endif
