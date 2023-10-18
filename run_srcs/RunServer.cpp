@@ -141,7 +141,7 @@ void	RunServer::readRequest(const int &a, Client &client) {
 	}
 	if (client.getRequest().isFinished() || client.getRequest().getErrorCode()) {
 		setCorrectServerName(client);
-		client.getResponse().initializeResponse(client.getRequest(), client.getServer());
+		client.getResponse().initializeResponse(client.getRequest());
 		client.getResponse().buildResponse();
 		if (client.getResponse().getCgiFlag()) {
 			handleCgiRequest(client);
