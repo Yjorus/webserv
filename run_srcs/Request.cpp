@@ -100,7 +100,6 @@ void	Request::checkHeaders() {
 	if (_headers.count("Content-Type") && _headers["Content-Type"].find("multipart/form-data") != std::string::npos)
     {
         size_t pos = _headers["Content-Type"].find("boundary=", 0);
-		std::cout << pos << std::endl;
         if (pos != std::string::npos)
             this->_boundary = _headers["Content-Type"].substr(pos + 9, _headers["Content-Type"].size());
         this->_multipart = true;
