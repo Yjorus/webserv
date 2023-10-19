@@ -342,6 +342,7 @@ bool	Response::buildBody() {
 		return (1);
 	if (this->_listing == true || this->_code || this->_cgi_flag)
 		return (0);
+	std::cout << this->_request.getMethod();
 	if (this->_request.getMethod() == "GET") {
 		std::ifstream	file(this->_full_path.c_str());
 		if (file.fail()) {
@@ -351,6 +352,7 @@ bool	Response::buildBody() {
 		this->_body = readFile(file);
 	}
 	else if (this->_request.getMethod() == "POST") {
+		std::cout << "IN POST" << std::endl;
 		if (realFile(this->_full_path)) {
 			this->_code = 204;
 			return (0);
@@ -361,6 +363,7 @@ bool	Response::buildBody() {
 			return (1);
 		}
 		if (this->_request.getMultiPart()) {
+			std::cout << "LOL" << std::endl;
 			std::string body = this->_request.getBody();
 			body = handleBoundary(body, this->_request.getBoundary());
 			file.write(body.c_str(), body.length());
@@ -559,9 +562,9 @@ std::string	Response::handleBoundary(std::string content, std::string boundary) 
 				if (!hold.compare(0, 31, "Content-Disposition: form-data;")) {
 					size_t b = hold.find("filename=\"");
 					if (b != std::string::npos) {
-						size_t c = hold.find("\"", a + 10);
+						size_t c = hold.find("\"", b + 10);
 						if (c != std::string::npos)
-							name = hold.substr(a + 10, b);
+							name = hold.substr(b + 10, c);
 					}
 				}
 				else if (!hold.compare(0, 1, "\r") && !name.empty()) {
