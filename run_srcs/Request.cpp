@@ -106,8 +106,8 @@ void	Request::checkHeaders() {
     }
 }
 
-void	Request::parseRequest(std::string requeststr, size_t requestsize) {
-	int					parsechar;
+void	Request::parseRequest(char *requeststr, size_t requestsize) {
+	u_int8_t				parsechar;
 	std::stringstream	ss;
 
 	for (std::string::size_type a = 0; a < requestsize; a++) {
@@ -333,8 +333,8 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 					}
 					else {
 						_step = request_handled;
-						continue ;
 					}
+					continue ;
 				}
 				break;
 			}
@@ -372,8 +372,9 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 			case start_body: {
 				if (_body.size() < _content_length)
 					_body.push_back(parsechar);
-				if (_body.size() == _content_length)
+				if (_body.size() == _content_length) {
 					_step = request_handled;
+				}
 				break;
 			}
 			case start_chunked: {
@@ -468,6 +469,7 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 					return ;
 				}
 				_step = request_handled;
+				continue ;
 			}
 			case request_handled: {
 				return ;

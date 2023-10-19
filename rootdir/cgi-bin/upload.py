@@ -14,7 +14,7 @@ if fileitem.filename:
    message = 'The file "' + os.path.basename(fileitem.filename) + '" was uploaded to ' + os.getcwd() + '/rootdir/cgi-bin/tmp'
 else:
    message = 'Uploading Failed'
-
+print("HTTP/1.1 200 OK")
 print("Content-Type: text/html;charset=utf-8")
-print ("Content-type:text/html\r\n")
+print ("Content-type: text/html\r\n\r")
 print("<H1> " + message + " </H1>")
