@@ -30,14 +30,11 @@ void	RunServer::connectClient(Server &server) {
 
 	if ((client_fd  = accept(server.getFd(), (struct sockaddr *)&client_addr, &client_len)) < 0)
 		return ;
-	// addToSet(client_fd, _read_fds);
 	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0) {
-		// removeFromSet(client_fd, _read_fds);
 		close(client_fd);
 		return ;
 	}
 	addToSet(client_fd, _read_fds);
-	// std::cout << "\nNEW CLIENT " << client_fd << std::endl;
 	new_client.setSocketFd(client_fd);
 	if (_clientmap.count(client_fd) != 0)
 		_clientmap.erase(client_fd);
@@ -49,7 +46,6 @@ void	RunServer::removeClient(int a) {
 		removeFromSet(a, _write_fds);
 	if (FD_ISSET(a, &_read_fds))
 		removeFromSet(a, _read_fds);
-	// std::cout << "\nCLOSING CONNECTION TO " << a << std::endl;
 	close(a);
 	_clientmap.erase(a);
 }
@@ -77,7 +73,13 @@ void	RunServer::serverLoop() {
 				readRequest(b, _clientmap[b]);
 			else if (FD_ISSET(b, &write_fds) && _clientmap.count(b))
 			{
-				sendResponse(b, _clientmap[b]); // Segfault inside
+				int state = _clientmap[b].getResponse().getCgiFlag();
+				if (state == 1 && FD_ISSET(_clientmap[b].getResponse().getCgiManager()._pipe_cgi_in[1], &write_fds))
+					sendCgiRequest(_clientmap[b], _clientmap[b].getResponse().getCgiManager());
+				else if (state == 1 && FD_ISSET(_clientmap[b].getResponse().getCgiManager()._pipe_cgi_out[0], &read_fds))
+					handleCgiResponse(_clientmap[b], _clientmap[b].getResponse().getCgiManager());
+				else if ((state == 0 || state == 2) && FD_ISSET(b, &write_fds))
+					sendResponse(b, _clientmap[b]);
 			}
 		}
 		disconnectTimeout();
@@ -123,7 +125,6 @@ void	RunServer::readRequest(const int &a, Client &client) {
 	char	buffer[10000];
 	memset(buffer, 0, sizeof(buffer));
 	int		read_ret_val = 0; 
-	// std::string	request;
 	read_ret_val = read(a, buffer, 10000);
 	if (read_ret_val <= 0) {
 		removeClient(a);
@@ -137,10 +138,26 @@ void	RunServer::readRequest(const int &a, Client &client) {
 	}
 	if (client.getRequest().isFinished() || client.getRequest().getErrorCode()) {
 		setCorrectServerName(client);
-		client.getResponse().initializeResponse(client.getRequest(), client.getServer());
+		client.getResponse().initializeResponse(client.getRequest());
 		client.getResponse().buildResponse();
+		if (client.getResponse().getCgiFlag()) {
+			handleCgiRequest(client);
+			addToSet(client.getResponse().getCgiManager()._pipe_cgi_in[1], _write_fds);
+			addToSet(client.getResponse().getCgiManager()._pipe_cgi_out[0], _read_fds);
+		}
 		removeFromSet(a, _read_fds);
 		addToSet(a, _write_fds);
+	}
+}
+
+void	RunServer::handleCgiRequest(Client & client) {
+	if (client.getRequest().getBody().size() == 0) {
+		std::string hold;
+		std::fstream	file(client.getResponse().getCgiManager().getPath().c_str());
+		std::stringstream stream;
+		stream << file.rdbuf();
+		hold = stream.str();
+		client.getRequest().setBody(hold);
 	}
 }
 
@@ -154,12 +171,9 @@ void	RunServer::setCorrectServerName(Client &client) {
 	}
 }
 
-//Does we return the correct error codes and where its needed
-
 void	RunServer::sendResponse(const int &a, Client &client) {
-	int			write_return;
+	int	write_return;
 	std::string	response = client.getResponse().getResponse();
-
 	if (response.length() >= 10000)
 		write_return = write(a, response.c_str(), 10000);
 	else
@@ -167,7 +181,7 @@ void	RunServer::sendResponse(const int &a, Client &client) {
 	if (write_return < 0)
 		removeClient(a);
 	else if (write_return == 0 || (size_t)write_return == response.length()) {
-		if (client.getRequest().getErrorCode() || client.getRequest().keepAlive() == false)
+		if (client.getRequest().getErrorCode() || client.getRequest().keepAlive() == false || client.getResponse().getCgiFlag()) // client.getRequest().keepAlive() == false || client.getResponse().getCgiState()
 				removeClient(a);
 		else {
 			removeFromSet(a, _write_fds);
@@ -178,6 +192,63 @@ void	RunServer::sendResponse(const int &a, Client &client) {
 	else {
 		client.refreshTime();
 		client.getResponse().cutResponse(write_return);
+	}
+}
+
+void	RunServer::sendCgiRequest(Client &client, CgiManager &manager) {
+	std::string &body = client.getRequest().getBody();
+	int a;
+	if (body.size() == 0)
+		a = 0;
+	else if (body.size() >= 10000)
+		a = write(manager._pipe_cgi_in[1], body.c_str(), 10000);
+	else
+		a = write(manager._pipe_cgi_in[1], body.c_str(), body.length());
+	if (a < 0) {
+		removeFromSet(manager._pipe_cgi_in[1], _write_fds);
+		close(manager._pipe_cgi_in[1]);
+		close(manager._pipe_cgi_out[1]);
+		client.getResponse().setCgiErrorResponse(500);
+	}
+	else if (a == 0 || (size_t) a == body.length()) {
+		removeFromSet(manager._pipe_cgi_in[1], _write_fds);
+		close(manager._pipe_cgi_in[1]);
+		close(manager._pipe_cgi_out[1]);
+	}
+	else {
+		client.refreshTime();
+		body = body.substr(a);
+	}
+}
+
+void	RunServer::handleCgiResponse(Client &client, CgiManager &manager) {
+	char	buffer[20000];
+	memset(buffer, 0, sizeof(buffer));
+	int		read_ret_val = 0; 
+	read_ret_val = read(manager._pipe_cgi_out[0], buffer, 20000);
+	if (read_ret_val < 0) {
+		removeFromSet(manager._pipe_cgi_out[0], _read_fds);
+		close(manager._pipe_cgi_in[0]);
+		close(manager._pipe_cgi_out[0]);
+		client.getResponse().setCgiFlag(2);
+		client.getResponse().setCgiErrorResponse(500);
+		return ;
+	}
+	else if (read_ret_val == 0){
+		removeFromSet(manager._pipe_cgi_out[0], _read_fds);
+		close(manager._pipe_cgi_in[0]);
+		close(manager._pipe_cgi_out[0]);
+		int status;
+		waitpid(manager.getPid(), &status, 0);
+		if (WEXITSTATUS(status) != 0)
+			client.getResponse().setCgiErrorResponse(502);
+		client.getResponse().setCgiFlag(2);
+		return ;
+	}
+	else {
+		client.refreshTime();
+		client.getResponse().updateResponse(buffer, read_ret_val);
+		memset(buffer, 0, sizeof(buffer));
 	}
 }
 

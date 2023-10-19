@@ -1,114 +1,102 @@
 # include "../inc/CgiManager.hpp"
 
-CgiManager::CgiManager(Request &request): _body(request.getBody())
+CgiManager::CgiManager() {
+	this->_cgi_path = "";
+	this->_cgi_pid = -1;
+	this->_exit_code = 0;
+	this->_env = NULL;
+	this->_av = NULL;
+}
 
-executestuff(&error_code) {
-	if (pipe(_pipe_cgi) < 0) {
-		error_code = 500;
-		return ; // maybe int?
-	}
-	this->_cgi_pid = fork()
-	if (this->_cgi_pid == -1) {
-		close(_pipe_cgi[0]);
-		clode(_pipe_cgi[1]);
-		error_code = 500;
+CgiManager::~CgiManager() {
+	clearCgi();
+}
+
+void	CgiManager::executeCgi(int &code) {
+	if (this->_av == NULL || this->_av[0] == NULL || this->_av[1] == NULL) {
+		code = 500;
 		return ;
 	}
-	else if (!this->_cgi_pid) {
-
+	if (pipe(_pipe_cgi_in) < 0) {
+		code = 500;
+		return ;
 	}
-	else {
-		waitpid(-1, NULL, 0);
+	if (pipe(_pipe_cgi_out) < 0) {
+		close(_pipe_cgi_in[0]);
+		close(_pipe_cgi_in[1]);
+		code = 500;
+		return ;
 	}
-	execve() //cgi-path, arguments, env;
-}
-
-void	CgiManager::initCGI(Request &request, const std::vector<Location>::iterator loc)
-{
-	std::string	path;
-	std::string	ext;
-
-	ext = this->_loc_cgi.substr(this->_loc_cgi.find("."));
-	//Maybe need to check for a error here
-	const std::map<std::string, std::string> test;
-	test = loc->getCgiMap(); //Idk how to fix this stuff
-	path = test[ext];
-	setupEnvCgi(request);
-	this->_cp_env = mapToCStrArray();
-	this->_argv = (char **)malloc(sizeof (char *) * 3);
-	this->_argv[0] = strdup(path.c_str());
-	this->_argv[1] = strdup(this->_loc_cgi.c_str());
-	this->_argv[2] = NULL;
-}
-
-void	CgiManager::exec()
-{
-	int				file;
-	int				fd[2];
-	int				pid;
-	int				status;
-
-	pipe(fd);
-	pid = fork();
-	if (pid == 0)
-	{
-		file = open("./tmpfile.txt", O_RDWR | O_TRUNC | O_CREAT, 0444); //Read only
-		// tmp = open("./", O_RDONLY);
-		// ft_error(file, "First File");
-		ft_error(dup2(file, STDIN_FILENO), "First Dup");
-		ft_error(dup2(fd[1], STDOUT_FILENO), "Second Dup"); //Where to send the result, is it correct
-		close(fd[0]);
-		execve("/usr/bin/python3" , (char * const *)"../rootdir/action_page.py", (char * const *)"/bin/bash");
-		close(file); //This execute but dont send the content to anywhere, or dont execute
+	this->_cgi_pid = fork();
+	if (this->_cgi_pid == 0) {
+		dup2(_pipe_cgi_in[0], STDIN_FILENO);
+		dup2(_pipe_cgi_out[1], STDOUT_FILENO);
+		close(_pipe_cgi_in[0]);
+		close(_pipe_cgi_in[1]);
+		close(_pipe_cgi_out[0]);
+		close(_pipe_cgi_out[1]);
+		this->_exit_code = execve(this->_av[0], this->_av, this->_env);
+		exit(this->_exit_code);
 	}
-	waitpid(pid, &status, 0); //Parent will wait for the children
+	else if (this->_cgi_pid < 0) {
+		code = 500;
+	}
 }
 
-void	ft_execve(char *argv, char **envp) // is it needed ? or can enter the Cgi functiosn ith less
-{
-	char	*path;
-	char	**cmd;
-
-	cmd = ft_split(argv, ' ');
-	if (cmd == NULL)
-		ft_error(-1, "Split");
-	path = find_cmdpath(cmd, envp);
-	execve(path, cmd, envp);
-}
-
-char	**CgiManager::mapToCStrArray()
-{
+char	**CgiManager::mapToCStrArray() {
 	char	**env = new char *[this->_cgi_env.size() + 1];
 	int a = 0;
 	for (std::map<std::string, std::string>::const_iterator b = this->_cgi_env.begin(); b != this->_cgi_env.end(); b++) {
 		std::string	element = b->first + "=" + b->second;
 		env[a] = new char[element.size() + 1];
-		env[a] = strcpy(env[j], (const char*)element.c_str());
+		env[a] = strcpy(env[a], (const char*)element.c_str());
 		a++;
 	}
 	env[a] = NULL;
 	return (env);
 }
 
-void CgiManager::setupEnvCgi(Request &request)
-{
-	this->_cgi_env["AUTH_TYPE"] = hold["Basic"] ;
+void	CgiManager::setupEnvCgi(Request &request, std::string extension, Location location) {
+
+	std::string path;
+	if (!location.getCgiMap().count(extension)) 
+		return ;
+	else
+		path = location.getCgiMap()[extension];
+	this->_cgi_env["AUTH_TYPE"] = "Basic";
 	this->_cgi_env["CONTENT_LENGTH"] = request.getHeader("Content-Length"); //stringstream
 	this->_cgi_env["CONTENT_TYPE"] = request.getHeader("Content-Type");
 	this->_cgi_env["GATEWAY_INTERFACE"] = "CGI/1.1";
-	this->_cgi_env["PATH_INFO"] = ;
-	this->_cgi_env["PATH_TRANSLATED"] = ;
+	// this->_cgi_env["PATH_INFO"] = ;
+	// this->_cgi_env["PATH_TRANSLATED"] = ;
 	this->_cgi_env["QUERY_STRING"] = request.getQuery();
 	this->_cgi_env["REMOTE_ADDR"] = request.getAddress();
 	this->_cgi_env["REMOTE_HOST"] = request.getServerName();
-	this->_cgi_env["REMOTE_IDENT"] = ;
-	this->_cgi_env["REMOTE_USER"] = ;
+	// this->_cgi_env["REMOTE_IDENT"] = ;
+	// this->_cgi_env["REMOTE_USER"] = ;
 	this->_cgi_env["REQUEST_METHOD"] = request.getMethod();
-	this->_cgi_env["SCRIPT_NAME"] = ;
+	this->_cgi_env["SCRIPT_NAME"] = this->_cgi_path;
 	this->_cgi_env["SERVER_NAME"] = request.getServerName();
 	this->_cgi_env["SERVER_PORT"] = request.getPort();
 	this->_cgi_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	this->_cgi_env["SERVER_SOFTWARE"] = ;
+	this->_cgi_env["SERVER_SOFTWARE"] = "LulzSec Server";
+
+	std::map<std::string, std::string> request_headers = request.getHeaders();
+	for(std::map<std::string, std::string>::iterator it = request_headers.begin(); it != request_headers.end(); ++it)
+	{
+		std::string name = it->first;
+		std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+		std::string key = "HTTP_" + name;
+		this->_cgi_env[key] = it->second;
+	}
+
+	this->_env = mapToCStrArray();
+	this->_av = new char *[3];
+	this->_av[0] = new char[path.size() + 1];
+	this->_av[0] = strcpy(this->_av[0], (const char*)path.c_str());
+	this->_av[1] = new char[this->_cgi_path.size() + 1];
+	this->_av[1] = strcpy(this->_av[1], (const char*)this->_cgi_path.c_str());
+	this->_av[2] = NULL;
 }
 
 // static char	*find_cmdpath(char **cmd, char **envp)
@@ -158,3 +146,34 @@ void CgiManager::setupEnvCgi(Request &request)
 //       var-name           = token
 //       extension-var-name = token
 // source : rfc3875
+
+void	CgiManager::setPath(std::string &path) {
+	this->_cgi_path = path;
+}
+
+std::string	CgiManager::getPath() {
+	return (this->_cgi_path);
+}
+
+void	CgiManager::clearCgi() {
+	this->_cgi_path.clear();
+	if (this->_env) {
+		for (int a = 0; this->_env[a]; a++)
+			delete [] this->_env[a];
+		delete [] this->_env;
+	}
+	if (this->_av) {
+		for (int a = 0; this->_av[a]; a++)
+			delete [] this->_av[a];
+		delete [] this->_av;
+	}
+	this->_env = NULL;
+	this->_av = NULL;
+	this->_cgi_pid = -1;
+	this->_exit_code = 0;
+	this->_cgi_env.clear();
+}
+
+pid_t		CgiManager::getPid() {
+	return (this->_cgi_pid);
+}

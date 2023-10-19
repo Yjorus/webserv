@@ -1,9 +1,0 @@
-1: Method {GET, POST, DELETE};
-2: file_location;
-3: http version
-
-next line !
-
-host: ip and port 
-user agent
-accept */*

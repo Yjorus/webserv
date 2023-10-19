@@ -6,16 +6,17 @@
 /*   By: gscarama <gscarama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 12:49:46 by gscarama          #+#    #+#             */
-/*   Updated: 2023/10/10 12:32:05 by gscarama         ###   ########.fr       */
+/*   Updated: 2023/10/19 14:33:25 by gscarama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef RESPONSE_HPP
-#define RESPONSE_HPP
+# define RESPONSE_HPP
 
-#include "AllHeaders.hpp"
-#include "Request.hpp"
-#include "Server.hpp"
+# include "AllHeaders.hpp"
+# include "Request.hpp"
+# include "Server.hpp"
+# include "CgiManager.hpp"
 
 class Response
 {
@@ -33,11 +34,12 @@ class Response
 		Response( void );
 		Response( Response const &other );
 		Response& operator=( Response const &other );
-		void		initializeResponse( Request &request, Server server);
+		void		initializeResponse( Request &request);
 		void		buildResponse();
 		void		clearResponse();
 		std::string	getResponse();
 		void		cutResponse(size_t a);
+		void		updateResponse(char *buffer, int a);
 
 		void	getLocationPath(std::string path, std::vector<Location> locations, std::string &locationpath);
 		bool	checkMethod(std::string method, std::vector<bool> allowed);
@@ -46,18 +48,29 @@ class Response
 		void	replaceProxy(Location location);
 		void	combineRootPath(Location location);
 		bool 	isDir(std::string path);
-		void	findStatusMsg();
 		bool 	realFile (const std::string& f);
 		bool	checkLocation();
+		bool	checkCgi(std::string &locationpath);
 		bool	checkErrorCode();
 		int		buildDirectoryListing(std::string path, std::string &listingbody);
+		std::string	handleBoundary(std::string content, std::string boundary);
+
+		void	setCgiErrorResponse(int a);
 
 		void	setServer(Server &server);
 		Server	getServer();
 
+		void		setCgiFlag(int a);
+		int			getCgiFlag();
+
+		CgiManager	&getCgiManager();
+
 	private:
 		Server						_server;
 		Request						_request;
+		CgiManager					_cgi_manager;
+		int							_cgi_flag;
+		int							_cgi_fd[2];
 		std::map<int, std::string>	_error_pages;
 		std::string					_status_msg;
 		std::string					_header;

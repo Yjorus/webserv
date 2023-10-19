@@ -1,34 +1,38 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   CgiManager.hpp                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: gscarama <gscarama@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/17 14:19:29 by gscarama          #+#    #+#             */
-/*   Updated: 2023/10/17 14:27:05 by gscarama         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#ifndef CGIMANAGER_HPP
+# define CGIMANAGER_HPP
 
-#include "AllHeaders.hpp"
-#include "Request.hpp"
-#include "Location.hpp"
+# include "AllHeaders.hpp"
+# include "Request.hpp"
+# include "Location.hpp"
 
 class CgiManager
 {
-	private:
-		pid_t								_cgi_pid;
-		std::string							_body;
+		pid_t					_cgi_pid;
+		std::string				_body;
 		std::map<std::string, std::string>	_cgi_env;
-		char**								_cp_env;
-		int									_execve_return_val;
-		std::string							_loc_cgi;
-		char**								_argv;
+		std::string				_cgi_path;
+		int						_exit_code;
+		char					**_env;
+		char					**_av;
+		
 	public:
-		void	initCGI(Request &request, const std::vector<Location>::iterator location);
+
+		CgiManager();
+		~CgiManager();
+		
+		void	executeCgi(int &code);
 		char	**mapToCStrArray();
-		void	setupEnvCgi(Request &request);
+		void	setupEnvCgi(Request &request, std::string extension, Location location);
+		void	setPath(std::string &path);
+		std::string	getPath();
+		void	clearCgi();
+		pid_t		getPid();
+
+		int						_pipe_cgi_in[2]; // 0 == stdin && 1 == stdout
+		int						_pipe_cgi_out[2]; // 0 == stdin && 1 == stdout
 };
+
+# endif
 
 //needed for cgi : av[0] == path av[1]
 

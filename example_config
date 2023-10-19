@@ -9,7 +9,7 @@ server {
 	root	rootdir/;
 	host	127.0.0.1;
 	index	index.html;
-	client_max_body_size 100;
+	client_max_body_size 1000000000;
 	#ooooooo
 	listing on;
 	error_pages
@@ -25,7 +25,7 @@ server {
 		methods	GET POST;
 	}
 
-	location /lol/ {
+	location /lmao/ {
 		listing on;
 		index lol.html;
 		proxy /test/lol/;
@@ -37,9 +37,10 @@ server {
 #	methods	GET POST DELETE;
 #}
 
-	location /cgi-bin {
-		root	./;
-		index	hello_world.pl;
+	location /cgi-bin/ {
+		root:	rootdir/;
+		index	time.py;
+		methods GET POST;
 		cgi_path	/usr/bin/perl /usr/bin/python3;
 		cgi_extensions	.pl .py;
 	}

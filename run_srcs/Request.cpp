@@ -18,6 +18,8 @@ Request::Request() {
 	this->_step = start_parsing;
 	this->_http_major = false;
 	this->_http_minor = false;
+	this->_multipart = false;
+	this->_boundary = "";
 	this->_field_name_storage = "";
 	this->_content_length = 0;
 	this->_length_of_chunk = 0;
@@ -75,7 +77,6 @@ void	Request::addToHeaders(std::string &str1, std::string &str2)
 {
 	trimWhitespace(str1);
 	trimWhitespace(str2);
-	// std::cout << str1 << ": " << str2 << std::endl; 
 	this->_headers[str1] = str2;
 }
 
@@ -96,13 +97,19 @@ void	Request::checkHeaders() {
 		_host = _headers["Host"].substr(0, h);
 		_port = _headers["Host"].substr(h + 1);
 	}
+	if (_headers.count("content-type") && _headers["content-type"].find("multipart/form-data") != std::string::npos)
+    {
+        size_t pos = _headers["content-type"].find("boundary=", 0);
+        if (pos != std::string::npos)
+            this->_boundary = _headers["content-type"].substr(pos + 9, _headers["content-type"].size());
+        this->_multipart = true;
+    }
 }
 
 void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 	int					parsechar;
 	std::stringstream	ss;
 
-	// std::cout << requeststr << std::endl;
 	for (std::string::size_type a = 0; a < requestsize; a++) {
 		parsechar = requeststr[a];
 		switch(_step) {
@@ -127,10 +134,8 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 					_error_code = 501;
 					return ;
 				}
-				if (_methodindex == _methods[_method].length()) {
-					// std::cout << "method: " << _methods[_method] << std::endl;
+				if (_methodindex == _methods[_method].length())
 					_step = check_first_space;
-				}
 				continue;
 			}
 			case check_first_space: {
@@ -153,21 +158,18 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 				if (parsechar == ' ') {
 					_step = H;
 					_location.append(_buffer);
-					// std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
 				else if (parsechar == '?') {
 					_step = check_path_query;
 					_location.append(_buffer);
-					// std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
 				else if (parsechar == '#') {
 					_step = check_path_fragment;
 					_location.append(_buffer);
-					// std::cout << "path: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
@@ -185,14 +187,12 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 				if (parsechar == ' ') {
 					_step = H;
 					_query.append(_buffer);
-					// std::cout << "query: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
 				else if (parsechar == '#') {
 					_step = check_path_fragment;
 					_query.append(_buffer);
-					// std::cout << "query: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
@@ -210,7 +210,6 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 				if (parsechar == ' ') {
 					_step = H;
 					_fragment.append(_buffer);
-					// std::cout << "fragment: " << _buffer << std::endl;
 					_buffer.clear();
 					continue;
 				}
@@ -468,7 +467,6 @@ void	Request::parseRequest(std::string requeststr, size_t requestsize) {
 					_error_code = 400;
 					return ;
 				}
-				std::cout << _body << std::endl;
 				_step = request_handled;
 			}
 			case request_handled: {
@@ -525,8 +523,14 @@ bool	Request::isFinished() {
 	return (_step == request_handled);
 }
 
-std::string	Request::getBody() {
+std::string	&Request::getBody() {
 	return (this->_body);
+}
+
+void	Request::setBody(std::string body) {
+	this->_body.clear();
+	this->_body.insert(this->_body.begin(), this->_body.begin(), this->_body.end());
+	this->_body = body;
 }
 
 std::string	Request::getPort() {
@@ -535,6 +539,14 @@ std::string	Request::getPort() {
 
 std::string	Request::getLocation() {
 	return (this->_location);
+}
+
+bool	Request::getMultiPart() {
+	return (this->_multipart);
+}
+
+std::string	Request::getBoundary() {
+	return (this->_boundary);
 }
 
 bool	Request::keepAlive() {
@@ -555,8 +567,10 @@ void	Request::clearRequest() {
 	this->_body.clear();
 	this->_host.clear();
 	this->_port.clear();
+	this->_boundary.clear();
 	this->_hasbody = false;
 	this->_ischunked = false;
+	this->_multipart = false;
 	this->_step = start_parsing;
 	this->_http_major = false;
 	this->_http_minor = false;
