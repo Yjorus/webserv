@@ -2,28 +2,37 @@
 # define CLIENT_HPP
 
 # include "AllHeaders.hpp"
+# include "Server.hpp"
 # include "Request.hpp"
+# include "Response.hpp"
 
 class Client
 {
 	int			_client_fd;
-	std::string	_request_str;
 	Request		_request;
+	time_t		_time;
+	Response	_response;
 
 	public:
 		
 		Client();
+		Client(Server &server);
 		// Client(Client const &copy);
 		~Client();
 
 		// Client	&operator=(Client const &assign);
 
 		void	setSocketFd(int fd);
-		void	updateRequest(std::string request);
+		void	setServer(Server &server);
 
-		int		getSocketFd();
-		std::string	getRequestStr();
+		int			getSocketFd();
 		Request		&getRequest();
+		Response	&getResponse();
+		void		refreshTime();
+		time_t		getTime();
+		Server		getServer();
+
+		void		clearClient();
 };
 
 #endif

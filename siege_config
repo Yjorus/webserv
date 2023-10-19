@@ -1,0 +1,6 @@
+server {
+	listen 2000;
+	root	siegedir/;
+	host	127.0.0.1;
+	index	siege.html;
+}
