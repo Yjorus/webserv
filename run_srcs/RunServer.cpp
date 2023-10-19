@@ -1,7 +1,7 @@
 #include "../inc/RunServer.hpp"
 
 RunServer::RunServer()
-{} //Simplify some stuff to be added here
+{}
 
 RunServer::~RunServer()
 {}
@@ -132,7 +132,6 @@ void	RunServer::readRequest(const int &a, Client &client) {
 	}
 	else if (read_ret_val != 0){
 		client.refreshTime();
-		// client.getRequest();
 		client.getRequest().parseRequest(buffer, read_ret_val);
 		memset(buffer, 0, sizeof(buffer));
 	}
@@ -250,27 +249,4 @@ void	RunServer::handleCgiResponse(Client &client, CgiManager &manager) {
 		client.getResponse().updateResponse(buffer, read_ret_val);
 		memset(buffer, 0, sizeof(buffer));
 	}
-}
-
-void	RunServer::readRequest(int a, Client &client)
-{
-	char	buffer[10000];
-	int		read_ret_val = 0;
-	size_t	request_size = 0; 
-	std::string	request;
-	read_ret_val = read(a, buffer, 10000);
-	if (read_ret_val <= 0)
-	{
-		removeClient(a);
-		return ;
-	}
-	while (read_ret_val != 0)
-	{
-		request = buffer;
-		request_size += read_ret_val;
-		client.updateRequest(request);
-		memset(buffer, 0, sizeof(buffer));
-		read_ret_val = read(a, buffer, 10000);
-	}
-	client.getRequest().parseRequest(client.getRequestStr(), request_size);
 }

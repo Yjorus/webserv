@@ -25,16 +25,17 @@
 		<main>
 			<h1><span>';--have i been pwned?</span></h1>
 			<h2>Check if your email address is in a data breach</h2>
-			<form style="text-align: left;" action="/action_page.py" method="post"> 
+			<form style="text-align: left;" action="./cgi-bin/time.py" method="post"> 
 				<div class="form-group">
-					<input class="form-field" style="width:50%;" type="email" placeholder="Email">
-					<span>@gmail.com</span>
-					<input class="form-field" style="width:10%;" type="submit">
+					<input class="form-field" style="width:50%;" type="email" placeholder="Email" id="email">
+					<span></span>
+					<span></span>
+					<input class="form-field" style="width:5%;" type="submit">
 				</div>
 				<h4><span>Do you agree to the terms?</span></h4>
 				<div class="checkbox-wrapper-10">
-					<input class="tgl tgl-flip" id="cb5" type="checkbox" checked />
-					<label class="tgl-btn" data-tg-off="Nope" data-tg-on="Yeah!" for="cb5"></label>
+					<input class="tgl tgl-flip" id="checkbox" type="checkbox" checked />
+					<label class="tgl-btn" data-tg-off="Nope" data-tg-on="Yeah!" for="checkbox"></label>
 				</div>
 			</form>
 		</main>
