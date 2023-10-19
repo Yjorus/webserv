@@ -45,3 +45,15 @@ class Location
 		std::vector<bool>			getMethodsL() const;
 };
 #endif
+
+		std::string					getPathL() const;
+		std::string					getRootL() const;
+		std::string					getIndexL() const;
+		std::string					getRedirectionL() const;
+		bool						getListingL() const;
+		unsigned long				getClientBodySizeL() const;
+		std::vector<std::string>	getCgiExtensionsL() const;
+		std::vector<std::string>	getCgiPathsL() const;
+		std::vector<bool>			getMethodsL() const;
+};
+#endif

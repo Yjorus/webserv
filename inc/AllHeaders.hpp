@@ -19,7 +19,9 @@
 # include <sys/socket.h>
 # include <arpa/inet.h>
 # include <netdb.h>
-# include <sys/epoll.h>
+# include <sys/select.h>
+# include <fcntl.h>
+# include <sys/time.h>
 
 #include <errno.h>
 #include <stdio.h>

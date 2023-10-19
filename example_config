@@ -11,6 +11,7 @@ server {
 	index	index.html;
 	client_max_body_size 1;
 	#ooooooo
+	listing on;
 	error_pages
 	404	folder/file.html
 	400	folder/file2.html;
