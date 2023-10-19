@@ -27,6 +27,7 @@ class CgiManager
 		std::string	getPath();
 		void	clearCgi();
 		pid_t		getPid();
+		int		findstart(std::string path, std::string key);
 
 		int						_pipe_cgi_in[2]; // 0 == stdin && 1 == stdout
 		int						_pipe_cgi_out[2]; // 0 == stdin && 1 == stdout

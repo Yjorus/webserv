@@ -56,11 +56,13 @@ class Request
 		std::string	_useragent; // example curl
 		std::string	_buffer;
 		std::string	_body;
+		std::string	_boundary;
 		ParseStep	_step;
 		bool		_hasbody;
 		bool		_ischunked;
 		bool		_http_major;
 		bool		_http_minor;
+		bool		_multipart;
 		std::string	_field_name_storage;
 		size_t		_content_length;
 		size_t		_length_of_chunk;
@@ -93,6 +95,8 @@ class Request
 		std::string							getPort();
 		std::string							getLocation();
 		bool								keepAlive();
+		bool								getMultiPart();
+		std::string							getBoundary();
 
 		void	clearRequest();
 		

@@ -342,6 +342,7 @@ bool	Response::buildBody() {
 		return (1);
 	if (this->_listing == true || this->_code || this->_cgi_flag)
 		return (0);
+	// std::cout << this->_request.getMethod();
 	if (this->_request.getMethod() == "GET") {
 		std::ifstream	file(this->_full_path.c_str());
 		if (file.fail()) {
@@ -351,6 +352,7 @@ bool	Response::buildBody() {
 		this->_body = readFile(file);
 	}
 	else if (this->_request.getMethod() == "POST") {
+		// std::cout << "IN POST" << std::endl;
 		if (realFile(this->_full_path)) {
 			this->_code = 204;
 			return (0);
@@ -360,7 +362,14 @@ bool	Response::buildBody() {
 			this->_code = 404;
 			return (1);
 		}
-		file.write(this->_request.getBody().c_str(), this->_request.getBody().length());
+		if (this->_request.getMultiPart()) {
+			std::cout << "LOL" << std::endl;
+			std::string body = this->_request.getBody();
+			body = handleBoundary(body, this->_request.getBoundary());
+			file.write(body.c_str(), body.length());
+		}
+		else
+			file.write(this->_request.getBody().c_str(), this->_request.getBody().length());
 	}
 	else if (this->_request.getMethod() == "DELETE") {
 		if (!realFile(this->_full_path)) {
@@ -528,6 +537,55 @@ int		Response::getCgiFlag() {
 
 CgiManager	&Response::getCgiManager() {
 	return (this->_cgi_manager);
+}
+
+std::string	Response::handleBoundary(std::string content, std::string boundary) {
+	std::string translated;
+	std::string	hold;
+	std::string name;
+	bool	bound = false;
+	bool	data = false;
+	if (content.find("--" + boundary) != std::string::npos && content.find("--" + boundary + "--") != std::string::npos) {
+		for (size_t a = 0; a < content.size(); a++) {
+			hold.clear();
+			while (content[a] != '\n') {
+				hold += content[a];
+				a++;
+			}
+			if (!hold.compare(("--" + boundary + "--\r"))) {
+				data = true;
+				bound = false;
+			}
+			if (!hold.compare(("--" + boundary + "\r")))
+				bound = true;
+			if (bound) {
+				if (!hold.compare(0, 31, "Content-Disposition: form-data;")) {
+					size_t b = hold.find("filename=\"");
+					if (b != std::string::npos) {
+						size_t c = hold.find("\"", b + 10);
+						if (c != std::string::npos)
+							name = hold.substr(b + 10, c);
+					}
+				}
+				else if (!hold.compare(0, 1, "\r") && !name.empty()) {
+					bound = false;
+					data = true;
+				}
+			}
+			else if (data) {
+				if (!hold.compare(("--" + boundary + "\r")))
+				bound = true;
+				else if (!hold.compare(("--" + boundary + "--\r"))) {
+					translated.erase(translated.end() - 1);
+					break ;
+				}
+				else
+					translated += (hold + "\n");
+			}
+		}
+	}
+	content.clear();
+	return (translated);
 }
 
 void	Response::clearResponse()

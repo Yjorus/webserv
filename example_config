@@ -40,6 +40,7 @@ server {
 	location /cgi-bin/ {
 		root:	rootdir/;
 		index	time.py;
+		methods GET POST;
 		cgi_path	/usr/bin/perl /usr/bin/python3;
 		cgi_extensions	.pl .py;
 	}
