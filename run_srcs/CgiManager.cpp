@@ -50,14 +50,25 @@ char	**CgiManager::mapToCStrArray() {
 		std::string	element = b->first + "=" + b->second;
 		env[a] = new char[element.size() + 1];
 		env[a] = strcpy(env[a], (const char*)element.c_str());
+		// std::cout << env[a] <<  std::endl;
 		a++;
 	}
 	env[a] = NULL;
 	return (env);
 }
 
+int		CgiManager::findstart(std::string path, std::string key) {
+	if (path.empty())
+		return (-1);
+	size_t a = path.find(key);
+	if (a == std::string::npos)
+		return (-1);
+	return (a);
+}
+
 void	CgiManager::setupEnvCgi(Request &request, std::string extension, Location location) {
 
+	int a;
 	std::string path;
 	if (!location.getCgiMap().count(extension)) 
 		return ;
@@ -67,6 +78,7 @@ void	CgiManager::setupEnvCgi(Request &request, std::string extension, Location l
 	this->_cgi_env["CONTENT_LENGTH"] = request.getHeader("Content-Length"); //stringstream
 	this->_cgi_env["CONTENT_TYPE"] = request.getHeader("Content-Type");
 	this->_cgi_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	a = findstart(this->_cgi_path, "cgi-bin/");
 	// this->_cgi_env["PATH_INFO"] = ;
 	// this->_cgi_env["PATH_TRANSLATED"] = ;
 	this->_cgi_env["QUERY_STRING"] = request.getQuery();
@@ -76,6 +88,7 @@ void	CgiManager::setupEnvCgi(Request &request, std::string extension, Location l
 	// this->_cgi_env["REMOTE_USER"] = ;
 	this->_cgi_env["REQUEST_METHOD"] = request.getMethod();
 	this->_cgi_env["SCRIPT_NAME"] = this->_cgi_path;
+	this->_cgi_env["SCRIPT_FILENAME"] = ((a < 0 || (size_t)(a + 8) > this->_cgi_path.size()) ? "" : this->_cgi_path.substr(a + 8, this->_cgi_path.size()));
 	this->_cgi_env["SERVER_NAME"] = request.getServerName();
 	this->_cgi_env["SERVER_PORT"] = request.getPort();
 	this->_cgi_env["SERVER_PROTOCOL"] = "HTTP/1.1";
