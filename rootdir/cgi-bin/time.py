@@ -2,7 +2,9 @@
 
 import datetime
 import cgi
-
+value=1
+while (value < 2):
+	print("LOL")
 print("HTTP/1.1 200 OK")
 print("Content-type: text/html\r\n\r\n")
 print("<html>")

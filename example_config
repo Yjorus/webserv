@@ -32,6 +32,11 @@ server {
 		methods GET;
 	}
 
+	location /delete/ {
+		listing on;
+		methods DELETE;
+	}
+
 #location /upload {
 #	index upload.html;
 #	methods	GET POST DELETE;

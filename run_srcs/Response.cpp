@@ -363,6 +363,7 @@ bool	Response::buildBody() {
 		if (this->_request.getMultiPart()) {
 			std::string body = this->_request.getBody();
 			body = handleBoundary(body, this->_request.getBoundary());
+			std::cout << body << std::endl;
 			file.write(body.c_str(), body.length());
 		}
 		else
