@@ -44,6 +44,12 @@ server {
 		cgi_path	/usr/bin/perl /usr/bin/python3;
 		cgi_extensions	.pl .py;
 	}
+
+	location /tmp/ {
+		root:	rootdir/;
+		listing on;
+		methods GET POST DELETE;
+	}
 }
 #server {
 #	index	index.html;

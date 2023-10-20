@@ -15,8 +15,8 @@
 						<li class="hackermen"><a href="index.html">HACKERMEN</a></li>
 						<li><a href="index.html">HOME</a></li>
 						<li><a href="services.html">SERVICES</a></li>
-						<li><a href="../error/404.html">ABOUT</a></li>
-						<li><a href="../error/404.html">CONTACT</a></li>
+						<li><a href="about.html">ABOUT</a></li>
+						<li><a href="cgi-bin/whoami.py">CONTACT</a></li>
 						<li><a href="leaks.html">LEAKS</a></li>
 					</ul>
 				</nav>
@@ -27,7 +27,10 @@
 			<h2>Check if your email address is in a data breach</h2>
 			<form style="text-align: left;" action="cgi-bin/pwned_page.py" method="get"> 
 				<div class="form-group">
-					<input class="form-field" style="width:50%;" name="email"type="email" placeholder="Email" id="email">
+					<input class="form-field" style="width:50%; border-radius: 6px 6px 6px 6px;" name="email"type="email" placeholder="Email" id="email">
+				</div>
+				<div class="form-group">
+					<input class="form-field" style="width:50%; margin-top: 0;" name="password"type="text" placeholder="Password" id="password">
 					<span></span>
 					<span></span>
 					<input class="form-field" style="width:5%;" type="submit">

@@ -1,7 +1,9 @@
-#!/usr/bin/python3
+#! /usr/bin/python3
 
-import datetime
-import cgi
+import os
+from http import cookies
+
+import cgi, cgitb 
 
 print("HTTP/1.1 200 OK")
 print("Content-type: text/html\r\n\r\n")
@@ -27,19 +29,22 @@ print("<li class=\"hackermen\"><a href=\"../index.html\">HACKERMEN</a></li>")
 print("<li><a href=\"../index.html\">HOME</a></li>")
 print("<li><a href=\"../services.html\">SERVICES</a></li>")
 print("<li><a href=\"../about.html\">ABOUT</a></li>")
-print("<li><a href=\"../cgi-bin/whoaim.py\">CONTACT</a></li>")
+print("<li><a href=\"whoaim.py\">CONTACT</a></li>")
 print("<li><a href=\"../leaks.html\">LEAKS</a></li>")
 print("</ul>")
 print("</nav>")
 print("</div>")
 print("</header>")
 
-# print("<h1 style=\"margin-top:30%; font-size: 3vw\";>" + arg1 + "<h1>")
-
-# print("<h1 style=\"color: red; border-bottom:0.1em solid red; font-size: 5vw;\"> You have been COMPROMISED</h1>")
-# print("<h2>Change your passwords ASAP</h2>")
-
-print(datetime.datetime.strftime(datetime.datetime.now(), "<h1 styel>  %H:%M:%S </h1>"))
+cookie = cookies.SimpleCookie()
+if 'HTTP_COOKIE' in os.environ:
+	cookie = os.environ["HTTP_COOKIE"]
+	cookie = cookie.split('; ')
+	print("<h1 style=\"margin-top: 10%; margin-bottom: 5%;\">Your cookie is:<br><br>")
+	print(cookie)
+	print("\h1")
+else:
+	print("<h1>Cookie was not found !<\h1>")
 
 print("</body>")
 print("</html>")
