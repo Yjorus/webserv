@@ -19,6 +19,7 @@
 # include <algorithm>
 # include <sys/socket.h>
 # include <arpa/inet.h>
+# include <netinet/in.h>
 # include <netdb.h>
 # include <sys/select.h>
 # include <fcntl.h>
