@@ -55,3 +55,4 @@ void	Client::clearClient() {
 	this->getRequest().clearRequest();
 	this->getResponse().clearResponse();
 }
+

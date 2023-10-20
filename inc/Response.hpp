@@ -6,7 +6,7 @@
 /*   By: gscarama <gscarama@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 12:49:46 by gscarama          #+#    #+#             */
-/*   Updated: 2023/10/19 14:33:25 by gscarama         ###   ########.fr       */
+/*   Updated: 2023/10/10 12:32:05 by gscarama         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Response
 	public:
 	
 		Response( void );
+		Response( Request request, std::map<int, std::string> error_pages);
 		Response( Response const &other );
 		Response& operator=( Response const &other );
 		void		initializeResponse( Request &request);

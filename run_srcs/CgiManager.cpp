@@ -112,38 +112,6 @@ void	CgiManager::setupEnvCgi(Request &request, std::string extension, Location l
 	this->_av[2] = NULL;
 }
 
-// static char	*find_cmdpath(char **cmd, char **envp)
-// {
-// 	char	**cmdpath;
-// 	int		row;
-
-// 	row = 0;
-// 	cmdpath = find_usrpath(cmd, envp);
-// 	while (access(cmdpath[row], X_OK) != 0 && cmdpath[row])
-// 		row++;
-// 	if (!cmdpath[row])
-// 	{
-// 		ft_free(cmd);
-// 		exit(1);
-// 	}
-// 	return (cmdpath[row]);
-// }
-
-// void	ft_execve(char *argv, char **envp) // is it needed ?
-// {
-// 	char	*path;
-// 	char	**cmd;
-
-// 	cmd = ft_split(argv, ' ');
-// 	if (cmd == NULL)
-// 		ft_error(-1, "Split");
-// 	path = find_cmdpath(cmd, envp);
-// 	execve(path, cmd, envp);
-// }
-
-
-
-
 //  meta-variable-name = "AUTH_TYPE" | "CONTENT_LENGTH" |
 //                            "CONTENT_TYPE" | "GATEWAY_INTERFACE" |
 //                            "PATH_INFO" | "PATH_TRANSLATED" |
