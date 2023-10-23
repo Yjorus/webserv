@@ -83,17 +83,17 @@ void	RunServer::serverLoop() {
 					sendResponse(b, _clientmap[b]);
 			}
 		}
-		disconnectTimeout();
+		disconnectTimeout(write_fds);
 	}
 }
 
-void	RunServer::disconnectTimeout() {
+void	RunServer::disconnectTimeout(fd_set &set) {
 	for (std::map<int, Client>::iterator it = _clientmap.begin(); it != _clientmap.end(); it++) {
 		if ( time(NULL) - it->second.getTime() > 15) {
 			removeClient(it->first);
 			return ;
 		}
-		if (it->second.getResponse().getCgiFlag() == 1) {
+		if (it->second.getResponse().getCgiFlag() == 1 && !FD_ISSET(it->second.getResponse().getCgiManager()._pipe_cgi_in[1], &set)) {
 			it->second.getResponse().getCgiManager().checkTimeout();
 		}
 	}
@@ -233,7 +233,6 @@ void	RunServer::handleCgiResponse(Client &client, CgiManager &manager) {
 		removeFromSet(manager._pipe_cgi_out[0], _read_fds);
 		close(manager._pipe_cgi_in[0]);
 		close(manager._pipe_cgi_out[0]);
-		client.getResponse().setCgiFlag(2);
 		client.getResponse().setCgiErrorResponse(500);
 		return ;
 	}

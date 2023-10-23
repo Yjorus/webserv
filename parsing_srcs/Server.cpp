@@ -423,7 +423,7 @@ int		Server::locationCheck(Location &location)const {
 		location.setCgiMap(temp_map);
 	}
 	else {
-		if (location.getPathL()[0] != '/')
+		if (location.getPathL()[0] != '/' || location.getPathL()[location.getPathL().size() - 1] != '/')
 			return (1);
 		if (location.getRootL().empty()) {
 			if (!this->_root.empty())
