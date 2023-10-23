@@ -77,12 +77,12 @@ void	Response::defineType()
 	std::string		ext;
 	int				i;
 
-	ext = _request.getLocation();
+	ext = this->_full_path;
 	i = ext.find('.');
 	ext.erase(0, i);
 	this->_contentType.append("Content-Type: ");
 	if (ext == ".html" || ext == ".htm")
-		this->_contentType = "text/html; charset=UTF-8";
+		this->_contentType.append("text/html; charset=UTF-8");
 	else if (ext == ".css")
 		this->_contentType.append("text/css");
 	else if (ext == ".js")
@@ -94,7 +94,7 @@ void	Response::defineType()
 	else if (ext == ".ico")
 		this->_contentType.append("image/x-icon");
 	else 
-		this->_contentType.append("text/html");
+		this->_contentType.append("text/plain");
 	this->_contentType.append("\r\n");
 }
 
@@ -473,6 +473,7 @@ void	Response::buildResponse() {
 			this->_body.insert(0, this->_listingbody);
 		}
 	}
+	this->defineType();
 	this->findLenght();
 	this->setDate();
 	this->_header.append(this->_conexion);
@@ -493,6 +494,7 @@ void	Response::setCgiErrorResponse(int a) {
 	buildErrorBody();
 	this->findLenght();
 	this->setDate();
+	this->_contentType = "content-type: text/plain\r\n";
 	this->_header.append(this->_conexion);
 	this->_status_msg = statusCodes(this->_code);
 	buildHeader();
@@ -582,7 +584,6 @@ std::string	Response::handleBoundary(std::string content, std::string boundary) 
 		}
 	}
 	content.clear();
-	std::cout << translated << std::endl;
 	return (translated);
 }
 

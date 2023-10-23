@@ -32,6 +32,11 @@ server {
 		methods GET;
 	}
 
+	location /delete/ {
+		listing on;
+		methods DELETE;
+	}
+
 #location /upload {
 #	index upload.html;
 #	methods	GET POST DELETE;
@@ -51,18 +56,13 @@ server {
 		methods GET POST DELETE;
 	}
 }
-#server {
-#	index	index.html;
-#	root	rootdir/;
-#	listen	2000;
-#	host	127.0.0.1;
-#	server_name	Wahoo.be;
-#	location /cgi-bin {
-#		index	index.html;
-#		cgi_path	a/;
-#		cgi_extensions	.py;
-#	}
-#}
+server {
+	index	test.html;
+	root	rootdir/;
+	listen	2001;
+	host	127.0.0.1;
+	server_name	Wahoo.be;
+}
 
 
 
