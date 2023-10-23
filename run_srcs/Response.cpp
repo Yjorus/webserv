@@ -467,6 +467,7 @@ void	Response::buildResponse() {
 		if (buildDirectoryListing(this->_full_path, this->_listingbody)) {
 			this->_code = 500;
 			buildErrorBody();
+			this->defineType();
 		}
 		else {
 			this->_code = 200;
