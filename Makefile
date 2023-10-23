@@ -1,7 +1,7 @@
 SRCS = main.cpp parsing_srcs/Webserv.cpp parsing_srcs/Server.cpp parsing_srcs/Location.cpp parsing_srcs/utils.cpp run_srcs/RunServer.cpp \
 		run_srcs/Client.cpp run_srcs/Request.cpp run_srcs/Response.cpp run_srcs/CgiManager.cpp
 CC = c++
-CPPFLAGS = -Werror -Wall -Wextra -std=c++98 -g
+CPPFLAGS = -Werror -Wall -Wextra -std=c++98
 OBJS = $(SRCS:.cpp=.o)
 RM = rm -rf
 NAME = webserv
