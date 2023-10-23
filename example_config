@@ -13,8 +13,12 @@ server {
 	#ooooooo
 	listing on;
 	error_pages
+	400 /error/400.html
+	403	/error/403.html
 	404	/error/404.html
-	400	folder/file2.html;
+	500	/error/500.html
+	501	/error/501.html
+	502	/error/502.html;
 	location / {#WOW
 		index index.html;
 		methods	GET POST;

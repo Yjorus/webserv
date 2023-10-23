@@ -497,7 +497,8 @@ void	Response::setCgiErrorResponse(int a) {
 	buildErrorBody();
 	this->findLenght();
 	this->setDate();
-	this->_contentType = "content-type: text/plain\r\n";
+	this->defineType();
+	// this->_contentType = "content-type: text/plain\r\n";
 	this->_header.append(this->_conexion);
 	this->_status_msg = statusCodes(this->_code);
 	buildHeader();
