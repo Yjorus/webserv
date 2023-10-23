@@ -41,7 +41,7 @@ server {
 
 	location /delete/ {
 		listing on;
-		methods GET DELETE;
+		methods GET POST DELETE;
 	}
 
 #location /upload {
