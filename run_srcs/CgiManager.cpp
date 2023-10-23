@@ -6,11 +6,13 @@ CgiManager::CgiManager() {
 	this->_exit_code = 0;
 	this->_env = NULL;
 	this->_av = NULL;
+	this->_timeout = 0;
 }
 
 CgiManager::~CgiManager() {
 	clearCgi();
 }
+
 
 void	CgiManager::executeCgi(int &code) {
 	if (this->_av == NULL || this->_av[0] == NULL || this->_av[1] == NULL) {
@@ -40,6 +42,9 @@ void	CgiManager::executeCgi(int &code) {
 	}
 	else if (this->_cgi_pid < 0) {
 		code = 500;
+	}
+	else {
+		this->_timeout = time(NULL) + 1;
 	}
 }
 
@@ -153,6 +158,14 @@ void	CgiManager::clearCgi() {
 	this->_cgi_pid = -1;
 	this->_exit_code = 0;
 	this->_cgi_env.clear();
+}
+
+void	CgiManager::checkTimeout() {
+	if (time(NULL) > this->_timeout) {
+		kill(this->_cgi_pid, SIGKILL);
+		this->_exit_code = 1;
+	}
+
 }
 
 pid_t		CgiManager::getPid() {

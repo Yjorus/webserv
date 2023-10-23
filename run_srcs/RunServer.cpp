@@ -30,11 +30,12 @@ void	RunServer::connectClient(Server &server) {
 
 	if ((client_fd  = accept(server.getFd(), (struct sockaddr *)&client_addr, &client_len)) < 0)
 		return ;
+	addToSet(client_fd, _read_fds);
 	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0) {
+		removeFromSet(client_fd, _read_fds);
 		close(client_fd);
 		return ;
 	}
-	addToSet(client_fd, _read_fds);
 	new_client.setSocketFd(client_fd);
 	if (_clientmap.count(client_fd) != 0)
 		_clientmap.erase(client_fd);
@@ -92,6 +93,9 @@ void	RunServer::disconnectTimeout() {
 			removeClient(it->first);
 			return ;
 		}
+		if (it->second.getResponse().getCgiFlag() == 1) {
+			it->second.getResponse().getCgiManager().checkTimeout();
+		}
 	}
 }
 
@@ -125,7 +129,7 @@ void	RunServer::readRequest(const int &a, Client &client) {
 	char	buffer[10000];
 	memset(buffer, 0, sizeof(buffer));
 	int		read_ret_val = 0; 
-	read_ret_val = read(a, buffer, 10000);
+	read_ret_val = recv(a, buffer, 10000, 0);
 	if (read_ret_val <= 0) {
 		removeClient(a);
 		return ;
@@ -180,7 +184,7 @@ void	RunServer::sendResponse(const int &a, Client &client) {
 	if (write_return < 0)
 		removeClient(a);
 	else if (write_return == 0 || (size_t)write_return == response.length()) {
-		if (client.getRequest().getErrorCode() || client.getRequest().keepAlive() == false || client.getResponse().getCgiFlag()) // client.getRequest().keepAlive() == false || client.getResponse().getCgiState()
+		if (client.getRequest().getErrorCode() || client.getRequest().keepAlive() == false || client.getResponse().getCgiFlag())
 				removeClient(a);
 		else {
 			removeFromSet(a, _write_fds);
@@ -239,12 +243,13 @@ void	RunServer::handleCgiResponse(Client &client, CgiManager &manager) {
 		close(manager._pipe_cgi_out[0]);
 		int status;
 		waitpid(manager.getPid(), &status, 0);
-		if (WEXITSTATUS(status) != 0)
+		if (WEXITSTATUS(status) != 0 || (WIFSIGNALED(status) && WTERMSIG(status)))
 			client.getResponse().setCgiErrorResponse(502);
 		client.getResponse().setCgiFlag(2);
 		return ;
 	}
 	else {
+		manager.checkTimeout();
 		client.refreshTime();
 		client.getResponse().updateResponse(buffer, read_ret_val);
 		memset(buffer, 0, sizeof(buffer));

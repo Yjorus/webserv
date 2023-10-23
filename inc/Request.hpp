@@ -74,7 +74,7 @@ class Request
 
 		Request();
 		~Request();
-		void	parseRequest(std::string requeststr, size_t requestsize);
+		void	parseRequest(char *requeststr, size_t requestsize);
 		bool	illegalCharLocation(int c);
 		bool	checkScopePath(std::string path);
 		bool	isIllegalToken(int c);
