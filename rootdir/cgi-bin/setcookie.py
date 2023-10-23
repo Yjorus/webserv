@@ -1,11 +1,14 @@
+
 #!/usr/bin/python3
 
+import os
 import datetime
 import cgi
-value=1
-while (value < 2):
-	{}
+from http import cookies
+
+cookie = cookies.SimpleCookie()
 print("HTTP/1.1 200 OK")
+print("Set-Cookie:UserID = User=XYZ, Password=XYZ123, Expires=Tuesday")
 print("Content-type: text/html\r\n\r\n")
 print("<html>")
 print("<head>")

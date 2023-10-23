@@ -25,6 +25,7 @@
 # include <fcntl.h>
 # include <sys/time.h>
 # include <ctime>
+# include <signal.h>
 
 # include <errno.h>
 # include <stdio.h>
