@@ -124,7 +124,7 @@ void	Response::setDate()
 	time_t		now = time(0);
 	std::string	utc;
 
-	tm* gmtm = gmtime(&now);
+	struct tm* gmtm = gmtime(&now);
 	if (gmtm != NULL)
 		utc = asctime(gmtm);
 	else
@@ -178,8 +178,7 @@ bool	Response::checkRedirection(Location location) {
 	return (0);
 }
 
-std::string Response::combinePaths(std::string str1, std::string str2, std::string str3)
-{
+std::string Response::combinePaths(std::string str1, std::string str2, std::string str3) {
     std::string	combined;
     size_t		len1;
     size_t		len2;
@@ -207,8 +206,7 @@ void	Response::combineRootPath(Location location) {
 	this->_full_path = combinePaths(location.getRootL(), this->_request.getLocation(), "");
 }
 
-bool Response::isDir(std::string path)
-{
+bool Response::isDir(std::string path) {
     struct stat file_stat;
     if (stat(path.c_str(), &file_stat) != 0)
         return (false);
@@ -473,9 +471,11 @@ void	Response::buildResponse() {
 		else {
 			this->_code = 200;
 			this->_body.insert(0, this->_listingbody);
+			this->_contentType = "Content-Type: text/html; charset=UTF-8\r\n";
 		}
 	}
-	this->defineType();
+	else
+		this->defineType();
 	this->findLenght();
 	this->setDate();
 	this->_header.append(this->_conexion);
