@@ -239,8 +239,10 @@ bool	Response::checkCgi(std::string &locationpath) {
 		this->_code = 404;
 		return (1);
 	}
-	if (checkMethod(this->_request.getMethod(), this->_server.getLocationByPath(locationpath)->getMethodsL()))
+	if (checkMethod(this->_request.getMethod(), this->_server.getLocationByPath(locationpath)->getMethodsL())) {
+		this->_cgi_flag = 0;
 		return (1);
+	}
 	this->_cgi_manager.clearCgi();
 	this->_cgi_manager.setPath(path);
 	this->_cgi_flag = 1;

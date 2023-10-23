@@ -10,8 +10,8 @@ fileitem = form['image_uploads']
 
 # Test if the file was uploaded
 if fileitem.filename:
-   open(os.getcwd() + '/rootdir/cgi-bin/../tmp/' + os.path.basename(fileitem.filename), 'wb').write(fileitem.file.read())
-   message = 'The file "' + os.path.basename(fileitem.filename) + '" was uploaded to ' + os.getcwd() + '/rootdir/cgi-bin/../tmp'
+   open(os.getcwd() + '/rootdir/tmp/' + os.path.basename(fileitem.filename), 'wb').write(fileitem.file.read())
+   message = 'The file "' + os.path.basename(fileitem.filename) + '" was uploaded to ' + os.getcwd() + '/rootdir/tmp'
 else:
    message = 'Uploading Failed'
 print("HTTP/1.1 200 OK")
