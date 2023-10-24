@@ -55,7 +55,6 @@ char	**CgiManager::mapToCStrArray() {
 		std::string	element = b->first + "=" + b->second;
 		env[a] = new char[element.size() + 1];
 		env[a] = strcpy(env[a], (const char*)element.c_str());
-		// std::cout << env[a] <<  std::endl;
 		a++;
 	}
 	env[a] = NULL;
@@ -80,7 +79,7 @@ void	CgiManager::setupEnvCgi(Request &request, std::string extension, Location l
 	else
 		path = location.getCgiMap()[extension];
 	this->_cgi_env["AUTH_TYPE"] = "Basic";
-	this->_cgi_env["CONTENT_LENGTH"] = request.getHeader("Content-Length"); //stringstream
+	this->_cgi_env["CONTENT_LENGTH"] = request.getHeader("Content-Length");
 	this->_cgi_env["CONTENT_TYPE"] = request.getHeader("Content-Type");
 	this->_cgi_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	a = findstart(this->_cgi_path, "cgi-bin/");
@@ -116,22 +115,6 @@ void	CgiManager::setupEnvCgi(Request &request, std::string extension, Location l
 	this->_av[1] = strcpy(this->_av[1], (const char*)this->_cgi_path.c_str());
 	this->_av[2] = NULL;
 }
-
-//  meta-variable-name = "AUTH_TYPE" | "CONTENT_LENGTH" |
-//                            "CONTENT_TYPE" | "GATEWAY_INTERFACE" |
-//                            "PATH_INFO" | "PATH_TRANSLATED" |
-//                            "QUERY_STRING" | "REMOTE_ADDR" |
-//                            "REMOTE_HOST" | "REMOTE_IDENT" |
-//                            "REMOTE_USER" | "REQUEST_METHOD" |
-//                            "SCRIPT_NAME" | "SERVER_NAME" |
-//                            "SERVER_PORT" | "SERVER_PROTOCOL" |
-//                            "SERVER_SOFTWARE" | scheme |
-//                            protocol-var-name | extension-var-name
-//       protocol-var-name  = ( protocol | scheme ) "_" var-name
-//       scheme             = alpha *( alpha | digit | "+" | "-" | "." )
-//       var-name           = token
-//       extension-var-name = token
-// source : rfc3875
 
 void	CgiManager::setPath(std::string &path) {
 	this->_cgi_path = path;

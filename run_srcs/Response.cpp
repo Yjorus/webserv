@@ -342,7 +342,6 @@ bool	Response::buildBody() {
 		return (1);
 	if (this->_listing == true || this->_code || this->_cgi_flag)
 		return (0);
-	// std::cout << this->_request.getMethod();
 	if (this->_request.getMethod() == "GET") {
 		std::ifstream	file(this->_full_path.c_str());
 		if (file.fail()) {
@@ -352,7 +351,6 @@ bool	Response::buildBody() {
 		this->_body = readFile(file);
 	}
 	else if (this->_request.getMethod() == "POST") {
-		// std::cout << "IN POST" << std::endl;
 		if (realFile(this->_full_path)) {
 			this->_code = 204;
 			return (0);
@@ -500,7 +498,6 @@ void	Response::setCgiErrorResponse(int a) {
 	this->findLenght();
 	this->setDate();
 	this->defineType();
-	// this->_contentType = "content-type: text/plain\r\n";
 	this->_header.append(this->_conexion);
 	this->_status_msg = statusCodes(this->_code);
 	buildHeader();

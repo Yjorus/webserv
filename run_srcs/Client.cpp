@@ -10,14 +10,23 @@ Client::Client(Server &server) {
 	_response.setServer(server);
 }
 
-// Client::Client(Client const &copy)
-// {}
+Client::Client(Client const &copy)
+{
+	*this = copy;
+}
 
 Client::~Client()
 {}
 
-// Client	&Client::operator=(Client const &assign)
-// {}
+Client	&Client::operator=(Client const &assign) {
+	if (this != &assign) {
+		this->_client_fd = assign._client_fd;
+		this->_request = assign._request;
+		this->_time = assign._time;
+		this->_response = assign._response;
+	}
+	return (*this);
+}
 
 void	Client::setSocketFd(int fd) {
 	this->_client_fd = fd;

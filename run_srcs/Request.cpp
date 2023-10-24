@@ -28,11 +28,38 @@ Request::Request() {
 Request::~Request()
 {}
 
+Request::Request(Request const &copy) {
+	*this = copy;
+}
 
-// "!" / "#" / "$" / "%" / "&" / "'" / "*"
-//                  / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
-//                  / DIGIT / ALPHA
-//                  ; any VCHAR, except delimiters
+Request	&Request::operator=(Request const &assign) {
+	if (this != &assign) {
+		this->_method = assign._method;
+		this->_error_code = assign._error_code;
+		this->_location = assign._location;
+		this->_query = assign._query;
+		this->_fragment = assign._fragment;
+		this->_host = assign._host;
+		this->_port = assign._port;
+		this->_address = assign._address;
+		this->_useragent = assign._useragent;
+		this->_buffer = assign._buffer;
+		this->_body = assign._body;
+		this->_boundary = assign._boundary;
+		this->_step = assign._step;
+		this->_hasbody = assign._hasbody;
+		this->_ischunked = assign._ischunked;
+		this->_http_major = assign._http_major;
+		this->_http_minor = assign._http_minor;
+		this->_multipart = assign._multipart;
+		this->_field_name_storage = assign._field_name_storage;
+		this->_content_length = assign._content_length;
+		this->_length_of_chunk = assign._length_of_chunk;
+		this->_methods = assign._methods;
+		this->_headers = assign._headers;
+	}
+	return (*this);
+}
 
 bool	Request::isIllegalToken(int c) {
 	if (c == '!' || (c >= 35 && c <= 39) || (c >= 94 && c <= 'z') || (c >= 'A' && c <= 'Z') \

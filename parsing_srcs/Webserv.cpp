@@ -3,14 +3,23 @@
 Webserv::Webserv(): _server_amount(0)
 {}
 
-// Webserv::Webserv(Webserv const &copy)
-// {}
+Webserv::Webserv(Webserv const &copy)
+{
+	*this = copy;
+}
 
 Webserv::~Webserv()
 {}
 
-// Webserv	&Webserv::operator=(Webserv const &assign)
-// {}
+Webserv	&Webserv::operator=(Webserv const &assign) {
+	if (this != &assign) {
+		this->_server_amount = assign._server_amount;
+		this->_server_blocks = assign._server_blocks;
+		this->_servers = assign._servers;
+		this->_connections = assign._connections;
+	}
+	return (*this);
+}
 
 void	Webserv::config(std::string conf) {
 	std::string	content;

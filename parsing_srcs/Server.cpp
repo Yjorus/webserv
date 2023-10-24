@@ -149,7 +149,7 @@ void	Server::config(std::string config) {
 		throw std::invalid_argument("Duplicate location paths");
 	setErrorPages(error_pages);
 	if (!this->_client_body_size)
-		this->_client_body_size = 10000; //PLACEHOLDER
+		this->_client_body_size = 10000;
 }
 
 void	Server::setHost(std::string host) {
@@ -350,7 +350,7 @@ void	Server::setLocation(std::string path, std::vector<std::string> data) {
 		if (this->_client_body_size)
 			location.setClientBodySizeL2(this->_client_body_size);
 		else
-			location.setClientBodySizeL2(1000); //PLACEHOLDER
+			location.setClientBodySizeL2(1000);
 	}
 	if (path != "/cgi-bin/" && location.getIndexL().empty()) {
 		location.setIndexL(this->_index);

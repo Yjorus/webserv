@@ -31,21 +31,8 @@ class CgiManager
 		int		findstart(std::string path, std::string key);
 		void	checkTimeout();
 
-		int						_pipe_cgi_in[2]; // 0 == stdin && 1 == stdout
-		int						_pipe_cgi_out[2]; // 0 == stdin && 1 == stdout
+		int						_pipe_cgi_in[2];
+		int						_pipe_cgi_out[2];
 };
 
 # endif
-
-//needed for cgi : av[0] == path av[1]
-
-//    "COMSPEC", "DOCUMENT_ROOT", "GATEWAY_INTERFACE",   
-//    "HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING",             
-//    "HTTP_ACCEPT_LANGUAGE", "HTTP_CONNECTION",         
-//    "HTTP_HOST", "HTTP_USER_AGENT", "PATH",            
-//    "QUERY_STRING", "REMOTE_ADDR", "REMOTE_PORT",      
-//    "REQUEST_METHOD", "REQUEST_URI", "SCRIPT_FILENAME",
-//    "SCRIPT_NAME", "SERVER_ADDR", "SERVER_ADMIN",      
-//    "SERVER_NAME","SERVER_PORT","SERVER_PROTOCOL",     
-//    "SERVER_SIGNATURE","SERVER_SOFTWARE"  
-// source : https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm
