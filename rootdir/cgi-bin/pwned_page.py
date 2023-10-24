@@ -11,8 +11,8 @@ arg2 = form.getvalue('password')
 arg3 = form.getvalue('checkbox')
 
 print("HTTP/1.1 200 OK")
-if arg1 != '' and arg2 == '':
-	print("Set-Cookie:webserv = user="+ arg1 +",  password=" + arg2 + ", expires=Tuesday, 31-Dec-2024 23:12:40 GMT")
+if arg1 and arg2:
+	print("Set-Cookie: webserv=user="+ arg1 +", password=" + arg2 + ", expires=Tuesday, 31-Dec-2024 23:12:40 GMT")
 print("Content-type: text/html\r\n\r\n")
 
 print("<html>")
