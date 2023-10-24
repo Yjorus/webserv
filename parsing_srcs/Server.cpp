@@ -12,20 +12,7 @@ Server::Server() {
 }
 
 Server::Server(Server const &copy) {
-	if (this != &copy) {
-		this->_client_body_size = copy._client_body_size;
-		this->_host = copy._host;
-		this->_port = copy._port;
-		this->_index = copy._index;
-		this->_server_name = copy._server_name;
-		this->_root = copy._root;
-		this->_error_pages = copy._error_pages;
-		this->_directory_listing = copy._directory_listing;
-		this->_locations = copy._locations;
-		this->_fd = copy._fd;
-		this->_address = copy._address;
-	}
-	return ;
+	*this = copy;
 }
 
 Server::~Server()
@@ -527,6 +514,10 @@ std::vector<Location>::iterator	Server::getLocationByPath(std::string path) {
 	throw std::invalid_argument(strerror(errno));
 }
 
+struct sockaddr_in	Server::getAddress() const
+{
+	return(this->_address);
+}
 
 std::ostream	&operator<<(std::ostream &o, Server const &server) {
 	o << "\nport: " << server.getPort();

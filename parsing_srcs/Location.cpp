@@ -14,20 +14,7 @@ Location::Location() {
 }
 
 Location::Location(Location const &copy) {
-	if (this != &copy) {
-		this->_path = copy._path;
-		this->_root = copy._root;
-		this->_index = copy._index;
-		this->_redirection = copy._redirection;
-		this->_proxy = copy._proxy;
-		this->_listing = copy._listing;
-		this->_client_body_size = copy._client_body_size;
-		this->_cgi_extensions = copy._cgi_extensions;
-		this->_cgi_paths = copy._cgi_paths;
-		this->_methods = copy._methods;
-		this->_cgimap = copy._cgimap;
-	}
-	return ;
+	*this = copy;
 }
 
 Location::~Location()

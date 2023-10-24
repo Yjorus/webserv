@@ -24,14 +24,12 @@ class Client
 
 		void	setSocketFd(int fd);
 		void	setServer(Server &server);
-
 		int			getSocketFd();
 		Request		&getRequest();
 		Response	&getResponse();
 		void		refreshTime();
 		time_t		getTime();
 		Server		getServer();
-
 		void		clearClient();
 };
 
