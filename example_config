@@ -55,9 +55,9 @@ server {
 server {
 	index	test.html;
 	root	rootdir/;
-	listen	2001;
+	listen	2000;
 	host	127.0.0.1;
-	server_name	theServe.com;
+	server_name	theserver.com;
 }
 
 

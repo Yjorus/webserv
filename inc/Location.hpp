@@ -23,7 +23,7 @@ class Location
 		Location(Location const &copy);
 		~Location();
 
-		Location	&operator=(Location const &copy);
+		Location	&operator=(Location const &assign);
 
 		void	setPathL(std::string path);
 		void	setRootL(std::string path);

@@ -20,17 +20,17 @@ Server::~Server()
 
 Server	&Server::operator=(Server const &assign) {
 	if (this != &assign) {
-		this->_client_body_size = assign.getClientBodySize();
-		this->_host = assign.getHost();
-		this->_port = assign.getPort();
-		this->_index = assign.getIndex();
-		this->_server_name = assign.getServerName();
-		this->_root = assign.getRoot();
-		this->_error_pages = assign.getErrorPages();
-		this->_directory_listing = assign.getDirectoryListing();
-		this->_locations = assign.getLocation();
-		this->_fd = assign.getFd();
-		this->_address = assign.getAddress();
+		this->_client_body_size = assign._client_body_size;
+		this->_host = assign._host;
+		this->_port = assign._port;
+		this->_index = assign._index;
+		this->_server_name = assign._server_name;
+		this->_root = assign._root;
+		this->_error_pages = assign._error_pages;
+		this->_directory_listing = assign._directory_listing;
+		this->_locations = assign._locations;
+		this->_fd = assign._fd;
+		this->_address = assign._address;
 	}
 	return (*this);
 }
@@ -337,7 +337,7 @@ void	Server::setLocation(std::string path, std::vector<std::string> data) {
 		if (this->_client_body_size)
 			location.setClientBodySizeL2(this->_client_body_size);
 		else
-			location.setClientBodySizeL2(1000); //PLACEHOLDER
+			location.setClientBodySizeL2(1000);
 	}
 	if (path != "/cgi-bin/" && location.getIndexL().empty()) {
 		location.setIndexL(this->_index);

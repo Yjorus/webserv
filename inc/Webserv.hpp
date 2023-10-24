@@ -10,11 +10,13 @@ class Webserv
 		std::vector<std::string> _server_blocks;
 		std::vector<Server>	_servers;
 		std::map<int, int>		_connections;
+		
 	public:
 		Webserv();
 		Webserv(Webserv const &copy);
-		Webserv	&operator=(Webserv const &other);
 		~Webserv();
+
+		Webserv	&operator=(Webserv const &assign);
 
 		void		config(std::string conf);
 		std::string	readContent(std::string path);

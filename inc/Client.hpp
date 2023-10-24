@@ -17,7 +17,11 @@ class Client
 		
 		Client();
 		Client(Server &server);
+		Client(Client const &copy);
 		~Client();
+
+		Client	&operator=(Client const &assign);
+
 		void	setSocketFd(int fd);
 		void	setServer(Server &server);
 		int			getSocketFd();

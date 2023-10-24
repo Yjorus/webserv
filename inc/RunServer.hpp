@@ -18,6 +18,8 @@ class	RunServer
 	public:
 		RunServer();
 		~RunServer();
+		RunServer(RunServer const &copy);
+		RunServer	&operator=(RunServer const &assign);
 
 		void	setupServers(std::vector<Server> servers);
 		void	connectClient(Server &server);

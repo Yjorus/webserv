@@ -74,6 +74,8 @@ class Request
 
 		Request();
 		~Request();
+		Request(Request const &copy);
+		Request	&operator=(Request const &assign);
 		void	parseRequest(char *requeststr, size_t requestsize);
 		bool	illegalCharLocation(int c);
 		bool	checkScopePath(std::string path);

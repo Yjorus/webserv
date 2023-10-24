@@ -6,6 +6,22 @@ RunServer::RunServer()
 RunServer::~RunServer()
 {}
 
+RunServer::RunServer(RunServer const &copy) {
+	*this = copy;
+}
+
+RunServer	&RunServer::operator=(RunServer const &assign) {
+	if (this != &assign) {
+		this->_read_fds = assign._read_fds;
+		this->_write_fds = assign._write_fds;
+		this->_highest_fd = assign._highest_fd;
+		this->_servers = assign._servers;
+		this->_clientmap = assign._clientmap;
+		this->_servermap = assign._servermap;
+	}
+	return (*this);
+}
+
 void	RunServer::setupServers(std::vector<Server> servers) {
 	_servers = servers;
 	bool	a = false;

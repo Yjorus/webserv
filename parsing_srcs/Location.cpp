@@ -20,19 +20,19 @@ Location::Location(Location const &copy) {
 Location::~Location()
 {}
 
-Location	&Location::operator=(Location const &copy) {
-	if (this != &copy) {
-		this->_path = copy.getPathL();
-		this->_root = copy.getRootL();
-		this->_index = copy.getIndexL();
-		this->_redirection = copy.getRedirectionL();
-		this->_proxy = copy.getProxyL();
-		this->_listing = copy.getListingL();
-		this->_client_body_size = copy.getClientBodySizeL();
-		this->_cgi_extensions = copy.getCgiExtensionsL();
-		this->_cgi_paths = copy.getCgiPathsL();
-		this->_methods = copy.getMethodsL();
-		this->_cgimap = copy.getCgiMap();
+Location	&Location::operator=(Location const &assign) {
+	if (this != &assign) {
+		this->_path = assign._path;
+		this->_root = assign._root;
+		this->_index = assign._index;
+		this->_redirection = assign._redirection;
+		this->_proxy = assign._proxy;
+		this->_listing = assign._listing;
+		this->_client_body_size = assign._client_body_size;
+		this->_cgi_extensions = assign._cgi_extensions;
+		this->_cgi_paths = assign._cgi_paths;
+		this->_methods = assign._methods;
+		this->_cgimap = assign._cgimap;
 	}
 	return (*this);
 }
