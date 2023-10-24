@@ -109,10 +109,12 @@ void	Request::addToHeaders(std::string &str1, std::string &str2)
 
 void	Request::checkHeaders() {
 	if (_headers.count("Content-Length")) {
-		_hasbody = true;
-		std::stringstream ss;
-		ss << _headers["Content-Length"];
-		ss >> _content_length;
+		if (_headers["Content-Length"] != "0") {
+			_hasbody = true;
+			std::stringstream ss;
+			ss << _headers["Content-Length"];
+			ss >> _content_length;
+		}
 	}
 	if (_headers.count("Transfer-Encoding")) {
 		_hasbody = true;
@@ -334,8 +336,9 @@ void	Request::parseRequest(char *requeststr, size_t requestsize) {
 				continue ;
 			}
 			case determine_field: {
-				if (parsechar == '\r')
+				if (parsechar == '\r') {
 					_step = end_of_field;
+				}
 				else if (!isIllegalToken(parsechar))
 					_step = determine_field_name;
 				else {
