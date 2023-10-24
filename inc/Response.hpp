@@ -20,7 +20,6 @@
 
 class Response
 {
-		// void		findStatusMsg();
 		void		buildHeader();
 		void		defineType();
 		void		setConnection();

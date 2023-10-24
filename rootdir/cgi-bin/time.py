@@ -36,11 +36,6 @@ print("</nav>")
 print("</div>")
 print("</header>")
 
-# print("<h1 style=\"margin-top:30%; font-size: 3vw\";>" + arg1 + "<h1>")
-
-# print("<h1 style=\"color: red; border-bottom:0.1em solid red; font-size: 5vw;\"> You have been COMPROMISED</h1>")
-# print("<h2>Change your passwords ASAP</h2>")
-
 print(datetime.datetime.strftime(datetime.datetime.now(), "<h1 styel>  %H:%M:%S </h1>"))
 
 print("</body>")

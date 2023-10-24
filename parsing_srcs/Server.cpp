@@ -12,20 +12,7 @@ Server::Server() {
 }
 
 Server::Server(Server const &copy) {
-	if (this != &copy) {
-		this->_client_body_size = copy._client_body_size;
-		this->_host = copy._host;
-		this->_port = copy._port;
-		this->_index = copy._index;
-		this->_server_name = copy._server_name;
-		this->_root = copy._root;
-		this->_error_pages = copy._error_pages;
-		this->_directory_listing = copy._directory_listing;
-		this->_locations = copy._locations;
-		this->_fd = copy._fd;
-		this->_address = copy._address;
-	}
-	return ;
+	*this = copy;
 }
 
 Server::~Server()
@@ -33,17 +20,17 @@ Server::~Server()
 
 Server	&Server::operator=(Server const &assign) {
 	if (this != &assign) {
-		this->_client_body_size = assign._client_body_size;
-		this->_host = assign._host;
-		this->_port = assign._port;
-		this->_index = assign._index;
-		this->_server_name = assign._server_name;
-		this->_root = assign._root;
-		this->_error_pages = assign._error_pages;
-		this->_directory_listing = assign._directory_listing;
-		this->_locations = assign._locations;
-		this->_fd = assign._fd;
-		this->_address = assign._address;
+		this->_client_body_size = assign.getClientBodySize();
+		this->_host = assign.getHost();
+		this->_port = assign.getPort();
+		this->_index = assign.getIndex();
+		this->_server_name = assign.getServerName();
+		this->_root = assign.getRoot();
+		this->_error_pages = assign.getErrorPages();
+		this->_directory_listing = assign.getDirectoryListing();
+		this->_locations = assign.getLocation();
+		this->_fd = assign.getFd();
+		this->_address = assign.getAddress();
 	}
 	return (*this);
 }
@@ -149,7 +136,7 @@ void	Server::config(std::string config) {
 		throw std::invalid_argument("Duplicate location paths");
 	setErrorPages(error_pages);
 	if (!this->_client_body_size)
-		this->_client_body_size = 10000; //PLACEHOLDER
+		this->_client_body_size = 10000;
 }
 
 void	Server::setHost(std::string host) {
@@ -527,6 +514,10 @@ std::vector<Location>::iterator	Server::getLocationByPath(std::string path) {
 	throw std::invalid_argument(strerror(errno));
 }
 
+struct sockaddr_in	Server::getAddress() const
+{
+	return(this->_address);
+}
 
 std::ostream	&operator<<(std::ostream &o, Server const &server) {
 	o << "\nport: " << server.getPort();

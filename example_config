@@ -1,8 +1,3 @@
-
-
-#smmfmk
-
-
 server {
 	listen 2000;
 	server_name	Wahoo.com;
@@ -10,7 +5,6 @@ server {
 	host	127.0.0.1;
 	index	index.html;
 	client_max_body_size 1000000000;
-	#ooooooo
 	listing on;
 	error_pages
 	400 /error/400.html
@@ -20,12 +14,12 @@ server {
 	500	/error/500.html
 	501	/error/501.html
 	502	/error/502.html;
-	location / {#WOW
+	location / {
 		index index.html;
 		methods	GET POST;
 	}
 
-	location /test/ {#WOW
+	location /test/ {
 		listing on;
 		index test.html;
 		methods	GET POST;
@@ -43,11 +37,6 @@ server {
 		listing on;
 		methods GET POST DELETE;
 	}
-
-#location /upload {
-#	index upload.html;
-#	methods	GET POST DELETE;
-#}
 
 	location /cgi-bin/ {
 		root:	rootdir/;
@@ -68,7 +57,7 @@ server {
 	root	rootdir/;
 	listen	2001;
 	host	127.0.0.1;
-	server_name	Wahoo.be;
+	server_name	theServe.com;
 }
 
 

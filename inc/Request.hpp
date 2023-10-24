@@ -44,16 +44,16 @@ enum ParseStep
 
 class Request
 {
-		int			_method; // 0=GET 1=POST 2=DELETE
+		int			_method;
 		size_t		_methodindex;
 		int			_error_code;
-		std::string	_location; // example /index.html
+		std::string	_location;
 		std::string _query;
 		std::string _fragment;
-		std::string	_host; // example 127.0.0.1
+		std::string	_host;
 		std::string _port;
 		std::string	_address;
-		std::string	_useragent; // example curl
+		std::string	_useragent;
 		std::string	_buffer;
 		std::string	_body;
 		std::string	_boundary;

@@ -1,13 +1,13 @@
 /* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Response.cpp                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: gscarama <gscarama@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/02 12:51:12 by gscarama          #+#    #+#             */
-/*   Updated: 2023/10/23mmit 15:20:12 by gscarama         ###   ########.fr       */
-/*                                                                            */
+/*  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	*/
+/*  	  	  	  	  	  	  	  	  	  	  	  	  	  	:::  	  ::::::::   */
+/*   Response.cpp  	  	  	  	  	  	  	  	  	   :+:  	  :+:  	:+:   */
+/*  	  	  	  	  	  	  	  	  	  	  	  	  	+:+ +:+  	  	 +:+  	 */
+/*   By: gscarama <gscarama@student.42.fr>  	  	  +#+  +:+  	   +#+  	  	*/
+/*  	  	  	  	  	  	  	  	  	  	  	  	+#+#+#+#+#+   +#+  	  	   */
+/*   Created: 2023/10/02 12:51:12 by gscarama  	  	  #+#  	#+#  	  	  	 */
+/*   Updated: 2023/10/23mmit 15:20:12 by gscarama  	  	 ###   ########.fr  	   */
+/*  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	*/
 /* ************************************************************************** */
 
 #include "../inc/Response.hpp"
@@ -112,11 +112,7 @@ void	Response::findLenght()
 
 void	Response::setServer()
 {
-	if (_request.getServerName() != "")
-		this->_host = _request.getServerName();
-	else
-		this->_host = "LulzSec Server";
-	this->_host.append("\r\n");
+	this->_host = "Server: LulzSec Server\r\n";
 }
 
 void	Response::setDate()
@@ -179,22 +175,22 @@ bool	Response::checkRedirection(Location location) {
 }
 
 std::string Response::combinePaths(std::string str1, std::string str2, std::string str3) {
-    std::string	combined;
-    size_t		len1;
-    size_t		len2;
+	std::string	combined;
+	size_t		len1;
+	size_t		len2;
 
-    len1 = str1.length();
-    len2 = str2.length();
-    if (str1[len1 - 1] == '/' && (!str2.empty() && str2[0] == '/') )
-        str2.erase(0, 1);
-    if (str1[len1 - 1] != '/' && (!str2.empty() && str2[0] != '/'))
-        str1.insert(str1.end(), '/');
-    if (str2[len2 - 1] == '/' && (!str3.empty() && str3[0] == '/') )
-        str3.erase(0, 1);
-    if (str2[len2 - 1] != '/' && (!str3.empty() && str3[0] != '/'))
-        str2.insert(str1.end(), '/');
-    combined = str1 + str2 + str3;
-    return (combined);
+	len1 = str1.length();
+	len2 = str2.length();
+	if (str1[len1 - 1] == '/' && (!str2.empty() && str2[0] == '/') )
+		str2.erase(0, 1);
+	if (str1[len1 - 1] != '/' && (!str2.empty() && str2[0] != '/'))
+		str1.insert(str1.end(), '/');
+	if (str2[len2 - 1] == '/' && (!str3.empty() && str3[0] == '/') )
+		str3.erase(0, 1);
+	if (str2[len2 - 1] != '/' && (!str3.empty() && str3[0] != '/'))
+		str2.insert(str1.end(), '/');
+	combined = str1 + str2 + str3;
+	return (combined);
 }
 
 void	Response::replaceProxy(Location location) {
@@ -207,16 +203,16 @@ void	Response::combineRootPath(Location location) {
 }
 
 bool Response::isDir(std::string path) {
-    struct stat file_stat;
-    if (stat(path.c_str(), &file_stat) != 0)
-        return (false);
+	struct stat file_stat;
+	if (stat(path.c_str(), &file_stat) != 0)
+		return (false);
 
-    return (S_ISDIR(file_stat.st_mode));
+	return (S_ISDIR(file_stat.st_mode));
 }
 
 bool Response::realFile (const std::string& f) {
-    std::ifstream file(f.c_str());
-    return (file.good());
+	std::ifstream file(f.c_str());
+	return (file.good());
 }
 
 bool	Response::checkCgi(std::string &locationpath) {
@@ -321,13 +317,13 @@ bool	Response::checkLocation() {
 				return (1);
 			}
 			if (isDir(this->_full_path))
-            {
-                this->_location = combinePaths(this->_request.getLocation(), this->_server.getIndex(), "");
-                if(this->_location[this->_location.length() - 1] != '/')
-                    this->_location.insert(this->_location.end(), '/');
+			{
+				this->_location = combinePaths(this->_request.getLocation(), this->_server.getIndex(), "");
+				if(this->_location[this->_location.length() - 1] != '/')
+					this->_location.insert(this->_location.end(), '/');
 				this->_code = 301;
-                return (1);
-            }
+				return (1);
+			}
 		}
 	}
 	return (0);
@@ -342,7 +338,6 @@ bool	Response::buildBody() {
 		return (1);
 	if (this->_listing == true || this->_code || this->_cgi_flag)
 		return (0);
-	// std::cout << this->_request.getMethod();
 	if (this->_request.getMethod() == "GET") {
 		std::ifstream	file(this->_full_path.c_str());
 		if (file.fail()) {
@@ -352,7 +347,6 @@ bool	Response::buildBody() {
 		this->_body = readFile(file);
 	}
 	else if (this->_request.getMethod() == "POST") {
-		// std::cout << "IN POST" << std::endl;
 		if (realFile(this->_full_path)) {
 			this->_code = 204;
 			return (0);
@@ -425,38 +419,38 @@ int	Response::buildDirectoryListing(std::string path, std::string &listingbody) 
 		return (1);
 	listingbody.append("<html>\n<head>\n<title> Index of" + path + "</title>\n</head>\n<body >\n<h1> Index of " + path + "</h1>\n");
 	listingbody.append("<table style=\"width:80%; font-size: 20px; border: 2px solid black; border-collapse: collapse\">\n");
-    listingbody.append("<th style=\"text-align:left; background-color: lightblue; border: 1px solid black\"> File Name </th>\n");
+	listingbody.append("<th style=\"text-align:left; background-color: lightblue; border: 1px solid black\"> File Name </th>\n");
 	listingbody.append("<th style=\"text-align:left; background-color: lightblue; border: 1px solid black\"> File Size </th>\n");
-    listingbody.append("<th style=\"text-align:left; background-color: lightblue; border: 1px solid black\"> Last Modification  </th>\n");
+	listingbody.append("<th style=\"text-align:left; background-color: lightblue; border: 1px solid black\"> Last Modification  </th>\n");
 
-    struct stat file_stat;
-    std::string file_path;
+	struct stat file_stat;
+	std::string file_path;
 
-    while((item = readdir(dir)) != NULL)
-    {
-        if(strcmp(item->d_name, ".") == 0)
-            continue;
-        file_path = path + item->d_name;
-        stat(file_path.c_str() , &file_stat);
-        listingbody.append("<tr>\n<td style = \"border: 1px solid black\">\n<a href=\"");
-        listingbody.append(item->d_name);
-        if (S_ISDIR(file_stat.st_mode))
-            listingbody.append("/");
-        listingbody.append("\">");
-        listingbody.append(item->d_name);
-        if (S_ISDIR(file_stat.st_mode))
-            listingbody.append("/");
-        listingbody.append("</a>\n</td>\n<td style = \"border: 1px solid black\">\n");
-        if (!S_ISDIR(file_stat.st_mode))
-            listingbody.append(to_String(file_stat.st_size));
+	while((item = readdir(dir)) != NULL)
+	{
+		if(strcmp(item->d_name, ".") == 0)
+			continue;
+		file_path = path + item->d_name;
+		stat(file_path.c_str() , &file_stat);
+		listingbody.append("<tr>\n<td style = \"border: 1px solid black\">\n<a href=\"");
+		listingbody.append(item->d_name);
+		if (S_ISDIR(file_stat.st_mode))
+			listingbody.append("/");
+		listingbody.append("\">");
+		listingbody.append(item->d_name);
+		if (S_ISDIR(file_stat.st_mode))
+			listingbody.append("/");
+		listingbody.append("</a>\n</td>\n<td style = \"border: 1px solid black\">\n");
+		if (!S_ISDIR(file_stat.st_mode))
+			listingbody.append(to_String(file_stat.st_size));
 		else
 			listingbody.append("Directory");
 		listingbody.append("</td>\n<td style = \"border: 1px solid black\">\n");
 		listingbody.append(ctime(&file_stat.st_mtime));
-        listingbody.append("</td>\n</tr>\n");
-    }
-    listingbody.append("</table>\n</body>\n</html>\n");
-    return (0);
+		listingbody.append("</td>\n</tr>\n");
+	}
+	listingbody.append("</table>\n</body>\n</html>\n");
+	return (0);
 }
 
 void	Response::buildResponse() {
@@ -480,12 +474,14 @@ void	Response::buildResponse() {
 	else
 		this->defineType();
 	this->findLenght();
+	this->setServer();
 	this->setDate();
 	this->_header.append(this->_conexion);
 	this->_status_msg = statusCodes(this->_code);
 	buildHeader();
 	this->_header.append(this->_conexion);
 	this->_header.append(this->_contentType);
+	this->_header.append(this->_host);
 	this->_header.append(this->_date);
 	this->_header.append(this->_content_lenght);
 	this->_header.append("\r\n");
@@ -498,14 +494,15 @@ void	Response::setCgiErrorResponse(int a) {
 	this->_body = "";
 	buildErrorBody();
 	this->findLenght();
+	this->setServer();
 	this->setDate();
 	this->defineType();
-	// this->_contentType = "content-type: text/plain\r\n";
 	this->_header.append(this->_conexion);
 	this->_status_msg = statusCodes(this->_code);
 	buildHeader();
 	this->_header.append(this->_conexion);
 	this->_header.append(this->_contentType);
+	this->_header.append(this->_host);
 	this->_header.append(this->_date);
 	this->_header.append(this->_content_lenght);
 	this->_header.append("\r\n");

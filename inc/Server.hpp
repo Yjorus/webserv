@@ -56,6 +56,7 @@ class Server
 		int							getFd()const;
 		std::vector<Location>		getLocation()const;
 		std::vector<Location>::iterator					getLocationByPath(std::string path);
+		struct sockaddr_in			getAddress() const;
 
 		void	prepareServer();
 

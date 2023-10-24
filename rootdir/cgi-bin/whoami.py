@@ -49,7 +49,6 @@ else:
 print("</body>")
 print("</html>")
 
-# Get data from fields
 cookie = cookies.SimpleCookie()
 if 'HTTP_COOKIE' in os.environ:
 	cookie = os.environ["HTTP_COOKIE"]
